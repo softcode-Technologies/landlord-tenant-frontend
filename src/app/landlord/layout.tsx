@@ -1,8 +1,11 @@
 "use client"
 
+import { useEffect } from "react"
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar"
 import { AuthGuard } from "@/components/layout/auth-guard"
 import { useUnreadCount } from "@/lib/hooks/use-unread-count"
+import { useAuthStore } from "@/lib/store/auth"
+import { authApi } from "@/lib/api/auth"
 import {
   LayoutDashboard,
   Building2,
@@ -15,10 +18,16 @@ import {
   Calendar,
   Bell,
   User,
+  ShieldCheck,
 } from "lucide-react"
 
 function LandlordNav({ children }: { children: React.ReactNode }) {
   const unreadCount = useUnreadCount()
+  const { setUser } = useAuthStore()
+
+  useEffect(() => {
+    authApi.me().then((res) => setUser(res.data)).catch(() => {})
+  }, [])
 
   const navItems = [
     { label: "Dashboard", href: "/landlord", icon: LayoutDashboard },
@@ -36,6 +45,7 @@ function LandlordNav({ children }: { children: React.ReactNode }) {
       icon: Bell,
       badge: unreadCount > 0 ? unreadCount : undefined,
     },
+    { label: "Verification", href: "/landlord/kyc", icon: ShieldCheck },
     { label: "Profile", href: "/landlord/profile", icon: User },
   ]
 

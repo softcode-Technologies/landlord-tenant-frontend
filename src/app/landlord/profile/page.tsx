@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/store/auth"
 import { userApi } from "@/lib/api/user"
 import { authApi } from "@/lib/api/auth"
@@ -13,13 +14,12 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getInitials, extractApiError } from "@/lib/utils"
 import {
-  User, Building2, Banknote, Shield, CheckCircle2, AlertCircle, Loader2, ShieldCheck, MessageCircle,
+  User, Building2, Banknote, Shield, CheckCircle2, Loader2, MessageCircle,
 } from "lucide-react"
 import { toast } from "sonner"
 
-type KycMethod = "nin" | "bvn" | "document"
-
 export default function LandlordProfilePage() {
+  const router = useRouter()
   const { user, setUser } = useAuthStore()
   const lp = user?.landlordProfile
 
@@ -30,10 +30,6 @@ export default function LandlordProfilePage() {
   const [bio, setBio]                       = useState(lp?.bio ?? "")
   const [bankName, setBankName]             = useState(lp?.bankName ?? "")
   const [bankAccountNumber, setBankAccountNumber] = useState(lp?.bankAccountNumber ?? "")
-  const [kycMethod, setKycMethod]           = useState<KycMethod>("nin")
-  const [ninValue, setNinValue]             = useState("")
-  const [bvnValue, setBvnValue]             = useState("")
-  const [kycUrl, setKycUrl]                 = useState("")
 
   const profileMutation = useMutation({
     mutationFn: () => userApi.updateProfile({ firstName, lastName, email }),
@@ -65,43 +61,10 @@ export default function LandlordProfilePage() {
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to update WhatsApp preference.")),
   })
 
-  const kycMutation = useMutation({
-    mutationFn: () => {
-      if (kycMethod === "nin") return userApi.submitKyc({ method: "nin", nin: ninValue })
-      if (kycMethod === "bvn") return userApi.submitKyc({ method: "bvn", bvn: bvnValue })
-      return userApi.submitKyc({ method: "document", kycDocumentUrl: kycUrl })
-    },
-    onSuccess: async (res) => {
-      const status = res.data?.kycStatus
-      if (status === "approved") {
-        toast.success("Identity verified! Your profile is now marked as verified.")
-      } else if (status === "rejected") {
-        toast.error(res.data?.reason ?? "Verification failed. Please try again.")
-      } else {
-        toast.success("KYC submitted. We'll review it within 24 hours.")
-      }
-      const fresh = await authApi.me()
-      setUser(fresh.data)
-      setNinValue(""); setBvnValue(""); setKycUrl("")
-    },
-    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to submit KYC.")),
-  })
-
   if (!user) return null
 
-  const fullName   = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "Landlord"
-  const kycStatus  = user.kycStatus ?? "none"
-
-  const KYC_CONFIG: Record<string, {
-    label: string; icon: typeof AlertCircle; color: string; bg: string
-    badgeVariant: "warning" | "success" | "destructive" | "secondary"
-  }> = {
-    none:     { label: "Not Verified",   icon: AlertCircle,   color: "text-slate-500",  bg: "bg-slate-50",  badgeVariant: "secondary"   },
-    pending:  { label: "Under Review",   icon: AlertCircle,   color: "text-orange-600", bg: "bg-orange-50", badgeVariant: "warning"     },
-    approved: { label: "ID Verified",    icon: ShieldCheck,   color: "text-green-600",  bg: "bg-green-50",  badgeVariant: "success"     },
-    rejected: { label: "Rejected",       icon: AlertCircle,   color: "text-red-600",    bg: "bg-red-50",    badgeVariant: "destructive" },
-  }
-  const kycConfig = KYC_CONFIG[kycStatus] ?? KYC_CONFIG["none"]
+  const fullName  = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "Landlord"
+  const kycStatus = user.kycStatus ?? "none"
 
   return (
     <div className="space-y-6">
@@ -150,107 +113,26 @@ export default function LandlordProfilePage() {
             </CardContent>
           </Card>
 
-          {/* KYC */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-[#1a3c5e]" />
-                <CardTitle>Identity Verification</CardTitle>
+          {/* KYC shortcut */}
+          {kycStatus !== "approved" && (
+            <button
+              onClick={() => router.push("/landlord/kyc")}
+              className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-[#1a3c5e] hover:bg-[#1a3c5e]/5 transition-colors text-left"
+            >
+              <Shield className="h-5 w-5 text-[#1a3c5e] shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-900">Identity Verification</p>
+                <p className="text-xs text-slate-500 truncate">
+                  {kycStatus === "pending"
+                    ? "Under review — we'll notify you shortly"
+                    : kycStatus === "rejected"
+                    ? "Rejected — tap to resubmit"
+                    : "Not verified — tap to get started"}
+                </p>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className={`flex items-start gap-3 p-3 rounded-xl ${kycConfig.bg}`}>
-                <kycConfig.icon className={`h-5 w-5 mt-0.5 shrink-0 ${kycConfig.color}`} />
-                <div>
-                  <p className={`font-semibold text-sm ${kycConfig.color}`}>{kycConfig.label}</p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {kycStatus === "approved"
-                      ? "Your identity is verified. Tenants see a verified badge on your profile."
-                      : kycStatus === "pending"
-                      ? "Your submission is under review. We'll notify you within 24 hours."
-                      : kycStatus === "rejected"
-                      ? (user.kycRejectReason ?? "Verification failed. Please resubmit.")
-                      : "Verify your identity to earn tenant trust and unlock all platform features."}
-                  </p>
-                </div>
-              </div>
-
-              {(kycStatus === "none" || kycStatus === "rejected") && (
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-slate-500 mb-2 block">Verification method</Label>
-                    <div className="flex gap-2">
-                      {(["nin", "bvn", "document"] as KycMethod[]).map((m) => (
-                        <button
-                          key={m}
-                          onClick={() => setKycMethod(m)}
-                          className={`flex-1 py-2 rounded-lg text-xs font-semibold border transition-colors ${
-                            kycMethod === m
-                              ? "bg-[#1a3c5e] text-white border-[#1a3c5e]"
-                              : "bg-white text-slate-600 border-slate-200 hover:border-[#1a3c5e]"
-                          }`}
-                        >
-                          {m === "nin" ? "NIN" : m === "bvn" ? "BVN" : "Document"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {kycMethod === "nin" && (
-                    <div className="space-y-1.5">
-                      <Label>National Identification Number (NIN)</Label>
-                      <Input
-                        value={ninValue}
-                        onChange={(e) => setNinValue(e.target.value.replace(/\D/g, "").slice(0, 11))}
-                        placeholder="12345678901"
-                        maxLength={11}
-                      />
-                      <p className="text-xs text-slate-400">11-digit number on your NIN slip, voter card, or national ID</p>
-                    </div>
-                  )}
-
-                  {kycMethod === "bvn" && (
-                    <div className="space-y-1.5">
-                      <Label>Bank Verification Number (BVN)</Label>
-                      <Input
-                        value={bvnValue}
-                        onChange={(e) => setBvnValue(e.target.value.replace(/\D/g, "").slice(0, 11))}
-                        placeholder="12345678901"
-                        maxLength={11}
-                      />
-                      <p className="text-xs text-slate-400">Dial *565*0# on any network to retrieve your BVN</p>
-                    </div>
-                  )}
-
-                  {kycMethod === "document" && (
-                    <div className="space-y-1.5">
-                      <Label>Government ID Document URL</Label>
-                      <Input
-                        value={kycUrl}
-                        onChange={(e) => setKycUrl(e.target.value)}
-                        placeholder="https://drive.google.com/..."
-                      />
-                      <p className="text-xs text-slate-400">Upload your ID to Google Drive or Dropbox and paste the shareable link</p>
-                    </div>
-                  )}
-
-                  <Button
-                    className="w-full gap-2"
-                    onClick={() => kycMutation.mutate()}
-                    disabled={
-                      kycMutation.isPending ||
-                      (kycMethod === "nin" && ninValue.length !== 11) ||
-                      (kycMethod === "bvn" && bvnValue.length !== 11) ||
-                      (kycMethod === "document" && !kycUrl)
-                    }
-                  >
-                    {kycMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                    {kycMethod === "document" ? "Submit for Review" : "Verify Identity"}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              <span className="text-xs text-[#1a3c5e] font-medium shrink-0">Manage →</span>
+            </button>
+          )}
         </div>
 
         <div className="lg:col-span-2 space-y-6">

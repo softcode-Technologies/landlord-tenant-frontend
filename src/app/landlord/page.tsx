@@ -13,16 +13,20 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatNaira, formatNairaAmount, formatDate, getStatusVariant } from "@/lib/utils"
 import {
-  Building2, Users, Wrench, TrendingUp, ArrowRight, DollarSign, Plus
+  Building2, Users, Wrench, TrendingUp, ArrowRight, DollarSign, Plus,
+  ShieldAlert, ShieldX, Clock,
 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip
 } from "recharts"
 
 export default function LandlordDashboard() {
   const { user } = useAuthStore()
+  const router = useRouter()
   const firstName = user?.firstName ?? "Landlord"
+  const kycStatus = user?.kycStatus ?? "none"
 
   const { data: analyticsData } = useQuery({
     queryKey: ["landlord-analytics"],
@@ -78,6 +82,55 @@ export default function LandlordDashboard() {
           </Link>
         </div>
       </div>
+
+      {/* KYC banner */}
+      {kycStatus === "none" && (
+        <div className="rounded-xl border-l-4 border-amber-500 bg-amber-50 p-4 flex items-start gap-3">
+          <ShieldAlert className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-amber-900 text-sm">Verify Your Identity</p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              Complete identity verification to earn tenant trust, get a verified badge, and unlock all features.
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/landlord/kyc")}
+            className="shrink-0 text-xs font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            Verify Now →
+          </button>
+        </div>
+      )}
+
+      {kycStatus === "pending" && (
+        <div className="rounded-xl bg-blue-50 border border-blue-200 p-4 flex items-start gap-3">
+          <Clock className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold text-blue-900 text-sm">Verification Under Review</p>
+            <p className="text-xs text-blue-700 mt-0.5">
+              We received your submission and will notify you within 24 hours.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {kycStatus === "rejected" && (
+        <div className="rounded-xl border-l-4 border-red-500 bg-red-50 p-4 flex items-start gap-3">
+          <ShieldX className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-red-900 text-sm">Verification Rejected</p>
+            <p className="text-xs text-red-700 mt-0.5">
+              {user?.kycRejectReason ?? "Your submission was rejected. Please resubmit."}
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/landlord/kyc")}
+            className="shrink-0 text-xs font-semibold text-red-700 bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            Resubmit →
+          </button>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
