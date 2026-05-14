@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { inspectionsApi } from "@/lib/api/inspections"
-import { propertiesApi } from "@/lib/api/properties"
+import { listingsApi } from "@/lib/api/listings"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -25,33 +25,18 @@ export default function LandlordInspectionsPage() {
   const [inviteListingId, setInviteListingId] = useState("")
   const [invitePhone, setInvitePhone] = useState("")
 
-  const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
-    queryKey: ["properties"],
-    queryFn: () => propertiesApi.getProperties(),
+  const { data: schedulesRaw, isLoading } = useQuery({
+    queryKey: ["lister-schedules-all"],
+    queryFn: () => inspectionsApi.getAllListerSchedules(),
   })
 
-  const properties = propertiesData?.data ?? []
-  const allListings = properties.flatMap((p) =>
-    p.units?.filter((u) => u.listing).map((u) => ({
-      id: u.listing!.id,
-      title: u.listing!.title ?? u.unitNumber,
-    })) ?? []
-  )
-  const allListingIds = allListings.map((l) => l.id)
-
-  const { data: schedulesRaw, isLoading: schedulesLoading } = useQuery({
-    queryKey: ["lister-schedules-all", allListingIds],
-    queryFn: async () => {
-      const results = await Promise.all(
-        allListingIds.map((listingId) => inspectionsApi.getListerSchedules(listingId))
-      )
-      return results.flatMap((r) => (r.data ?? []) as InspectionSchedule[])
-    },
-    enabled: !propertiesLoading && allListingIds.length > 0,
+  const { data: listingsData } = useQuery({
+    queryKey: ["landlord-listings"],
+    queryFn: () => listingsApi.getLandlordListings(),
   })
 
-  const isLoading = propertiesLoading || schedulesLoading
-  const schedules: InspectionSchedule[] = schedulesRaw ?? []
+  const schedules: InspectionSchedule[] = schedulesRaw?.data ?? []
+  const allListings = (listingsData?.data ?? []).map((l) => ({ id: l.id, title: l.title ?? l.id }))
 
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ["lister-schedules-all"] })

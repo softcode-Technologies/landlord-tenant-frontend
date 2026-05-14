@@ -26,6 +26,9 @@ export const inspectionsApi = {
     data: { scheduledAt: string; note?: string }
   ) => apiClient.post(`/inspections/listings/${listingId}/schedule`, data),
 
+  getAllListerSchedules: () =>
+    apiClient.get<InspectionSchedule[]>("/inspections/lister/schedules"),
+
   getListerSchedules: (listingId: string) =>
     apiClient.get<InspectionSchedule[]>(
       `/inspections/listings/${listingId}/schedules`
