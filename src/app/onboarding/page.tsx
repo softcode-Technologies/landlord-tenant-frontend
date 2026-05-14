@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { userApi, OnboardData } from "@/lib/api/user"
+import { authApi } from "@/lib/api/auth"
 import { useAuthStore, getRoleDashboardPath } from "@/lib/store/auth"
 import { toast } from "sonner"
 
@@ -90,10 +91,16 @@ export default function OnboardingPage() {
 
   const updateMutation = useMutation({
     mutationFn: (data: OnboardData) => userApi.onboard(data),
-    onSuccess: (res) => {
-      setUser(res.data)
-      toast.success("Profile saved! Welcome to NaijaRental.")
-      router.push(getRoleDashboardPath(res.data))
+    onSuccess: async () => {
+      try {
+        const freshRes = await authApi.me()
+        setUser(freshRes.data)
+        toast.success("Profile saved! Welcome to NaijaRental.")
+        router.push(getRoleDashboardPath(freshRes.data))
+      } catch {
+        toast.error("Setup saved but failed to load your profile. Please log in.")
+        router.push("/auth/login")
+      }
     },
     onError: () => {
       toast.error("Failed to save your profile. Please try again.")
