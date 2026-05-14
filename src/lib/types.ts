@@ -25,13 +25,12 @@ export interface User {
 export interface LandlordProfile {
   id: string
   userId: string
-  companyName?: string
-  bio?: string
+  companyName?: string | null
+  bio?: string | null
   bankName?: string | null
   bankCode?: string | null
   bankAccountNumber?: string | null
   isVerified?: boolean
-  kycStatus: "pending" | "approved" | "rejected"
 }
 
 export interface TenantProfile {
