@@ -48,10 +48,10 @@ export default function TenantInspectionsPage() {
                     <h3 className="font-semibold text-slate-900 mb-1">
                       {schedule.listing?.title ?? "Property Inspection"}
                     </h3>
-                    {schedule.listing && (
+                    {schedule.listing?.property && (
                       <div className="flex items-center gap-1 text-sm text-slate-500 mb-2">
                         <MapPin className="h-3.5 w-3.5" />
-                        {schedule.listing.city}, {schedule.listing.state}
+                        {schedule.listing.property.city}, {schedule.listing.property.state}
                       </div>
                     )}
                     <div className="flex items-center gap-1.5 text-sm text-slate-600">

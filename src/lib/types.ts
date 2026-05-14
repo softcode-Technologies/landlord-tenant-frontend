@@ -98,6 +98,7 @@ export interface Listing {
   averageRating?: number
   reviewCount?: number
   isSaved?: boolean
+  property?: Pick<Property, "city" | "state" | "address" | "name">
 }
 
 export interface ListingFilters {
