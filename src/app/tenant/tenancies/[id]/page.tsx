@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatNairaAmount, formatDate, getStatusVariant } from "@/lib/utils"
+import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
 import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -53,7 +53,7 @@ export default function TenantTenancyDetailPage() {
       toast.success("Agreement signed successfully!")
       queryClient.invalidateQueries({ queryKey: ["agreement", id] })
     },
-    onError: () => toast.error("Failed to sign agreement"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to sign agreement")),
   })
 
   const rejectMutation = useMutation({
@@ -62,7 +62,7 @@ export default function TenantTenancyDetailPage() {
       toast.success("Agreement rejected")
       queryClient.invalidateQueries({ queryKey: ["agreement", id] })
     },
-    onError: () => toast.error("Failed to reject agreement"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to reject agreement")),
   })
 
   const tenancy = data?.data

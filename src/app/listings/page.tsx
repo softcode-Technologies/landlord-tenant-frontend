@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, Suspense } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
@@ -12,35 +12,31 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { listingsApi } from "@/lib/api/listings"
+import { NIGERIAN_STATES, getLGAs } from "@/lib/data/nigeria-geo"
 import { SlidersHorizontal, Search, ChevronLeft, ChevronRight } from "lucide-react"
-
-const NIGERIAN_STATES = [
-  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue",
-  "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT",
-  "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi",
-  "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo",
-  "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
-]
 
 function ListingsContent() {
   const searchParams = useSearchParams()
-  const router = useRouter()
 
   const [filters, setFilters] = useState({
-    city: searchParams.get("city") ?? "",
     state: searchParams.get("state") ?? "",
+    lga: searchParams.get("lga") ?? "",
+    area: searchParams.get("area") ?? "",
     minRent: searchParams.get("minRent") ?? "",
     maxRent: searchParams.get("maxRent") ?? "",
     page: parseInt(searchParams.get("page") ?? "1"),
   })
   const [showFilters, setShowFilters] = useState(false)
 
+  const lgas = getLGAs(filters.state)
+
   const { data, isLoading } = useQuery({
     queryKey: ["listings", filters],
     queryFn: () =>
       listingsApi.getListings({
-        city: filters.city || undefined,
         state: filters.state || undefined,
+        lga: filters.lga || undefined,
+        area: filters.area || undefined,
         minRent: filters.minRent ? parseInt(filters.minRent) * 100 : undefined,
         maxRent: filters.maxRent ? parseInt(filters.maxRent) * 100 : undefined,
         page: filters.page,
@@ -51,14 +47,13 @@ function ListingsContent() {
   const listings = data?.data?.data ?? []
   const pagination = data?.data?.pagination
 
-  const handleSearch = () => {
-    setFilters((f) => ({ ...f, page: 1 }))
-  }
-
   const handlePageChange = (newPage: number) => {
     setFilters((f) => ({ ...f, page: newPage }))
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
+
+  const clearFilters = () =>
+    setFilters({ state: "", lga: "", area: "", minRent: "", maxRent: "", page: 1 })
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -69,7 +64,9 @@ function ListingsContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-2">Browse Listings</h1>
           <p className="text-slate-300">
-            {pagination?.total ? `${pagination.total.toLocaleString()} properties available` : "Find your perfect rental"}
+            {pagination?.total
+              ? `${pagination.total.toLocaleString()} properties available`
+              : "Find your perfect rental"}
           </p>
         </div>
       </div>
@@ -82,7 +79,7 @@ function ListingsContent() {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-semibold text-slate-900">Filters</h3>
                 <button
-                  onClick={() => setFilters({ city: "", state: "", minRent: "", maxRent: "", page: 1 })}
+                  onClick={clearFilters}
                   className="text-xs text-[#f97316] hover:underline"
                 >
                   Clear all
@@ -90,20 +87,19 @@ function ListingsContent() {
               </div>
 
               <div className="space-y-5">
-                <div>
-                  <Label className="mb-2 block">City</Label>
-                  <Input
-                    placeholder="e.g. Lekki, Maitama"
-                    value={filters.city}
-                    onChange={(e) => setFilters((f) => ({ ...f, city: e.target.value }))}
-                  />
-                </div>
-
+                {/* State */}
                 <div>
                   <Label className="mb-2 block">State</Label>
                   <Select
                     value={filters.state}
-                    onValueChange={(val) => setFilters((f) => ({ ...f, state: val === "all" ? "" : val }))}
+                    onValueChange={(val) =>
+                      setFilters((f) => ({
+                        ...f,
+                        state: val === "all" ? "" : val,
+                        lga: "",
+                        page: 1,
+                      }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All states" />
@@ -117,13 +113,46 @@ function ListingsContent() {
                   </Select>
                 </div>
 
+                {/* LGA — cascades from state */}
+                <div>
+                  <Label className="mb-2 block">Local Government Area</Label>
+                  <Select
+                    value={filters.lga}
+                    disabled={!filters.state}
+                    onValueChange={(val) =>
+                      setFilters((f) => ({ ...f, lga: val === "all" ? "" : val, page: 1 }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={filters.state ? "All LGAs" : "Select state first"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All LGAs</SelectItem>
+                      {lgas.map((lga) => (
+                        <SelectItem key={lga} value={lga}>{lga}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Area / neighbourhood */}
+                <div>
+                  <Label className="mb-2 block">Area / Neighbourhood</Label>
+                  <Input
+                    placeholder="e.g. Lekki Phase 1, GRA"
+                    value={filters.area}
+                    onChange={(e) => setFilters((f) => ({ ...f, area: e.target.value, page: 1 }))}
+                  />
+                </div>
+
+                {/* Rent range */}
                 <div>
                   <Label className="mb-2 block">Min Rent (₦/year)</Label>
                   <Input
                     type="number"
-                    placeholder="e.g. 500000"
+                    placeholder="e.g. 500,000"
                     value={filters.minRent}
-                    onChange={(e) => setFilters((f) => ({ ...f, minRent: e.target.value }))}
+                    onChange={(e) => setFilters((f) => ({ ...f, minRent: e.target.value, page: 1 }))}
                   />
                 </div>
 
@@ -131,13 +160,16 @@ function ListingsContent() {
                   <Label className="mb-2 block">Max Rent (₦/year)</Label>
                   <Input
                     type="number"
-                    placeholder="e.g. 3000000"
+                    placeholder="e.g. 3,000,000"
                     value={filters.maxRent}
-                    onChange={(e) => setFilters((f) => ({ ...f, maxRent: e.target.value }))}
+                    onChange={(e) => setFilters((f) => ({ ...f, maxRent: e.target.value, page: 1 }))}
                   />
                 </div>
 
-                <Button onClick={handleSearch} className="w-full">
+                <Button
+                  onClick={() => setFilters((f) => ({ ...f, page: 1 }))}
+                  className="w-full gap-2"
+                >
                   <Search className="h-4 w-4" />
                   Apply Filters
                 </Button>
@@ -179,7 +211,7 @@ function ListingsContent() {
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">No listings found</h3>
                 <p className="text-slate-500 text-sm">
-                  Try adjusting your filters or search in a different area.
+                  Try adjusting your filters or searching a different area.
                 </p>
               </div>
             ) : (

@@ -1,4 +1,5 @@
 "use client"
+import { extractApiError } from "@/lib/utils"
 
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -19,14 +20,7 @@ import { EmptyState } from "@/components/shared/empty-state"
 import { Building2, Plus, MapPin, Home, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
-
-const NIGERIAN_STATES = [
-  "Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno",
-  "Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","FCT","Gombe","Imo",
-  "Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa",
-  "Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba",
-  "Yobe","Zamfara"
-]
+import { NIGERIAN_STATES, getLGAs } from "@/lib/data/nigeria-geo"
 
 const PROPERTY_TYPES = [
   { value: "flat", label: "Flat / Apartment" },
@@ -43,6 +37,8 @@ const schema = z.object({
   address: z.string().min(5, "Address required"),
   city: z.string().min(2, "City required"),
   state: z.string().min(2, "State required"),
+  lga: z.string().optional(),
+  area: z.string().optional(),
   propertyType: z.string().min(1, "Property type required"),
   description: z.string().optional(),
 })
@@ -62,9 +58,13 @@ export default function LandlordPropertiesPage() {
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) })
+
+  const watchState = watch("state")
+  const lgas = getLGAs(watchState ?? "")
 
   const createMutation = useMutation({
     mutationFn: (data: FormData) => propertiesApi.createProperty(data),
@@ -74,10 +74,15 @@ export default function LandlordPropertiesPage() {
       setOpen(false)
       reset()
     },
-    onError: () => toast.error("Failed to create property"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to create property")),
   })
 
   const properties = data?.data ?? []
+
+  const handleClose = () => {
+    setOpen(false)
+    reset()
+  }
 
   return (
     <div className="space-y-6">
@@ -122,14 +127,16 @@ export default function LandlordPropertiesPage() {
 
                 <h3 className="font-semibold text-slate-900 mb-1">{property.name}</h3>
 
-                <div className="flex items-center gap-1 text-sm text-slate-500 mb-4">
-                  <MapPin className="h-3.5 w-3.5" />
+                <div className="flex items-center gap-1 text-sm text-slate-500 mb-1">
+                  <MapPin className="h-3.5 w-3.5 shrink-0" />
                   <span className="truncate">
-                    {property.address}, {property.city}, {property.state}
+                    {[property.area, property.lga, property.city, property.state]
+                      .filter(Boolean)
+                      .join(", ")}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mb-4">
                   <div className="flex items-center gap-1 text-xs text-slate-500">
                     <Home className="h-3.5 w-3.5" />
                     {property.units?.filter((u) => u.tenancy?.status === "active").length ?? 0}/
@@ -137,7 +144,7 @@ export default function LandlordPropertiesPage() {
                   </div>
                 </div>
 
-                <Link href={`/landlord/properties/${property.id}`} className="mt-4 block">
+                <Link href={`/landlord/properties/${property.id}`} className="block">
                   <Button variant="outline" className="w-full gap-2 text-sm">
                     Manage
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -150,8 +157,8 @@ export default function LandlordPropertiesPage() {
       )}
 
       {/* Create Property Dialog */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md">
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add New Property</DialogTitle>
           </DialogHeader>
@@ -163,7 +170,7 @@ export default function LandlordPropertiesPage() {
               <Label>Property Name</Label>
               <Input
                 {...register("name")}
-                placeholder="e.g. Adeola Court Lekki"
+                placeholder="e.g. Adeola Court"
                 className="mt-1.5"
               />
               {errors.name && (
@@ -171,48 +178,74 @@ export default function LandlordPropertiesPage() {
               )}
             </div>
 
+            {/* State */}
             <div>
-              <Label>Address</Label>
+              <Label>State</Label>
+              <Select
+                onValueChange={(val) => {
+                  setValue("state", val)
+                  setValue("lga", "")
+                  setValue("city", val)
+                }}
+              >
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue placeholder="Select state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {NIGERIAN_STATES.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.state && (
+                <p className="text-xs text-red-500 mt-1">{errors.state.message}</p>
+              )}
+            </div>
+
+            {/* LGA — cascades from state */}
+            <div>
+              <Label>Local Government Area (LGA)</Label>
+              <Select
+                disabled={!watchState || lgas.length === 0}
+                onValueChange={(val) => setValue("lga", val)}
+              >
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue placeholder={watchState ? "Select LGA" : "Select state first"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {lgas.map((lga) => (
+                    <SelectItem key={lga} value={lga}>{lga}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Area / Neighbourhood */}
+            <div>
+              <Label>Area / Neighbourhood <span className="text-slate-400 font-normal">(optional)</span></Label>
               <Input
-                {...register("address")}
-                placeholder="e.g. 14 Admiralty Road"
+                {...register("area")}
+                placeholder="e.g. Lekki Phase 1, GRA, Maitama"
                 className="mt-1.5"
               />
+              <p className="text-xs text-slate-400 mt-1">Specific area within the LGA</p>
+            </div>
+
+            {/* Street Address */}
+            <div>
+              <Label>Street Address</Label>
+              <Input
+                {...register("address")}
+                placeholder="e.g. 14 Admiralty Way"
+                className="mt-1.5"
+              />
+              <p className="text-xs text-slate-400 mt-1">Street address — only shown to approved tenants</p>
               {errors.address && (
                 <p className="text-xs text-red-500 mt-1">{errors.address.message}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>City</Label>
-                <Input
-                  {...register("city")}
-                  placeholder="e.g. Lekki"
-                  className="mt-1.5"
-                />
-                {errors.city && (
-                  <p className="text-xs text-red-500 mt-1">{errors.city.message}</p>
-                )}
-              </div>
-              <div>
-                <Label>State</Label>
-                <Select onValueChange={(val) => setValue("state", val)}>
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue placeholder="Select state" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {NIGERIAN_STATES.map((s) => (
-                      <SelectItem key={s} value={s}>{s}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.state && (
-                  <p className="text-xs text-red-500 mt-1">{errors.state.message}</p>
-                )}
-              </div>
-            </div>
-
+            {/* Property Type */}
             <div>
               <Label>Property Type</Label>
               <Select onValueChange={(val) => setValue("propertyType", val)}>
@@ -231,7 +264,7 @@ export default function LandlordPropertiesPage() {
             </div>
 
             <div>
-              <Label>Description (optional)</Label>
+              <Label>Description <span className="text-slate-400 font-normal">(optional)</span></Label>
               <Textarea
                 {...register("description")}
                 placeholder="Brief description of the property..."
@@ -245,12 +278,12 @@ export default function LandlordPropertiesPage() {
                 type="button"
                 variant="outline"
                 className="flex-1"
-                onClick={() => { setOpen(false); reset() }}
+                onClick={handleClose}
               >
                 Cancel
               </Button>
               <Button type="submit" className="flex-1" disabled={createMutation.isPending}>
-                {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
                 Create Property
               </Button>
             </div>

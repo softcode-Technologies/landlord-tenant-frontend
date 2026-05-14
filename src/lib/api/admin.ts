@@ -19,9 +19,18 @@ export const adminApi = {
 
   approveKyc: (userId: string) => apiClient.patch(`/admin/kyc/${userId}/approve`),
 
-  rejectKyc: (userId: string) => apiClient.patch(`/admin/kyc/${userId}/reject`),
+  rejectKyc: (userId: string, reason?: string) =>
+    apiClient.patch(`/admin/kyc/${userId}/reject`, { reason }),
 
-  getAllTenancies: () => apiClient.get<Tenancy[]>("/admin/tenancies"),
+  getAllTenancies: (params?: { page?: number; limit?: number }) =>
+    apiClient.get<{ data: Tenancy[]; meta: { total: number; page: number; limit: number; totalPages: number } }>(
+      "/admin/tenancies",
+      { params }
+    ),
 
-  getAllPayments: () => apiClient.get<Payment[]>("/admin/payments"),
+  getAllPayments: (params?: { page?: number; limit?: number }) =>
+    apiClient.get<{ data: Payment[]; meta: { total: number; page: number; limit: number; totalPages: number } }>(
+      "/admin/payments",
+      { params }
+    ),
 }

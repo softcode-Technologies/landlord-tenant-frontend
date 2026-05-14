@@ -5,15 +5,34 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** Extract a human-readable message from an Axios API error response */
+export function extractApiError(err: unknown, fallback = "Something went wrong. Please try again."): string {
+  const e = err as {
+    response?: {
+      data?: {
+        error?: { message?: string; details?: Array<{ message?: string }> }
+        message?: string
+      }
+    }
+    message?: string
+  }
+  return (
+    e?.response?.data?.error?.details?.[0]?.message ??
+    e?.response?.data?.error?.message ??
+    e?.response?.data?.message ??
+    fallback
+  )
+}
+
 /** Convert kobo to naira and format as ₦ */
-export function formatNaira(kobo: number): string {
-  const naira = kobo / 100
+export function formatNaira(kobo: number | null | undefined): string {
+  const naira = (kobo ?? 0) / 100
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(naira)
+  }).format(isNaN(naira) ? 0 : naira)
 }
 
 /** Format naira amount (already in naira not kobo) */

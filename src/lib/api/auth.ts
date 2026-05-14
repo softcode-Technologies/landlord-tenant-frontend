@@ -21,6 +21,11 @@ interface RawUser {
   tenantProfile?: User["tenantProfile"]
   agentProfile?: User["agentProfile"]
   createdAt?: string
+  kycStatus?: User["kycStatus"]
+  kycMethod?: User["kycMethod"]
+  kycRejectReason?: string | null
+  whatsappOptIn?: boolean
+  referralCode?: string | null
 }
 
 export function normalizeUser(raw: RawUser): User {
@@ -39,6 +44,11 @@ export function normalizeUser(raw: RawUser): User {
     landlordProfile: raw.landlordProfile,
     tenantProfile: raw.tenantProfile,
     agentProfile: raw.agentProfile,
+    kycStatus: raw.kycStatus ?? "none",
+    kycMethod: raw.kycMethod ?? null,
+    kycRejectReason: raw.kycRejectReason ?? null,
+    whatsappOptIn: raw.whatsappOptIn ?? false,
+    referralCode: raw.referralCode ?? null,
   }
 }
 

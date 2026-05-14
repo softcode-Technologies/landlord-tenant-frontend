@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatNairaAmount, formatDate, getStatusVariant } from "@/lib/utils"
+import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
 import { UserPlus, Plus, Copy, Loader2, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -71,7 +71,7 @@ export default function LandlordInvitesPage() {
       setOpen(false)
       resetForm()
     },
-    onError: () => toast.error("Failed to send invite"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to send invite")),
   })
 
   const cancelMutation = useMutation({

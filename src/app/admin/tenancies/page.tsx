@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/shared/empty-state"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
-import { formatNairaAmount, formatDate, getStatusVariant } from "@/lib/utils"
+import { formatNaira, formatDate, getStatusVariant } from "@/lib/utils"
 import { Home } from "lucide-react"
 
 export default function AdminTenanciesPage() {
@@ -18,7 +18,7 @@ export default function AdminTenanciesPage() {
     queryFn: () => adminApi.getAllTenancies(),
   })
 
-  const tenancies = data?.data ?? []
+  const tenancies = data?.data?.data ?? []
 
   return (
     <div className="space-y-6">
@@ -70,7 +70,7 @@ export default function AdminTenanciesPage() {
                       {tenancy.property?.name ?? tenancy.unit?.unitNumber ?? "N/A"}
                     </TableCell>
                     <TableCell className="font-semibold text-[#1a3c5e] text-sm">
-                      {formatNairaAmount(tenancy.rentAmount)}
+                      {formatNaira(tenancy.rentAmount)}
                     </TableCell>
                     <TableCell className="text-sm text-slate-500">
                       {formatDate(tenancy.startDate)}

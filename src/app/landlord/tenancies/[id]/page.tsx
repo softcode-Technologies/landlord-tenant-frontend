@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatNaira, formatNairaAmount, formatDate, getStatusVariant, getInitials } from "@/lib/utils"
+import { formatNaira, formatNairaAmount, formatDate, getStatusVariant, getInitials, extractApiError } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Calendar, DollarSign, Shield, Trash2, RefreshCw, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -47,7 +47,7 @@ export default function LandlordTenancyDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["tenancy", id] })
       setRenewOpen(false)
     },
-    onError: () => toast.error("Failed to renew tenancy"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to renew tenancy")),
   })
 
   const depositMutation = useMutation({
@@ -62,7 +62,7 @@ export default function LandlordTenancyDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["tenancy", id] })
       setDepositOpen(false)
     },
-    onError: () => toast.error("Failed to record deposit"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to record deposit")),
   })
 
   const terminateMutation = useMutation({
@@ -71,7 +71,7 @@ export default function LandlordTenancyDetailPage() {
       toast.success("Tenancy terminated")
       router.push("/landlord/tenancies")
     },
-    onError: () => toast.error("Failed to terminate tenancy"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to terminate tenancy")),
   })
 
   const { data: agreementData, isLoading: agreementLoading } = useQuery({
@@ -89,7 +89,7 @@ export default function LandlordTenancyDetailPage() {
       setAgreementOpen(false)
       setDocUrl("")
     },
-    onError: () => toast.error("Failed to create agreement"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to create agreement")),
   })
 
   const sendAgreementMutation = useMutation({
@@ -98,7 +98,7 @@ export default function LandlordTenancyDetailPage() {
       toast.success("Agreement sent to tenant for signing")
       queryClient.invalidateQueries({ queryKey: ["agreement", id] })
     },
-    onError: () => toast.error("Failed to send agreement"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to send agreement")),
   })
 
   const signAgreementMutation = useMutation({
@@ -107,7 +107,7 @@ export default function LandlordTenancyDetailPage() {
       toast.success("Agreement countersigned successfully!")
       queryClient.invalidateQueries({ queryKey: ["agreement", id] })
     },
-    onError: () => toast.error("Failed to sign agreement"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to sign agreement")),
   })
 
   const tenancy = data?.data

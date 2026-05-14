@@ -290,7 +290,9 @@ export default function ListingDetailPage() {
                 <div className="flex items-center gap-2 text-slate-500">
                   <MapPin className="h-4 w-4" />
                   <span className="text-sm">
-                    {listing.address}, {listing.city}, {listing.state}
+                    {[listing.area, listing.lga, listing.city, listing.state]
+                      .filter(Boolean)
+                      .join(", ")}
                   </span>
                 </div>
               </div>

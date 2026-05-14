@@ -18,10 +18,10 @@ export default function AdminPaymentsPage() {
     queryFn: () => adminApi.getAllPayments(),
   })
 
-  const payments = data?.data ?? []
+  const payments = data?.data?.data ?? []
   const totalRevenue = payments
     .filter((p) => p.status === "success")
-    .reduce((sum, p) => sum + p.amountKobo, 0)
+    .reduce((sum, p) => sum + p.amount, 0)
 
   return (
     <div className="space-y-6">
@@ -66,10 +66,10 @@ export default function AdminPaymentsPage() {
                       {payment.type === "rent" ? "Rent Payment" : "Wallet Topup"}
                     </TableCell>
                     <TableCell className="font-bold text-[#1a3c5e] text-sm">
-                      {formatNaira(payment.amountKobo)}
+                      {formatNaira(payment.amount)}
                     </TableCell>
                     <TableCell className="text-xs text-slate-400 font-mono">
-                      {payment.paystackRef ?? "—"}
+                      {payment.reference ?? "—"}
                     </TableCell>
                     <TableCell className="text-sm text-slate-500">
                       {formatDate(payment.createdAt)}

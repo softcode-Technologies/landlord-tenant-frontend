@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatNairaAmount, formatDate, getStatusVariant } from "@/lib/utils"
+import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
 import { Home, MapPin, ArrowRight, Mail, CheckCircle2, Loader2, MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -39,7 +39,7 @@ export default function TenantTenanciesPage() {
       toast.success("Conversation started!")
       router.push("/tenant/messages")
     },
-    onError: () => toast.error("Failed to start conversation."),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to start conversation.")),
   })
 
   const acceptMutation = useMutation({

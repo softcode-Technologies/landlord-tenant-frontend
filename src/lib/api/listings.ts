@@ -40,6 +40,7 @@ interface RawListing {
     city: string
     state: string
     lga?: string
+    area?: string
     propertyType: string
     images?: string[]
     latitude?: number | null
@@ -82,8 +83,10 @@ function normalizeListing(raw: RawListing): Listing {
     rentPerAnnum: raw.rentPerAnnum,
     city: raw.property?.city ?? "",
     state: raw.property?.state ?? "",
+    lga: raw.property?.lga,
+    area: raw.property?.area,
     address: raw.property
-      ? `${raw.property.name ?? ""}, ${raw.property.lga ?? raw.property.city}`.replace(/^, /, "")
+      ? `${raw.property.name ?? ""}, ${raw.property.area ?? raw.property.lga ?? raw.property.city}`.replace(/^, /, "")
       : "",
     bedrooms: raw.unit?.bedrooms ?? 0,
     bathrooms: raw.unit?.bathrooms ?? 0,

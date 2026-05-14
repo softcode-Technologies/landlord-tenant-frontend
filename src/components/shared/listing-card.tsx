@@ -94,7 +94,7 @@ export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
           <div className="flex items-center gap-1 text-slate-500 mb-3">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
             <span className="text-xs truncate">
-              {listing.city}, {listing.state}
+              {[listing.area, listing.lga, listing.state].filter(Boolean).join(", ")}
             </span>
           </div>
 

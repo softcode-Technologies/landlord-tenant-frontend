@@ -15,7 +15,7 @@ import { EmptyState } from "@/components/shared/empty-state"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { getInitials, formatRelativeTime } from "@/lib/utils"
+import { getInitials, formatRelativeTime, extractApiError } from "@/lib/utils"
 import type { Message, Conversation } from "@/lib/types"
 import { MessageCircle, Send, Loader2, Plus } from "lucide-react"
 import { toast } from "sonner"
@@ -99,7 +99,7 @@ export default function TenantMessagesPage() {
       setSelected(res.data)
       toast.success("Conversation started!")
     },
-    onError: () => toast.error("Failed to start conversation."),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to start conversation.")),
   })
 
   const conversations = convsData?.data ?? []

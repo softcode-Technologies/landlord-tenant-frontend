@@ -16,6 +16,12 @@ export interface User {
   landlordProfile?: LandlordProfile
   tenantProfile?: TenantProfile
   agentProfile?: AgentProfile
+  // KYC fields
+  kycStatus?: "none" | "pending" | "approved" | "rejected"
+  kycMethod?: "nin" | "bvn" | "document" | null
+  kycRejectReason?: string | null
+  whatsappOptIn?: boolean
+  referralCode?: string | null
   // Backend alternate field names (tolerated after normalizeUser)
   roles?: string[]
   isPhoneVerified?: boolean
@@ -73,6 +79,8 @@ export interface Listing {
   rentPerAnnum: number
   city: string
   state: string
+  lga?: string
+  area?: string
   address: string
   bedrooms: number
   bathrooms: number
@@ -101,7 +109,7 @@ export interface Listing {
   averageRating?: number
   reviewCount?: number
   isSaved?: boolean
-  property?: Pick<Property, "city" | "state" | "address" | "name">
+  property?: Pick<Property, "city" | "state" | "lga" | "area" | "address" | "name">
 }
 
 export interface ListingFilters {
@@ -109,6 +117,8 @@ export interface ListingFilters {
   limit?: number
   city?: string
   state?: string
+  lga?: string
+  area?: string
   minRent?: number
   maxRent?: number
   featured?: boolean
@@ -133,6 +143,8 @@ export interface Property {
   address: string
   city: string
   state: string
+  lga?: string
+  area?: string
   description?: string
   landlordUserId: string
   units: Unit[]
@@ -266,13 +278,27 @@ export interface Message {
 }
 
 // Notifications
+export type NotificationType =
+  | "rent_reminder"
+  | "payment_confirmed"
+  | "tenancy_expiring"
+  | "invite_received"
+  | "inspection_unlocked"
+  | "inspection_scheduled"
+  | "inspection_confirmed"
+  | "inspection_cancelled"
+  | "inspection_completed"
+  | "maintenance_update"
+  | "broadcast"
+
 export interface Notification {
   id: string
   userId: string
   title: string
   body: string
-  type: string
+  type: NotificationType
   isRead: boolean
+  metadata?: Record<string, unknown>
   data?: Record<string, unknown>
   createdAt: string
 }
@@ -285,11 +311,13 @@ export interface Wallet {
 export interface Payment {
   id: string
   userId: string
+  reference: string
   tenancyId?: string
-  type: "rent" | "topup" | "inspection_unlock"
-  amountKobo: number
-  status: "pending" | "success" | "failed"
-  paystackRef?: string
+  type: "rent" | "wallet_topup" | "inspection_fee" | "listing_boost"
+  amount: number
+  status: "pending" | "success" | "failed" | "refunded"
+  receiptUrl?: string | null
+  paidAt?: string | null
   createdAt: string
   tenancy?: Tenancy
 }
@@ -310,7 +338,7 @@ export interface Review {
 
 // Analytics
 export interface TenantAnalytics {
-  totalRentPaid: number
+  totalRentPaidKobo: number
   activetenancies: number
   upcomingPayments: { dueDate: string; amountKobo: number; tenancyId: string }[]
   recentPayments: Payment[]
@@ -402,11 +430,16 @@ export interface AdminStats {
 
 export interface KycRecord {
   id: string
-  userId: string
-  kycDocumentUrl: string
-  status: "pending" | "approved" | "rejected"
-  reviewNote?: string
-  user?: User
+  phone: string
+  firstName?: string | null
+  lastName?: string | null
+  avatarUrl?: string | null
+  kycStatus: "pending" | "approved" | "rejected"
+  kycMethod?: "nin" | "bvn" | "document" | null
+  kycDocumentUrl?: string | null
+  kycIdentifier?: string | null
+  kycRejectReason?: string | null
+  kycSubmittedAt?: string | null
   createdAt: string
   updatedAt: string
 }

@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { useQuery, useMutation } from "@tanstack/react-query"
+import { useState, useEffect, Suspense } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useSearchParams, useRouter } from "next/navigation"
 import { paymentsApi } from "@/lib/api/payments"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,11 +11,16 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatNaira, formatDate, getStatusVariant } from "@/lib/utils"
-import { Wallet, Plus, ArrowUpRight, Loader2, TrendingUp } from "lucide-react"
+import { Wallet, Plus, ArrowUpRight, Loader2, TrendingUp, Download } from "lucide-react"
 import { toast } from "sonner"
 
-export default function TenantWalletPage() {
+const QUICK_AMOUNTS = [5000, 10000, 25000, 50000, 100000]
+
+function WalletContent() {
   const [topupAmount, setTopupAmount] = useState("")
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const queryClient = useQueryClient()
 
   const { data: walletData, isLoading: walletLoading } = useQuery({
     queryKey: ["wallet"],
@@ -26,6 +32,17 @@ export default function TenantWalletPage() {
     queryFn: () => paymentsApi.getPaymentHistory(),
   })
 
+  // Show success toast and refetch after Paystack redirect
+  useEffect(() => {
+    if (searchParams.get("topup") === "success") {
+      toast.success("Wallet topped up successfully!")
+      queryClient.invalidateQueries({ queryKey: ["wallet"] })
+      queryClient.invalidateQueries({ queryKey: ["payment-history"] })
+      // Remove the query param from URL without re-render loop
+      router.replace("/tenant/wallet")
+    }
+  }, [searchParams, queryClient, router])
+
   const topupMutation = useMutation({
     mutationFn: () => paymentsApi.topupWallet(parseInt(topupAmount) * 100),
     onSuccess: (res) => {
@@ -34,14 +51,13 @@ export default function TenantWalletPage() {
       }
     },
     onError: () => {
-      toast.error("Failed to initiate topup")
+      toast.error("Failed to initiate top-up. Please try again.")
     },
   })
 
+  // balance is stored in kobo — pass directly to formatNaira (which divides by 100)
   const balance = walletData?.data?.balance ?? 0
   const history = historyData?.data ?? []
-
-  const QUICK_AMOUNTS = [5000, 10000, 25000, 50000, 100000]
 
   return (
     <div className="space-y-6">
@@ -65,7 +81,7 @@ export default function TenantWalletPage() {
                 <Skeleton className="h-10 w-40 bg-white/20" />
               ) : (
                 <p className="text-4xl font-bold">
-                  {formatNaira(balance * 100)}
+                  {formatNaira(balance)}
                 </p>
               )}
               <div className="mt-4 flex items-center gap-2">
@@ -92,7 +108,6 @@ export default function TenantWalletPage() {
                 />
               </div>
 
-              {/* Quick amounts */}
               <div>
                 <p className="text-xs text-slate-500 mb-2">Quick select:</p>
                 <div className="flex flex-wrap gap-2">
@@ -106,7 +121,7 @@ export default function TenantWalletPage() {
                           : "border-slate-200 text-slate-600 hover:border-[#1a3c5e]"
                       }`}
                     >
-                      ₦{(amount).toLocaleString()}
+                      ₦{amount.toLocaleString()}
                     </button>
                   ))}
                 </div>
@@ -162,36 +177,51 @@ export default function TenantWalletPage() {
                       <div className="flex items-center gap-3">
                         <div
                           className={`p-2 rounded-xl ${
-                            payment.type === "rent"
-                              ? "bg-[#1a3c5e]/10"
-                              : "bg-green-50"
+                            payment.type === "rent" ? "bg-[#1a3c5e]/10" : "bg-green-50"
                           }`}
                         >
                           <ArrowUpRight
                             className={`h-4 w-4 ${
-                              payment.type === "rent"
-                                ? "text-[#1a3c5e]"
-                                : "text-green-600"
+                              payment.type === "rent" ? "text-[#1a3c5e]" : "text-green-600"
                             }`}
                           />
                         </div>
                         <div>
                           <p className="text-sm font-medium text-slate-900 capitalize">
-                            {payment.type === "rent" ? "Rent Payment" : "Wallet Topup"}
+                            {payment.type === "rent"
+                              ? "Rent Payment"
+                              : payment.type === "wallet_topup"
+                              ? "Wallet Top-Up"
+                              : payment.type === "inspection_fee"
+                              ? "Inspection Fee"
+                              : "Payment"}
                           </p>
                           <p className="text-xs text-slate-400">{formatDate(payment.createdAt)}</p>
+                          {payment.reference && (
+                            <p className="text-[10px] text-slate-300 font-mono">{payment.reference}</p>
+                          )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-slate-900">
-                          {formatNaira(payment.amountKobo)}
-                        </p>
-                        <Badge
-                          variant={getStatusVariant(payment.status)}
-                          className="text-[10px] capitalize mt-0.5"
-                        >
-                          {payment.status}
-                        </Badge>
+                      <div className="flex items-center gap-2">
+                        {payment.type === "rent" && payment.status === "success" && payment.receiptUrl && (
+                          <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer">
+                            <Button variant="outline" size="sm" className="h-7 px-2 gap-1 text-[10px]">
+                              <Download className="h-3 w-3" />
+                              Receipt
+                            </Button>
+                          </a>
+                        )}
+                        <div className="text-right">
+                          <p className="font-semibold text-slate-900">
+                            {formatNaira(payment.amount)}
+                          </p>
+                          <Badge
+                            variant={getStatusVariant(payment.status)}
+                            className="text-[10px] capitalize mt-0.5"
+                          >
+                            {payment.status}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -202,5 +232,13 @@ export default function TenantWalletPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function TenantWalletPage() {
+  return (
+    <Suspense>
+      <WalletContent />
+    </Suspense>
   )
 }

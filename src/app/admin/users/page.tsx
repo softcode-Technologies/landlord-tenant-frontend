@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
-import { formatDate, getInitials } from "@/lib/utils"
+import { formatDate, getInitials, extractApiError } from "@/lib/utils"
 import { Search, Ban, CheckCircle2, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -32,7 +32,7 @@ export default function AdminUsersPage() {
       toast.success("User banned")
       queryClient.invalidateQueries({ queryKey: ["admin-users"] })
     },
-    onError: () => toast.error("Failed to ban user"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to ban user")),
   })
 
   const unbanMutation = useMutation({
@@ -41,7 +41,7 @@ export default function AdminUsersPage() {
       toast.success("User unbanned")
       queryClient.invalidateQueries({ queryKey: ["admin-users"] })
     },
-    onError: () => toast.error("Failed to unban user"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to unban user")),
   })
 
   const users = data?.data?.data ?? []

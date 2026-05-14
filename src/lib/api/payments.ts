@@ -31,4 +31,7 @@ export const paymentsApi = {
     apiClient.post<{ paymentUrl: string }>("/payments/rent", { tenancyId, amountKobo }),
 
   getPaymentHistory: () => apiClient.get<Payment[]>("/payments/history"),
+
+  getReceipt: (paymentId: string) =>
+    apiClient.get<{ receiptUrl: string }>(`/payments/${paymentId}/receipt`),
 }

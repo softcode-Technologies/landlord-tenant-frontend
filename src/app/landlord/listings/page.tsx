@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { formatNairaAmount, formatDate } from "@/lib/utils"
+import { formatNairaAmount, formatDate, extractApiError } from "@/lib/utils"
 import { List, Plus, MapPin, Bed, Eye, Pencil, Trash2, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -44,7 +44,7 @@ export default function LandlordListingsPage() {
       queryClient.invalidateQueries({ queryKey: ["my-listings"] })
       setEditListing(null)
     },
-    onError: () => toast.error("Failed to update listing"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to update listing")),
   })
 
   const closeMutation = useMutation({
@@ -54,7 +54,7 @@ export default function LandlordListingsPage() {
       queryClient.invalidateQueries({ queryKey: ["my-listings"] })
       setClosingId(null)
     },
-    onError: () => toast.error("Failed to close listing"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to close listing")),
   })
 
   const activateMutation = useMutation({
@@ -63,7 +63,7 @@ export default function LandlordListingsPage() {
       toast.success("Listing activated")
       queryClient.invalidateQueries({ queryKey: ["my-listings"] })
     },
-    onError: () => toast.error("Failed to activate listing"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to activate listing")),
   })
 
   const openEdit = (listing: Listing) => {

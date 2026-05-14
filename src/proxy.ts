@@ -19,7 +19,8 @@ export function proxy(request: NextRequest) {
   }
 
   if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL("/", request.url))
+    const redirectTo = request.nextUrl.searchParams.get("redirect") || "/"
+    return NextResponse.redirect(new URL(redirectTo, request.url))
   }
 
   return NextResponse.next()

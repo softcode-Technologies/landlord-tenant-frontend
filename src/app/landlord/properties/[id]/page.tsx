@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { formatNairaAmount } from "@/lib/utils"
+import { formatNairaAmount, extractApiError } from "@/lib/utils"
 import { ArrowLeft, Building2, Bed, Bath, MapPin, Plus, Loader2, Image, Upload, X as XIcon, UserCheck, UserMinus } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -51,7 +51,7 @@ export default function PropertyDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["property", id] })
       closeUnitDialog()
     },
-    onError: () => toast.error("Failed to add unit"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to add unit")),
   })
 
   const uploadImagesMutation = useMutation({
@@ -65,7 +65,7 @@ export default function PropertyDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["property", id] })
       setImageFiles([])
     },
-    onError: () => toast.error("Failed to upload images"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to upload images")),
   })
 
   const { data: agentsData } = useQuery({
@@ -83,7 +83,7 @@ export default function PropertyDetailPage() {
       setAgentOpen(false)
       setSelectedAgentId("")
     },
-    onError: () => toast.error("Failed to assign agent"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to assign agent")),
   })
 
   const removeAgentMutation = useMutation({
@@ -92,7 +92,7 @@ export default function PropertyDetailPage() {
       toast.success("Agent removed")
       queryClient.invalidateQueries({ queryKey: ["property", id] })
     },
-    onError: () => toast.error("Failed to remove agent"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to remove agent")),
   })
 
   const closeUnitDialog = () => {
@@ -160,7 +160,7 @@ export default function PropertyDetailPage() {
           <h1 className="text-2xl font-bold text-slate-900">{property.name}</h1>
           <div className="flex items-center gap-1 text-sm text-slate-500 mt-0.5">
             <MapPin className="h-3.5 w-3.5" />
-            {property.address}, {property.city}, {property.state}
+            {[property.area, property.lga, property.city, property.state].filter(Boolean).join(", ")}
           </div>
         </div>
         <div className="flex items-center gap-2">

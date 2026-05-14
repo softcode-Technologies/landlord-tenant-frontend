@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatDate, formatNaira, getStatusVariant } from "@/lib/utils"
+import { formatDate, formatNaira, getStatusVariant, extractApiError } from "@/lib/utils"
 import { Wrench, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import type { MaintenanceRequest } from "@/lib/types"
@@ -53,7 +53,7 @@ export default function LandlordMaintenancePage() {
       queryClient.invalidateQueries({ queryKey: ["landlord-maintenance"] })
       setSelected(null)
     },
-    onError: () => toast.error("Failed to update"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to update")),
   })
 
   const requests = data?.data ?? []

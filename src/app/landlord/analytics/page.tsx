@@ -173,7 +173,7 @@ export default function LandlordAnalyticsPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-slate-900">
-                      {formatNaira(payment.amountKobo)}
+                      {formatNaira(payment.amount)}
                     </p>
                     <Badge
                       variant={getStatusVariant(payment.status)}

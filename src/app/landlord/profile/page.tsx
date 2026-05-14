@@ -11,11 +11,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getInitials } from "@/lib/utils"
+import { getInitials, extractApiError } from "@/lib/utils"
 import {
-  User, Building2, Banknote, Shield, CheckCircle2, AlertCircle, Loader2, Upload,
+  User, Building2, Banknote, Shield, CheckCircle2, AlertCircle, Loader2, ShieldCheck, MessageCircle,
 } from "lucide-react"
 import { toast } from "sonner"
+
+type KycMethod = "nin" | "bvn" | "document"
 
 export default function LandlordProfilePage() {
   const { user, setUser } = useAuthStore()
@@ -28,6 +30,9 @@ export default function LandlordProfilePage() {
   const [bio, setBio]                       = useState(lp?.bio ?? "")
   const [bankName, setBankName]             = useState(lp?.bankName ?? "")
   const [bankAccountNumber, setBankAccountNumber] = useState(lp?.bankAccountNumber ?? "")
+  const [kycMethod, setKycMethod]           = useState<KycMethod>("nin")
+  const [ninValue, setNinValue]             = useState("")
+  const [bvnValue, setBvnValue]             = useState("")
   const [kycUrl, setKycUrl]                 = useState("")
 
   const profileMutation = useMutation({
@@ -37,7 +42,7 @@ export default function LandlordProfilePage() {
       setUser(fresh.data)
       toast.success("Personal info updated.")
     },
-    onError: () => toast.error("Failed to update profile."),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to update profile.")),
   })
 
   const landlordMutation = useMutation({
@@ -47,31 +52,54 @@ export default function LandlordProfilePage() {
       setUser(fresh.data)
       toast.success("Business & bank details saved.")
     },
-    onError: () => toast.error("Failed to save business details."),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to save business details.")),
+  })
+
+  const whatsappMutation = useMutation({
+    mutationFn: (optIn: boolean) => userApi.toggleWhatsappOptIn(optIn),
+    onSuccess: async (res) => {
+      const fresh = await authApi.me()
+      setUser(fresh.data)
+      toast.success(res.data.whatsappOptIn ? "WhatsApp reminders enabled." : "WhatsApp reminders disabled.")
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to update WhatsApp preference.")),
   })
 
   const kycMutation = useMutation({
-    mutationFn: () => userApi.submitKyc(kycUrl),
-    onSuccess: () => {
-      toast.success("KYC submitted! We'll review it shortly.")
-      setKycUrl("")
+    mutationFn: () => {
+      if (kycMethod === "nin") return userApi.submitKyc({ method: "nin", nin: ninValue })
+      if (kycMethod === "bvn") return userApi.submitKyc({ method: "bvn", bvn: bvnValue })
+      return userApi.submitKyc({ method: "document", kycDocumentUrl: kycUrl })
     },
-    onError: () => toast.error("Failed to submit KYC."),
+    onSuccess: async (res) => {
+      const status = res.data?.kycStatus
+      if (status === "approved") {
+        toast.success("Identity verified! Your profile is now marked as verified.")
+      } else if (status === "rejected") {
+        toast.error(res.data?.reason ?? "Verification failed. Please try again.")
+      } else {
+        toast.success("KYC submitted. We'll review it within 24 hours.")
+      }
+      const fresh = await authApi.me()
+      setUser(fresh.data)
+      setNinValue(""); setBvnValue(""); setKycUrl("")
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to submit KYC.")),
   })
 
   if (!user) return null
 
   const fullName   = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "Landlord"
-  const kycStatus  = (user as { kycStatus?: string }).kycStatus ?? "none"
+  const kycStatus  = user.kycStatus ?? "none"
 
   const KYC_CONFIG: Record<string, {
     label: string; icon: typeof AlertCircle; color: string; bg: string
     badgeVariant: "warning" | "success" | "destructive" | "secondary"
   }> = {
-    none:     { label: "Not Submitted",  icon: AlertCircle,   color: "text-slate-500",  bg: "bg-slate-50",  badgeVariant: "secondary"   },
-    pending:  { label: "Pending Review", icon: AlertCircle,   color: "text-orange-600", bg: "bg-orange-50", badgeVariant: "warning"     },
-    approved: { label: "KYC Approved",   icon: CheckCircle2,  color: "text-green-600",  bg: "bg-green-50",  badgeVariant: "success"     },
-    rejected: { label: "KYC Rejected",   icon: AlertCircle,   color: "text-red-600",    bg: "bg-red-50",    badgeVariant: "destructive" },
+    none:     { label: "Not Verified",   icon: AlertCircle,   color: "text-slate-500",  bg: "bg-slate-50",  badgeVariant: "secondary"   },
+    pending:  { label: "Under Review",   icon: AlertCircle,   color: "text-orange-600", bg: "bg-orange-50", badgeVariant: "warning"     },
+    approved: { label: "ID Verified",    icon: ShieldCheck,   color: "text-green-600",  bg: "bg-green-50",  badgeVariant: "success"     },
+    rejected: { label: "Rejected",       icon: AlertCircle,   color: "text-red-600",    bg: "bg-red-50",    badgeVariant: "destructive" },
   }
   const kycConfig = KYC_CONFIG[kycStatus] ?? KYC_CONFIG["none"]
 
@@ -127,7 +155,7 @@ export default function LandlordProfilePage() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-[#1a3c5e]" />
-                <CardTitle>KYC Verification</CardTitle>
+                <CardTitle>Identity Verification</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -137,28 +165,87 @@ export default function LandlordProfilePage() {
                   <p className={`font-semibold text-sm ${kycConfig.color}`}>{kycConfig.label}</p>
                   <p className="text-xs text-slate-500 mt-1">
                     {kycStatus === "approved"
-                      ? "Your identity is verified."
+                      ? "Your identity is verified. Tenants see a verified badge on your profile."
+                      : kycStatus === "pending"
+                      ? "Your submission is under review. We'll notify you within 24 hours."
                       : kycStatus === "rejected"
-                      ? "Please resubmit with clearer documents."
-                      : "Submit a government-issued ID to get verified."}
+                      ? (user.kycRejectReason ?? "Verification failed. Please resubmit.")
+                      : "Verify your identity to earn tenant trust and unlock all platform features."}
                   </p>
                 </div>
               </div>
-              {kycStatus !== "approved" && (
-                <div className="space-y-2">
-                  <Label>Document URL</Label>
-                  <Input
-                    value={kycUrl}
-                    onChange={(e) => setKycUrl(e.target.value)}
-                    placeholder="https://drive.google.com/..."
-                  />
+
+              {(kycStatus === "none" || kycStatus === "rejected") && (
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs text-slate-500 mb-2 block">Verification method</Label>
+                    <div className="flex gap-2">
+                      {(["nin", "bvn", "document"] as KycMethod[]).map((m) => (
+                        <button
+                          key={m}
+                          onClick={() => setKycMethod(m)}
+                          className={`flex-1 py-2 rounded-lg text-xs font-semibold border transition-colors ${
+                            kycMethod === m
+                              ? "bg-[#1a3c5e] text-white border-[#1a3c5e]"
+                              : "bg-white text-slate-600 border-slate-200 hover:border-[#1a3c5e]"
+                          }`}
+                        >
+                          {m === "nin" ? "NIN" : m === "bvn" ? "BVN" : "Document"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {kycMethod === "nin" && (
+                    <div className="space-y-1.5">
+                      <Label>National Identification Number (NIN)</Label>
+                      <Input
+                        value={ninValue}
+                        onChange={(e) => setNinValue(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                        placeholder="12345678901"
+                        maxLength={11}
+                      />
+                      <p className="text-xs text-slate-400">11-digit number on your NIN slip, voter card, or national ID</p>
+                    </div>
+                  )}
+
+                  {kycMethod === "bvn" && (
+                    <div className="space-y-1.5">
+                      <Label>Bank Verification Number (BVN)</Label>
+                      <Input
+                        value={bvnValue}
+                        onChange={(e) => setBvnValue(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                        placeholder="12345678901"
+                        maxLength={11}
+                      />
+                      <p className="text-xs text-slate-400">Dial *565*0# on any network to retrieve your BVN</p>
+                    </div>
+                  )}
+
+                  {kycMethod === "document" && (
+                    <div className="space-y-1.5">
+                      <Label>Government ID Document URL</Label>
+                      <Input
+                        value={kycUrl}
+                        onChange={(e) => setKycUrl(e.target.value)}
+                        placeholder="https://drive.google.com/..."
+                      />
+                      <p className="text-xs text-slate-400">Upload your ID to Google Drive or Dropbox and paste the shareable link</p>
+                    </div>
+                  )}
+
                   <Button
                     className="w-full gap-2"
                     onClick={() => kycMutation.mutate()}
-                    disabled={!kycUrl || kycMutation.isPending}
+                    disabled={
+                      kycMutation.isPending ||
+                      (kycMethod === "nin" && ninValue.length !== 11) ||
+                      (kycMethod === "bvn" && bvnValue.length !== 11) ||
+                      (kycMethod === "document" && !kycUrl)
+                    }
                   >
-                    {kycMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                    Submit KYC
+                    {kycMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                    {kycMethod === "document" ? "Submit for Review" : "Verify Identity"}
                   </Button>
                 </div>
               )}
@@ -227,6 +314,41 @@ export default function LandlordProfilePage() {
                   placeholder="Tell tenants about yourself..."
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* WhatsApp Notifications */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                <CardTitle>WhatsApp Notifications</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-900">Maintenance & KYC alerts</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Receive KYC decisions and platform updates directly on WhatsApp.
+                  </p>
+                </div>
+                <button
+                  role="switch"
+                  aria-checked={user.whatsappOptIn ?? false}
+                  onClick={() => whatsappMutation.mutate(!(user.whatsappOptIn ?? false))}
+                  disabled={whatsappMutation.isPending}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+                    user.whatsappOptIn ? "bg-[#25D366]" : "bg-slate-200"
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform ${
+                      user.whatsappOptIn ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
               </div>
             </CardContent>
           </Card>

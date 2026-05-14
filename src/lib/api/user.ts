@@ -29,6 +29,7 @@ export interface OnboardData {
   occupation?: string
   companyName?: string
   licenseNumber?: string
+  referredByCode?: string
 }
 
 export const userApi = {
@@ -46,8 +47,15 @@ export const userApi = {
     return { ...res, data: normalizeUser(res.data) }
   },
 
-  submitKyc: (kycDocumentUrl: string) =>
-    apiClient.post("/user/kyc", { kycDocumentUrl }),
+  toggleWhatsappOptIn: (optIn: boolean) =>
+    apiClient.patch<{ whatsappOptIn: boolean }>("/user/whatsapp-optin", { optIn }),
+
+  submitKyc: (
+    data:
+      | { method: "nin"; nin: string }
+      | { method: "bvn"; bvn: string }
+      | { method: "document"; kycDocumentUrl: string }
+  ) => apiClient.post<{ kycStatus?: string; reason?: string }>("/user/kyc", data),
 
   getAgreement: (tenancyId: string) =>
     apiClient.get<TenancyAgreement>(`/agreements/${tenancyId}`),

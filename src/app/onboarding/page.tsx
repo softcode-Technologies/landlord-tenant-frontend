@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { userApi, OnboardData } from "@/lib/api/user"
+import { extractApiError } from "@/lib/utils"
 import { authApi } from "@/lib/api/auth"
 import { useAuthStore, getRoleDashboardPath } from "@/lib/store/auth"
 import { toast } from "sonner"
@@ -86,6 +87,7 @@ export default function OnboardingPage() {
   const [companyName, setCompanyName] = useState("")
   const [licenseNumber, setLicenseNumber] = useState("")
   const [bio, setBio] = useState("")
+  const [referredByCode, setReferredByCode] = useState("")
 
   const progressValue = (step / STEP_COUNT) * 100
 
@@ -99,11 +101,11 @@ export default function OnboardingPage() {
         router.push(getRoleDashboardPath(freshRes.data))
       } catch {
         toast.error("Setup saved but failed to load your profile. Please log in.")
-        router.push("/auth/login")
+        router.push("/login")
       }
     },
-    onError: () => {
-      toast.error("Failed to save your profile. Please try again.")
+    onError: (err: unknown) => {
+      toast.error(extractApiError(err, "Failed to save your profile. Please try again."))
     },
   })
 
@@ -134,6 +136,7 @@ export default function OnboardingPage() {
       email: email.trim() || undefined,
       bio: bio.trim() || undefined,
       role: selectedRole,
+      referredByCode: referredByCode.trim().toUpperCase() || undefined,
     }
 
     if (selectedRole === "tenant") {
@@ -245,6 +248,22 @@ export default function OnboardingPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="referredByCode">
+                  Referral Code <span className="text-slate-400 text-xs">(optional)</span>
+                </Label>
+                <Input
+                  id="referredByCode"
+                  placeholder="e.g. ABC12345"
+                  value={referredByCode}
+                  onChange={(e) => setReferredByCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8))}
+                  maxLength={8}
+                />
+                <p className="text-xs text-slate-400">
+                  Enter a friend&apos;s referral code to connect your accounts.
+                </p>
               </div>
 
               <Button type="submit" className="w-full h-12 text-base gap-2">

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatNairaAmount, formatDate, getStatusVariant, getInitials } from "@/lib/utils"
+import { formatNairaAmount, formatDate, getStatusVariant, getInitials, extractApiError } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Users, ArrowRight, MessageCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -35,7 +35,7 @@ export default function LandlordTenanciesPage() {
       toast.success("Conversation started!")
       router.push("/landlord/messages")
     },
-    onError: () => toast.error("Failed to start conversation."),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to start conversation.")),
   })
 
   return (

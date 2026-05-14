@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatDateTime, getStatusVariant, getInitials } from "@/lib/utils"
+import { formatDateTime, getStatusVariant, getInitials, extractApiError } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Calendar, CheckCircle2, X, AlertCircle, Loader2, Send } from "lucide-react"
 import { toast } from "sonner"
@@ -70,7 +70,7 @@ export default function LandlordInspectionsPage() {
       setInviteListingId("")
       setInvitePhone("")
     },
-    onError: () => toast.error("Failed to send invite"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to send invite")),
   })
 
   return (

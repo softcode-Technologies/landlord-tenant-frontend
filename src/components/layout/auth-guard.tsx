@@ -7,11 +7,11 @@ import { Loader2 } from "lucide-react"
 
 interface AuthGuardProps {
   children: React.ReactNode
-  /** Optional: redirect here instead of /auth/login */
+  /** Optional: redirect here instead of /login */
   redirectTo?: string
 }
 
-export function AuthGuard({ children, redirectTo = "/auth/login" }: AuthGuardProps) {
+export function AuthGuard({ children, redirectTo = "/login" }: AuthGuardProps) {
   const router = useRouter()
   const { isAuthenticated, _hasHydrated } = useAuthStore()
 

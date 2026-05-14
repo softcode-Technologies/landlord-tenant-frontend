@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { getInitials, formatDate } from "@/lib/utils"
+import { getInitials, formatDate, extractApiError } from "@/lib/utils"
 import { CheckCircle2, Star, Pencil, Loader2, X } from "lucide-react"
 import { toast } from "sonner"
 
@@ -33,7 +33,7 @@ export default function AgentProfilePage() {
       setEditing(false)
       toast.success("Profile updated successfully")
     },
-    onError: () => toast.error("Failed to update profile"),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to update profile")),
   })
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
