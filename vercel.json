@@ -3,7 +3,7 @@
   "buildCommand": "next build",
   "outputDirectory": ".next",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://your-render-backend-url/api/v1",
-    "NEXT_PUBLIC_WS_URL": "https://your-render-backend-url"
+    "NEXT_PUBLIC_API_URL": "https://yourbackend/api/v1",
+    "NEXT_PUBLIC_WS_URL": "https://yourbackend-url"
   }
 }
