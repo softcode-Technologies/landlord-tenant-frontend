@@ -15,6 +15,8 @@ export const invitesApi = {
 
   getInvites: () => apiClient.get<Invite[]>("/invites"),
 
+  getMyInvites: () => apiClient.get<Invite[]>("/invites/for-me"),
+
   getInviteByCode: (code: string) => apiClient.get<Invite>(`/invites/${code}`),
 
   acceptInvite: (code: string) => apiClient.post(`/invites/${code}/accept`),
