@@ -34,7 +34,7 @@ export default function LandlordInspectionsPage() {
   const allListings = properties.flatMap((p) =>
     p.units?.filter((u) => u.listing).map((u) => ({
       id: u.listing!.id,
-      title: u.listing!.title ?? u.label,
+      title: u.listing!.title ?? u.unitNumber,
     })) ?? []
   )
   const allListingIds = allListings.map((l) => l.id)

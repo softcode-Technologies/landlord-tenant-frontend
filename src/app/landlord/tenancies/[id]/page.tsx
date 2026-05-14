@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatNairaAmount, formatDate, getStatusVariant, getInitials } from "@/lib/utils"
+import { formatNaira, formatNairaAmount, formatDate, getStatusVariant, getInitials } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Calendar, DollarSign, Shield, Trash2, RefreshCw, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -209,7 +209,7 @@ export default function LandlordTenancyDetailPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Security Deposit</CardTitle>
-                {!tenancy.depositAmountKobo && (
+                {!tenancy.depositAmount && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -221,12 +221,12 @@ export default function LandlordTenancyDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {tenancy.depositAmountKobo ? (
+              {tenancy.depositAmount ? (
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
                     <span className="text-sm text-slate-600">Amount</span>
                     <span className="font-bold text-slate-900">
-                      {formatNaira(tenancy.depositAmountKobo)}
+                      {formatNaira(tenancy.depositAmount)}
                     </span>
                   </div>
                   {tenancy.depositPaidAt && (

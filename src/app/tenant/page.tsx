@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatNaira, formatDate } from "@/lib/utils"
+import { formatNaira, formatNairaAmount, formatDate } from "@/lib/utils"
 import {
   Home, Wallet, Wrench, Calendar, ArrowRight, TrendingUp
 } from "lucide-react"
