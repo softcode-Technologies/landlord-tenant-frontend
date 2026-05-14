@@ -55,6 +55,14 @@ export default function ListingDetailPage() {
   const [scheduledAt, setScheduledAt] = useState("")
   const [scheduleNote, setScheduleNote] = useState("")
 
+  // Returns a datetime-local string in local timezone with an optional offset in minutes
+  const localDateTimeString = (offsetMinutes = 0) => {
+    const d = new Date(Date.now() + offsetMinutes * 60000)
+    d.setSeconds(0, 0)
+    const pad = (n: number) => String(n).padStart(2, "0")
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  }
+
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
     queryFn: () => listingsApi.getListing(id),
@@ -154,6 +162,13 @@ export default function ListingDetailPage() {
       router.push("/login?redirect=/listings/" + id)
       return
     }
+    // Default to tomorrow at 10:00 local time
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setHours(10, 0, 0, 0)
+    const pad = (n: number) => String(n).padStart(2, "0")
+    const defaultVal = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}T10:00`
+    setScheduledAt(defaultVal)
     setScheduleOpen(true)
   }
 
@@ -541,7 +556,7 @@ export default function ListingDetailPage() {
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
                 className="mt-1.5"
-                min={new Date().toISOString().slice(0, 16)}
+                min={localDateTimeString(60)}
               />
             </div>
             <div>
@@ -566,7 +581,13 @@ export default function ListingDetailPage() {
             <Button
               className="flex-1"
               disabled={!scheduledAt || scheduleMutation.isPending}
-              onClick={() => scheduleMutation.mutate()}
+              onClick={() => {
+                if (new Date(scheduledAt) <= new Date()) {
+                  toast.error("Please select a future date and time.")
+                  return
+                }
+                scheduleMutation.mutate()
+              }}
             >
               {scheduleMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
