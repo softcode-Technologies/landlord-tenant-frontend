@@ -4,17 +4,21 @@ import { useState, useEffect, useRef } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { io, Socket } from "socket.io-client"
 import { messagingApi } from "@/lib/api/messaging"
+import { tenanciesApi } from "@/lib/api/tenancies"
 import { useAuthStore } from "@/lib/store/auth"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { EmptyState } from "@/components/shared/empty-state"
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog"
 import { getInitials, formatRelativeTime } from "@/lib/utils"
 import type { Message, Conversation } from "@/lib/types"
-import { MessageCircle, Send, Loader2 } from "lucide-react"
+import { MessageCircle, Send, Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 
 export default function TenantMessagesPage() {
   const { user, accessToken } = useAuthStore()
@@ -22,8 +26,11 @@ export default function TenantMessagesPage() {
   const [selected, setSelected] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState("")
+  const [composeOpen, setComposeOpen] = useState(false)
   const socketRef = useRef<Socket | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const isLandlord = !!user?.landlordProfile
 
   // Connect Socket.IO
   useEffect(() => {
@@ -41,9 +48,7 @@ export default function TenantMessagesPage() {
       queryClient.invalidateQueries({ queryKey: ["conversations"] })
     })
 
-    return () => {
-      socket.disconnect()
-    }
+    return () => { socket.disconnect() }
   }, [accessToken, queryClient])
 
   // Load messages when conversation selected
@@ -52,16 +57,10 @@ export default function TenantMessagesPage() {
     messagingApi.getMessages(selected.id).then((res) => {
       setMessages(res.data ?? [])
     })
-
-    // Join room
     socketRef.current?.emit("join_conversation", selected.id)
-
-    return () => {
-      socketRef.current?.emit("leave_conversation", selected.id)
-    }
+    return () => { socketRef.current?.emit("leave_conversation", selected.id) }
   }, [selected])
 
-  // Auto scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
@@ -69,6 +68,15 @@ export default function TenantMessagesPage() {
   const { data: convsData, isLoading } = useQuery({
     queryKey: ["conversations"],
     queryFn: () => messagingApi.getConversations(),
+  })
+
+  // Fetch tenancies to populate the contact picker
+  const { data: tenanciesData } = useQuery({
+    queryKey: isLandlord ? ["landlord-tenancies"] : ["tenant-tenancies"],
+    queryFn: isLandlord
+      ? () => tenanciesApi.getLandlordTenancies()
+      : () => tenanciesApi.getTenantTenancies(),
+    enabled: composeOpen,
   })
 
   const sendMutation = useMutation({
@@ -79,11 +87,44 @@ export default function TenantMessagesPage() {
     },
   })
 
+  const startMutation = useMutation({
+    mutationFn: (recipientUserId: string) =>
+      messagingApi.createConversation({
+        recipientUserId,
+        body: "Hello! I'd like to get in touch.",
+      }),
+    onSuccess: (res) => {
+      setComposeOpen(false)
+      queryClient.invalidateQueries({ queryKey: ["conversations"] })
+      setSelected(res.data)
+      toast.success("Conversation started!")
+    },
+    onError: () => toast.error("Failed to start conversation."),
+  })
+
   const conversations = convsData?.data ?? []
 
-  const getOtherParticipant = (conv: Conversation) => {
-    return conv.participants?.find((p) => p.id !== user?.id) ?? conv.participants?.[0]
-  }
+  // Build contact list from tenancies
+  const contacts = (() => {
+    const tenancies = tenanciesData?.data ?? []
+    const seen = new Set<string>()
+    return tenancies.flatMap((t) => {
+      const contact = isLandlord ? t.tenant : t.landlord
+      const contactId = isLandlord ? t.tenantUserId : t.landlordUserId
+      if (!contact || !contactId || seen.has(contactId)) return []
+      seen.add(contactId)
+      return [{
+        id: contactId,
+        name: `${contact.firstName ?? ""} ${contact.lastName ?? ""}`.trim() || "User",
+        avatarUrl: contact.avatarUrl,
+        role: isLandlord ? "Tenant" : "Landlord",
+        property: t.property?.name ?? t.unit?.unitNumber ?? "",
+      }]
+    })
+  })()
+
+  const getOtherParticipant = (conv: Conversation) =>
+    conv.participants?.find((p) => p.id !== user?.id) ?? conv.participants?.[0]
 
   const doSend = () => {
     if (!inputText.trim() || !selected) return
@@ -105,8 +146,17 @@ export default function TenantMessagesPage() {
       <div className="flex gap-0 h-[calc(100vh-250px)] min-h-[500px] bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {/* Conversations list */}
         <div className="w-full sm:w-80 border-r border-slate-100 flex flex-col shrink-0">
-          <div className="p-4 border-b border-slate-100">
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-700">Conversations</p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 gap-1 text-xs"
+              onClick={() => setComposeOpen(true)}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              New
+            </Button>
           </div>
 
           <ScrollArea className="flex-1">
@@ -125,7 +175,11 @@ export default function TenantMessagesPage() {
             ) : conversations.length === 0 ? (
               <div className="p-8 text-center">
                 <MessageCircle className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                <p className="text-xs text-slate-400">No conversations yet</p>
+                <p className="text-xs text-slate-400 mb-3">No conversations yet</p>
+                <Button size="sm" variant="outline" onClick={() => setComposeOpen(true)} className="gap-1">
+                  <Plus className="h-3.5 w-3.5" />
+                  Start one
+                </Button>
               </div>
             ) : (
               <div className="divide-y divide-slate-50">
@@ -149,9 +203,7 @@ export default function TenantMessagesPage() {
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <p className="text-sm font-semibold text-slate-900 truncate">
-                            {name}
-                          </p>
+                          <p className="text-sm font-semibold text-slate-900 truncate">{name}</p>
                           {conv.lastMessage && (
                             <span className="text-[10px] text-slate-400 shrink-0">
                               {formatRelativeTime(conv.updatedAt)}
@@ -159,9 +211,7 @@ export default function TenantMessagesPage() {
                           )}
                         </div>
                         {conv.lastMessage && (
-                          <p className="text-xs text-slate-500 truncate">
-                            {conv.lastMessage.body}
-                          </p>
+                          <p className="text-xs text-slate-500 truncate">{conv.lastMessage.body}</p>
                         )}
                       </div>
                       {(conv.unreadCount ?? 0) > 0 && (
@@ -181,7 +231,6 @@ export default function TenantMessagesPage() {
         <div className="flex-1 flex flex-col">
           {selected ? (
             <>
-              {/* Chat header */}
               <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
                 {(() => {
                   const other = getOtherParticipant(selected)
@@ -205,16 +254,12 @@ export default function TenantMessagesPage() {
                 })()}
               </div>
 
-              {/* Messages */}
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-3">
                   {messages.map((msg) => {
                     const isMe = msg.senderUserId === user?.id
                     return (
-                      <div
-                        key={msg.id}
-                        className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                      >
+                      <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                         <div
                           className={`max-w-xs lg:max-w-md px-4 py-2.5 rounded-2xl text-sm ${
                             isMe
@@ -223,11 +268,7 @@ export default function TenantMessagesPage() {
                           }`}
                         >
                           <p className="leading-relaxed">{msg.body}</p>
-                          <p
-                            className={`text-[10px] mt-1 ${
-                              isMe ? "text-blue-200" : "text-slate-400"
-                            }`}
-                          >
+                          <p className={`text-[10px] mt-1 ${isMe ? "text-blue-200" : "text-slate-400"}`}>
                             {formatRelativeTime(msg.createdAt)}
                           </p>
                         </div>
@@ -238,7 +279,6 @@ export default function TenantMessagesPage() {
                 </div>
               </ScrollArea>
 
-              {/* Input */}
               <form
                 onSubmit={handleSend}
                 className="flex items-center gap-2 px-4 py-3 border-t border-slate-100"
@@ -249,17 +289,10 @@ export default function TenantMessagesPage() {
                   placeholder="Type a message..."
                   className="flex-1"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault()
-                      doSend()
-                    }
+                    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doSend() }
                   }}
                 />
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={!inputText.trim() || sendMutation.isPending}
-                >
+                <Button type="submit" size="icon" disabled={!inputText.trim() || sendMutation.isPending}>
                   {sendMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
@@ -279,6 +312,53 @@ export default function TenantMessagesPage() {
           )}
         </div>
       </div>
+
+      {/* New Conversation Dialog */}
+      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>New Conversation</DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            {contacts.length === 0 ? (
+              <div className="text-center py-8">
+                <MessageCircle className="h-10 w-10 text-slate-200 mx-auto mb-3" />
+                <p className="text-sm text-slate-500">
+                  {isLandlord
+                    ? "You have no active tenants to message. Invite a tenant first."
+                    : "You have no active tenancy. Accept an invite or browse listings to get started."}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-slate-400 mb-3">Select who you want to message:</p>
+                {contacts.map((contact) => (
+                  <button
+                    key={contact.id}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors text-left border border-slate-100"
+                    onClick={() => startMutation.mutate(contact.id)}
+                    disabled={startMutation.isPending}
+                  >
+                    <Avatar className="h-10 w-10 shrink-0">
+                      <AvatarImage src={contact.avatarUrl} />
+                      <AvatarFallback>{getInitials(contact.name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-slate-900">{contact.name}</p>
+                      <p className="text-xs text-slate-400">
+                        {contact.role}{contact.property ? ` · ${contact.property}` : ""}
+                      </p>
+                    </div>
+                    {startMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                    ) : null}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
