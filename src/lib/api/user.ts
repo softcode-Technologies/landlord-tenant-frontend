@@ -12,6 +12,14 @@ export interface UpdateProfileData {
   licenseNumber?: string
 }
 
+export interface UpdateLandlordProfileData {
+  companyName?: string
+  bio?: string
+  bankName?: string
+  bankCode?: string
+  bankAccountNumber?: string
+}
+
 export interface OnboardData {
   firstName: string
   lastName?: string
@@ -28,6 +36,9 @@ export const userApi = {
 
   updateProfile: (data: UpdateProfileData) =>
     apiClient.patch<User>("/user/profile", data),
+
+  updateLandlordProfile: (data: UpdateLandlordProfileData) =>
+    apiClient.patch<User>("/user/landlord-profile", data),
 
   onboard: async (data: OnboardData) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

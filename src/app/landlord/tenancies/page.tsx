@@ -1,7 +1,9 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
 import { tenanciesApi } from "@/lib/api/tenancies"
+import { messagingApi } from "@/lib/api/messaging"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,16 +11,32 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
 import { formatNairaAmount, formatDate, getStatusVariant, getInitials } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Users, ArrowRight, Shield } from "lucide-react"
+import { Users, ArrowRight, MessageCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 export default function LandlordTenanciesPage() {
+  const router = useRouter()
+
   const { data, isLoading } = useQuery({
     queryKey: ["landlord-tenancies"],
     queryFn: () => tenanciesApi.getLandlordTenancies(),
   })
 
   const tenancies = data?.data ?? []
+
+  const messageMutation = useMutation({
+    mutationFn: (recipientUserId: string) =>
+      messagingApi.createConversation({
+        recipientUserId,
+        body: "Hello! I'm reaching out regarding your tenancy.",
+      }),
+    onSuccess: () => {
+      toast.success("Conversation started!")
+      router.push("/landlord/messages")
+    },
+    onError: () => toast.error("Failed to start conversation."),
+  })
 
   return (
     <div className="space-y-6">
@@ -86,6 +104,22 @@ export default function LandlordTenanciesPage() {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
+                      {tenancy.tenantUserId && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() => messageMutation.mutate(tenancy.tenantUserId)}
+                          disabled={messageMutation.isPending}
+                        >
+                          {messageMutation.isPending ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <MessageCircle className="h-3.5 w-3.5" />
+                          )}
+                          Message
+                        </Button>
+                      )}
                       <Link href={`/landlord/tenancies/${tenancy.id}`}>
                         <Button variant="outline" size="sm" className="gap-1">
                           Details

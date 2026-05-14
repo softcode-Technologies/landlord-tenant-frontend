@@ -27,6 +27,10 @@ export interface LandlordProfile {
   userId: string
   companyName?: string
   bio?: string
+  bankName?: string | null
+  bankCode?: string | null
+  bankAccountNumber?: string | null
+  isVerified?: boolean
   kycStatus: "pending" | "approved" | "rejected"
 }
 

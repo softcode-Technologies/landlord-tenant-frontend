@@ -12,6 +12,7 @@ import {
   BarChart3,
   MessageCircle,
   Calendar,
+  User,
 } from "lucide-react"
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { label: "Inspections", href: "/landlord/inspections", icon: Calendar },
   { label: "Analytics", href: "/landlord/analytics", icon: BarChart3 },
   { label: "Messages", href: "/landlord/messages", icon: MessageCircle },
+  { label: "Profile", href: "/landlord/profile", icon: User },
 ]
 
 export default function LandlordLayout({ children }: { children: React.ReactNode }) {
