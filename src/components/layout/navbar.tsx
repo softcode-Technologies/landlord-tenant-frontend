@@ -15,21 +15,28 @@ import {
 import { useAuthStore, getRoleDashboardPath } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
 import { getInitials } from "@/lib/utils"
-import { Building2, LogOut, User, LayoutDashboard, Bell, Menu, X } from "lucide-react"
-import { useState } from "react"
+import { Building2, LogOut, User, LayoutDashboard, Menu, X, Sun, Moon } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import { toast } from "sonner"
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuthStore()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const { setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const handleScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const handleLogout = async () => {
-    try {
-      await authApi.logout()
-    } catch {
-      // ignore
-    }
+    try { await authApi.logout() } catch { /* ignore */ }
     logout()
     document.cookie = "naijarental-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
     toast.success("Logged out successfully")
@@ -38,53 +45,69 @@ export function Navbar() {
 
   const dashboardPath = getRoleDashboardPath(user)
   const fullName = user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "User" : ""
+  const isDark = resolvedTheme === "dark"
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-100 shadow-sm">
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
+      scrolled
+        ? "bg-white/90 dark:bg-[#0a0f1e]/90 backdrop-blur-xl shadow-lg shadow-slate-900/5 dark:shadow-black/20 border-b border-slate-100/80 dark:border-white/5"
+        : "bg-white/80 dark:bg-transparent backdrop-blur-md"
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center shadow-md">
               <Building2 className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-[#1a3c5e]">
+            <span className="text-xl font-bold text-[#1a3c5e] dark:text-white">
               Naija<span className="text-[#f97316]">Rental</span>
             </span>
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link
-              href="/listings"
-              className="text-sm font-medium text-slate-600 hover:text-[#1a3c5e] transition-colors"
-            >
-              Browse Listings
-            </Link>
-            <Link
-              href="/agents"
-              className="text-sm font-medium text-slate-600 hover:text-[#1a3c5e] transition-colors"
-            >
-              Find Agents
-            </Link>
+          <div className="hidden md:flex items-center gap-1">
+            {[
+              { label: "Browse Listings", href: "/listings" },
+              { label: "Find Agents", href: "/agents" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#1a3c5e] dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
-          {/* Desktop Auth */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop Auth + Theme Toggle */}
+          <div className="hidden md:flex items-center gap-2">
+            {/* Dark mode toggle */}
+            {mounted && (
+              <button
+                onClick={() => setTheme(isDark ? "light" : "dark")}
+                className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-[#1a3c5e] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                aria-label="Toggle theme"
+              >
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
+            )}
+
             {isAuthenticated && user ? (
               <>
                 <Link href={dashboardPath}>
-                  <Button variant="ghost" size="sm" className="gap-2">
+                  <Button variant="ghost" size="sm" className="gap-2 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10">
                     <LayoutDashboard className="h-4 w-4" />
                     Dashboard
                   </Button>
                 </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-2 p-1 rounded-full hover:bg-slate-50 transition-colors">
+                    <button className="flex items-center gap-2 p-1 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors ring-2 ring-transparent hover:ring-[#f97316]/30">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={user.avatarUrl} />
-                        <AvatarFallback className="text-xs">{getInitials(fullName)}</AvatarFallback>
+                        <AvatarFallback className="text-xs bg-[#1a3c5e] text-white">{getInitials(fullName)}</AvatarFallback>
                       </Avatar>
                     </button>
                   </DropdownMenuTrigger>
@@ -98,23 +121,17 @@ export function Navbar() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href={dashboardPath} className="cursor-pointer">
-                        <LayoutDashboard className="h-4 w-4 mr-2" />
-                        Dashboard
+                        <LayoutDashboard className="h-4 w-4 mr-2" />Dashboard
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href={`${dashboardPath}/profile`} className="cursor-pointer">
-                        <User className="h-4 w-4 mr-2" />
-                        Profile
+                        <User className="h-4 w-4 mr-2" />Profile
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="text-red-600 cursor-pointer"
-                      onClick={handleLogout}
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Log out
+                    <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={handleLogout}>
+                      <LogOut className="h-4 w-4 mr-2" />Log out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -122,12 +139,12 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10">
                     Log in
                   </Button>
                 </Link>
                 <Link href="/login">
-                  <Button size="sm" className="bg-[#f97316] hover:bg-[#f97316]/90 text-white">
+                  <Button size="sm" className="bg-[#f97316] hover:bg-[#ea6b0e] text-white rounded-xl shadow-md shadow-orange-500/20">
                     Get Started
                   </Button>
                 </Link>
@@ -135,56 +152,65 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          {/* Mobile: theme + menu */}
+          <div className="md:hidden flex items-center gap-2">
+            {mounted && (
+              <button
+                onClick={() => setTheme(isDark ? "light" : "dark")}
+                className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10"
+              >
+                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            )}
+            <button
+              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden py-4 border-t border-slate-100 space-y-2">
-            <Link
-              href="/listings"
-              className="block px-3 py-2 text-sm font-medium text-slate-600 hover:text-[#1a3c5e] hover:bg-slate-50 rounded-lg"
-              onClick={() => setMobileOpen(false)}
-            >
-              Browse Listings
-            </Link>
-            <Link
-              href="/agents"
-              className="block px-3 py-2 text-sm font-medium text-slate-600 hover:text-[#1a3c5e] hover:bg-slate-50 rounded-lg"
-              onClick={() => setMobileOpen(false)}
-            >
-              Find Agents
-            </Link>
+          <div className="md:hidden py-4 border-t border-slate-100 dark:border-white/10 space-y-1">
+            {[
+              { label: "Browse Listings", href: "/listings" },
+              { label: "Find Agents", href: "/agents" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#1a3c5e] dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
             {isAuthenticated ? (
               <>
                 <Link
                   href={dashboardPath}
-                  className="block px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg"
+                  className="block px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg"
                   onClick={() => setMobileOpen(false)}
                 >
                   Dashboard
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="block w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg"
+                  className="block w-full text-left px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
                 >
                   Log out
                 </button>
               </>
             ) : (
-              <Link
-                href="/login"
-                className="block px-3 py-2 text-sm font-medium text-[#1a3c5e] hover:bg-slate-50 rounded-lg"
-                onClick={() => setMobileOpen(false)}
-              >
-                Log in / Sign up
-              </Link>
+              <div className="px-3 pt-2">
+                <Link href="/login" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full bg-[#f97316] hover:bg-[#ea6b0e] text-white">
+                    Log in / Sign up
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         )}
