@@ -314,30 +314,29 @@ export default function HomePage() {
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-white dark:bg-[#0a0f1e]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold text-[#f97316] uppercase tracking-wider mb-3">Simple Process</p>
-            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">How NaijaRental Works</h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto text-lg">
+      <section className="py-14 bg-white dark:bg-[#0a0f1e]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-wider mb-2">Simple Process</p>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-3">How NaijaRental Works</h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto text-sm">
               From search to move-in in three simple steps. No stress, no hidden fees.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {/* Connecting line (desktop) */}
-            <div className="hidden md:block absolute top-12 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px bg-gradient-to-r from-blue-500 via-[#f97316] to-emerald-500 opacity-30" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            <div className="hidden md:block absolute top-9 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px bg-gradient-to-r from-blue-500 via-[#f97316] to-emerald-500 opacity-30" />
 
             {STEPS.map((step, i) => (
               <div key={step.step} className="relative flex flex-col items-center text-center group">
-                <div className={`relative w-24 h-24 rounded-2xl bg-gradient-to-br ${step.gradient} flex items-center justify-center mb-6 shadow-xl ${step.glow} group-hover:scale-105 transition-transform duration-300`}>
-                  <step.icon className="h-10 w-10 text-white" />
-                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-md border-2 border-slate-100 dark:border-slate-700">
-                    <span className="text-xs font-black text-[#1a3c5e] dark:text-white">{i + 1}</span>
+                <div className={`relative w-16 h-16 rounded-xl bg-gradient-to-br ${step.gradient} flex items-center justify-center mb-4 shadow-lg ${step.glow} group-hover:scale-105 transition-transform duration-300`}>
+                  <step.icon className="h-7 w-7 text-white" />
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-md border-2 border-slate-100 dark:border-slate-700">
+                    <span className="text-[10px] font-black text-[#1a3c5e] dark:text-white">{i + 1}</span>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{step.title}</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-xs">{step.description}</p>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">{step.title}</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed max-w-[220px]">{step.description}</p>
               </div>
             ))}
           </div>
