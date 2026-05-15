@@ -8,7 +8,7 @@ export function useUnreadCount(): number {
   const { data } = useQuery({
     queryKey: ["notifications-unread-count"],
     queryFn: () => notificationsApi.getUnreadCount(),
-    refetchInterval: 30_000,
+    refetchInterval: 60_000,
     enabled: !!user,
   })
 
