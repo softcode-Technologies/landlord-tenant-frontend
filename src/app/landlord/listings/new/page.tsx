@@ -49,6 +49,7 @@ export default function NewListingPage() {
   const allUnits = properties.flatMap((p) =>
     p.units?.map((u) => ({ ...u, propertyName: p.name })) ?? []
   )
+  const selectedUnit = allUnits.find((u) => u.id === form.unitId)
 
   const validate = (): boolean => {
     const errs: Partial<Record<keyof FormData, string>> = {}
@@ -104,7 +105,17 @@ export default function NewListingPage() {
             <CardTitle>Select Unit</CardTitle>
           </CardHeader>
           <CardContent>
-            <Select value={form.unitId} onValueChange={(val) => setField("unitId", val)}>
+            <Select
+              value={form.unitId}
+              onValueChange={(val) => {
+                const unit = allUnits.find((u) => u.id === val)
+                setForm((f) => ({
+                  ...f,
+                  unitId: val,
+                  rentPerAnnum: unit?.rentPerAnnum ? String(unit.rentPerAnnum) : f.rentPerAnnum,
+                }))
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Choose a unit to list" />
               </SelectTrigger>
@@ -171,7 +182,14 @@ export default function NewListingPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Annual Rent (₦)</Label>
+                <Label>
+                  Annual Rent (₦)
+                  {selectedUnit?.rentPerAnnum && (
+                    <span className="ml-2 text-xs font-normal text-green-600">
+                      pre-filled from unit
+                    </span>
+                  )}
+                </Label>
                 <Input
                   type="number"
                   value={form.rentPerAnnum}
@@ -179,7 +197,9 @@ export default function NewListingPage() {
                   placeholder="e.g. 1200000"
                   className="mt-1.5"
                 />
-                <p className="text-xs text-slate-400 mt-1">Enter amount in Naira per year</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Asking price shown to tenants — can differ from the unit's base rent
+                </p>
                 {errors.rentPerAnnum && (
                   <p className="text-xs text-red-500 mt-1">{errors.rentPerAnnum}</p>
                 )}
