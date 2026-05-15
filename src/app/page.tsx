@@ -519,31 +519,29 @@ export default function HomePage() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────────────────────────── */}
-      <section className="py-24 relative overflow-hidden">
+      <section className="py-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#f97316] via-[#f97316] to-[#ea6b0e]" />
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
-        <div className="absolute top-0 right-1/4 w-64 h-64 bg-white/10 rounded-full blur-[80px]" />
-
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-4 py-1.5 mb-6">
-            <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-            <span className="text-sm font-medium text-white">Join 28,000+ Nigerians</span>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-3 py-1 mb-4">
+            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+            <span className="text-xs font-medium text-white">Join 28,000+ Nigerians</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-5 leading-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 leading-tight">
             Ready to find your next home?
           </h2>
-          <p className="text-orange-100 text-lg mb-10 max-w-xl mx-auto">
+          <p className="text-orange-100 text-sm mb-7 max-w-md mx-auto">
             Nigeria&apos;s most trusted rental platform. Verified listings, transparent pricing, zero hidden fees.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/listings">
-              <Button size="lg" className="bg-white text-[#f97316] hover:bg-white/95 font-bold px-10 h-14 text-base shadow-2xl shadow-black/20 rounded-xl gap-2">
-                <Search className="h-5 w-5" />Browse Listings
+              <Button size="lg" className="bg-white text-[#f97316] hover:bg-white/95 font-bold px-8 h-11 text-sm shadow-xl shadow-black/20 rounded-xl gap-2">
+                <Search className="h-4 w-4" />Browse Listings
               </Button>
             </Link>
             <Link href="/login">
-              <Button size="lg" variant="outline" className="border-2 border-white/50 text-white hover:bg-white/10 font-bold px-10 h-14 text-base rounded-xl gap-2">
-                Create Free Account <ChevronRight className="h-5 w-5" />
+              <Button size="lg" variant="outline" className="border-2 border-white/50 text-white hover:bg-white/10 font-bold px-8 h-11 text-sm rounded-xl gap-2">
+                Create Free Account <ChevronRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
