@@ -225,16 +225,18 @@ export default function HomePage() {
       </section>
 
       {/* ── STATS BAR ─────────────────────────────────────────────────────────── */}
-      <section className="bg-white dark:bg-[#0a0f1e] py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x divide-slate-100 dark:divide-slate-800">
+      <section className="bg-white dark:bg-[#0a0f1e] py-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 md:divide-x divide-slate-100 dark:divide-slate-800">
             {STATS.map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center text-center md:px-8 gap-2">
-                <div className="w-10 h-10 rounded-xl bg-[#f97316]/10 flex items-center justify-center mb-1">
-                  <stat.icon className="h-5 w-5 text-[#f97316]" />
+              <div key={stat.label} className="flex items-center justify-center gap-3 md:px-6 py-2">
+                <div className="w-8 h-8 rounded-lg bg-[#f97316]/10 flex items-center justify-center shrink-0">
+                  <stat.icon className="h-4 w-4 text-[#f97316]" />
                 </div>
-                <p className="text-3xl font-bold text-[#1a3c5e] dark:text-white">{stat.value}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
+                <div>
+                  <p className="text-xl font-bold text-[#1a3c5e] dark:text-white leading-tight">{stat.value}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{stat.label}</p>
+                </div>
               </div>
             ))}
           </div>
