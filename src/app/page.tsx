@@ -540,7 +540,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/login">
-              <Button size="lg" variant="outline" className="border-2 border-white/50 text-white hover:bg-white/10 font-bold px-8 h-11 text-sm rounded-xl gap-2">
+              <Button size="lg" className="bg-[#0f2d48] hover:bg-[#1a3c5e] text-white font-bold px-8 h-11 text-sm rounded-xl gap-2 border-0">
                 Create Free Account <ChevronRight className="h-4 w-4" />
               </Button>
             </Link>
