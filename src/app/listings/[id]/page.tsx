@@ -499,7 +499,7 @@ export default function ListingDetailPage() {
                       Unlock Contact
                     </Button>
                     <p className="text-xs text-slate-400 text-center">
-                      Pay ₦1,500 to unlock landlord contact details, then book an inspection
+                      Pay ₦1,500 to unlock verified landlord contact details, then book an inspection
                     </p>
                   </>
                 )}
