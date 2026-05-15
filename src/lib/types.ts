@@ -108,6 +108,7 @@ export interface Listing {
   reviews?: Review[]
   averageRating?: number
   reviewCount?: number
+  isListerVerified?: boolean
   isSaved?: boolean
   property?: Pick<Property, "city" | "state" | "lga" | "area" | "address" | "name">
 }

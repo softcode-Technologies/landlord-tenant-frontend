@@ -45,6 +45,7 @@ interface RawListing {
     images?: string[]
     latitude?: number | null
     longitude?: number | null
+    landlordProfile?: { isVerified?: boolean }
   }
   lister?: {
     id: string
@@ -85,6 +86,8 @@ function normalizeListing(raw: RawListing): Listing {
     state: raw.property?.state ?? "",
     lga: raw.property?.lga,
     area: raw.property?.area,
+    isListerVerified: raw.property?.landlordProfile?.isVerified ?? false,
+    viewCount: raw.viewCount ?? 0,
     address: raw.property
       ? `${raw.property.name ?? ""}, ${raw.property.area ?? raw.property.lga ?? raw.property.city}`.replace(/^, /, "")
       : "",

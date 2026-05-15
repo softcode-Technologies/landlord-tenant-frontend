@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { MapPin, Bed, Bath, Heart, Star } from "lucide-react"
+import { MapPin, Bed, Bath, Heart, Star, BadgeCheck, Eye } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatNairaAmount } from "@/lib/utils"
@@ -59,11 +59,23 @@ export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
               (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop"
             }}
           />
-          {listing.isFeatured && (
-            <Badge className="absolute top-3 left-3 bg-[#f97316] text-white">
-              Featured
-            </Badge>
-          )}
+          <div className="absolute top-3 left-3 flex items-center gap-1.5">
+            {listing.isFeatured && (
+              <Badge className="bg-[#f97316] text-white">Featured</Badge>
+            )}
+            {listing.isListerVerified && (
+              <Badge className="bg-[#1a3c5e] text-white gap-1 px-2">
+                <BadgeCheck className="h-3 w-3" />
+                Verified
+              </Badge>
+            )}
+          </div>
+
+          {/* View count */}
+          <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+            <Eye className="h-3 w-3" />
+            <span>{(listing.viewCount ?? 0).toLocaleString()}</span>
+          </div>
           <button
             onClick={handleSave}
             disabled={saving}
