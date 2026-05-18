@@ -91,6 +91,7 @@ export interface Listing {
   images: string[]
   status?: "draft" | "active" | "paused" | "closed"
   isFeatured: boolean
+  featuredUntil?: string | null
   isActive: boolean
   viewCount?: number
   createdAt: string
@@ -260,12 +261,17 @@ export interface InspectionSchedule {
 // Conversations & Messages
 export interface Conversation {
   id: string
-  participantIds: string[]
+  landlordUserId?: string
+  tenantUserId?: string
+  agentUserId?: string
+  landlord?: Pick<User, "id" | "firstName" | "lastName" | "email" | "avatarUrl">
+  tenant?: Pick<User, "id" | "firstName" | "lastName" | "email" | "avatarUrl">
+  agent?: Pick<User, "id" | "firstName" | "lastName" | "email" | "avatarUrl">
   propertyId?: string
   lastMessage?: Message
-  participants?: User[]
   property?: Property
   unreadCount?: number
+  lastMessageAt?: string
   updatedAt: string
 }
 

@@ -40,9 +40,11 @@ export default function TenantMessagesPage() {
     })
     socketRef.current = socket
 
-    socket.on("new_message", (msg: Message) => {
+    // Backend emits { conversationId, message } — unwrap the message
+    socket.on("new_message", (payload: { conversationId?: string; message?: Message } | Message) => {
+      const msg = (payload as { message?: Message }).message ?? (payload as Message)
       setMessages((prev) => {
-        if (prev.find((m) => m.id === msg.id)) return prev
+        if (!msg?.id || prev.find((m) => m.id === msg.id)) return prev
         return [...prev, msg]
       })
       queryClient.invalidateQueries({ queryKey: ["conversations"] })
@@ -55,7 +57,10 @@ export default function TenantMessagesPage() {
   useEffect(() => {
     if (!selected) return
     messagingApi.getMessages(selected.id).then((res) => {
-      setMessages(res.data ?? [])
+      const payload = res.data as unknown
+      const msgs: Message[] = Array.isArray(payload) ? payload : ((payload as { data: Message[] })?.data ?? [])
+      // Backend returns DESC order; reverse for chronological display
+      setMessages([...msgs].reverse())
     })
     socketRef.current?.emit("join_conversation", selected.id)
     return () => { socketRef.current?.emit("leave_conversation", selected.id) }
@@ -93,10 +98,15 @@ export default function TenantMessagesPage() {
         recipientUserId,
         body: "Hello! I'd like to get in touch.",
       }),
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       setComposeOpen(false)
+      const newId = (res.data as Conversation).id
+      // Re-fetch to get conversation with participant data included
+      const refreshed = await messagingApi.getConversations()
+      const convList = (refreshed.data as unknown as Conversation[]) ?? []
+      const found = convList.find((c) => c.id === newId) ?? (res.data as Conversation)
       queryClient.invalidateQueries({ queryKey: ["conversations"] })
-      setSelected(res.data)
+      setSelected(found)
       toast.success("Conversation started!")
     },
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to start conversation.")),
@@ -123,8 +133,13 @@ export default function TenantMessagesPage() {
     })
   })()
 
-  const getOtherParticipant = (conv: Conversation) =>
-    conv.participants?.find((p) => p.id !== user?.id) ?? conv.participants?.[0]
+  const getOtherParticipant = (conv: Conversation) => {
+    const uid = user?.id
+    if (conv.landlord && conv.landlordUserId !== uid) return conv.landlord
+    if (conv.tenant && conv.tenantUserId !== uid) return conv.tenant
+    if (conv.agent && conv.agentUserId !== uid) return conv.agent
+    return null
+  }
 
   const doSend = () => {
     if (!inputText.trim() || !selected) return
@@ -143,20 +158,18 @@ export default function TenantMessagesPage() {
         <p className="text-slate-500 mt-1">Real-time conversations with landlords and agents</p>
       </div>
 
-      <div className="flex gap-0 h-[calc(100vh-250px)] min-h-[500px] bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div className="flex gap-0 h-[calc(100vh-250px)] min-h-[500px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         {/* Conversations list */}
         <div className="w-full sm:w-80 border-r border-slate-100 flex flex-col shrink-0">
           <div className="p-4 border-b border-slate-100 flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-700">Conversations</p>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 gap-1 text-xs"
+            <button
               onClick={() => setComposeOpen(true)}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               <Plus className="h-3.5 w-3.5" />
               New
-            </Button>
+            </button>
           </div>
 
           <ScrollArea className="flex-1">
@@ -287,7 +300,7 @@ export default function TenantMessagesPage() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Type a message..."
-                  className="flex-1"
+                  className="flex-1 bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doSend() }
                   }}

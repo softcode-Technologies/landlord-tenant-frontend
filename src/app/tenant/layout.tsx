@@ -17,6 +17,7 @@ import {
   Bell,
   User,
   Gift,
+  KeyRound,
 } from "lucide-react"
 
 function TenantNav({ children }: { children: React.ReactNode }) {
@@ -30,8 +31,9 @@ function TenantNav({ children }: { children: React.ReactNode }) {
   const navItems = [
     { label: "Dashboard", href: "/tenant", icon: LayoutDashboard },
     { label: "My Tenancies", href: "/tenant/tenancies", icon: Home },
-    { label: "Maintenance", href: "/tenant/maintenance", icon: Wrench },
+    { label: "Tenancy Invites", href: "/tenant/invites", icon: KeyRound },
     { label: "Inspections", href: "/tenant/inspections", icon: Calendar },
+    { label: "Maintenance", href: "/tenant/maintenance", icon: Wrench },
     { label: "Wallet", href: "/tenant/wallet", icon: Wallet },
     { label: "Refer & Earn", href: "/tenant/referrals", icon: Gift },
     { label: "Saved Listings", href: "/tenant/saved", icon: Heart },

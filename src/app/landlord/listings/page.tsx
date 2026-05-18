@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { listingsApi, UpdateListingData } from "@/lib/api/listings"
+import { paymentsApi } from "@/lib/api/payments"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -18,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { formatNairaAmount, formatDate, extractApiError } from "@/lib/utils"
-import { List, Plus, MapPin, Bed, Eye, Pencil, Trash2, Loader2, CheckCircle } from "lucide-react"
+import { List, Plus, MapPin, Bed, Eye, Pencil, Trash2, Loader2, CheckCircle, Rocket } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import type { Listing } from "@/lib/types"
@@ -27,9 +28,31 @@ export default function LandlordListingsPage() {
   const queryClient = useQueryClient()
   const [editListing, setEditListing] = useState<Listing | null>(null)
   const [closingId, setClosingId] = useState<string | null>(null)
+  const [boostingListing, setBoostingListing] = useState<Listing | null>(null)
+  const [selectedTierDays, setSelectedTierDays] = useState<number | null>(null)
 
   const [title, setTitle] = useState("")
   const [rentInput, setRentInput] = useState("")
+
+  const { data: boostTiers } = useQuery({
+    queryKey: ["boost-tiers"],
+    queryFn: () => paymentsApi.getBoostTiers().then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const boostMutation = useMutation({
+    mutationFn: ({ listingId, tierDays }: { listingId: string; tierDays: number }) =>
+      paymentsApi.boostListing(listingId, tierDays),
+    onSuccess: (res) => {
+      const url = res.data?.paymentUrl
+      if (url) {
+        window.location.href = url
+      } else {
+        toast.error("No payment URL returned. Please try again.")
+      }
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to start boost payment")),
+  })
 
   const { data, isLoading } = useQuery({
     queryKey: ["my-listings"],
@@ -199,6 +222,20 @@ export default function LandlordListingsPage() {
                         Activate
                       </Button>
                     )}
+                    {listing.isActive && boostTiers?.enabled && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1 text-orange-600 hover:text-orange-700 border-orange-200"
+                        onClick={() => {
+                          setBoostingListing(listing)
+                          setSelectedTierDays(boostTiers.tiers[0]?.days ?? null)
+                        }}
+                      >
+                        <Rocket className="h-3.5 w-3.5" />
+                        Boost
+                      </Button>
+                    )}
                     {listing.isActive && (
                       <Button
                         variant="outline"
@@ -294,6 +331,85 @@ export default function LandlordListingsPage() {
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Close Listing"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Boost Dialog */}
+      <Dialog
+        open={!!boostingListing}
+        onOpenChange={(o) => {
+          if (!o) {
+            setBoostingListing(null)
+            setSelectedTierDays(null)
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Rocket className="h-5 w-5 text-orange-500" />
+              Boost listing
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <p className="text-sm text-slate-600">
+              Featured listings appear at the top of search results, so more tenants see them.
+              {boostingListing?.isFeatured && boostingListing.featuredUntil && (
+                <span className="block mt-1 text-xs text-orange-700">
+                  Currently featured until {formatDate(boostingListing.featuredUntil)} — buying
+                  another tier adds days on top.
+                </span>
+              )}
+            </p>
+            <div className="space-y-2">
+              {boostTiers?.tiers.map((t) => (
+                <button
+                  key={t.days}
+                  type="button"
+                  onClick={() => setSelectedTierDays(t.days)}
+                  className={`w-full text-left rounded-md border p-3 transition ${
+                    selectedTierDays === t.days
+                      ? "border-orange-500 bg-orange-50"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-900">{t.days} days</span>
+                    <span className="font-bold text-[#1a3c5e]">
+                      {formatNairaAmount(t.priceKobo)}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setBoostingListing(null)
+                setSelectedTierDays(null)
+              }}
+              disabled={boostMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (boostingListing && selectedTierDays) {
+                  boostMutation.mutate({ listingId: boostingListing.id, tierDays: selectedTierDays })
+                }
+              }}
+              disabled={!selectedTierDays || boostMutation.isPending}
+              className="bg-orange-500 hover:bg-orange-600"
+            >
+              {boostMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Pay & boost"
               )}
             </Button>
           </DialogFooter>

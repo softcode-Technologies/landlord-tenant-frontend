@@ -11,12 +11,19 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "NaijaRental — Find Your Perfect Home in Nigeria",
+    default: "NaijaRental — The Rental Operating System for Nigeria",
     template: "%s | NaijaRental",
   },
   description:
-    "Nigeria's most trusted PropTech rental platform. Find verified listings in Lagos, Abuja, Port Harcourt and beyond.",
-  keywords: ["Nigeria rental", "Lagos property", "Abuja apartment", "PropTech Nigeria"],
+    "List, lease, and manage your rentals from one platform. Built for Nigerian landlords, agents, and tenants — covering listings, tenancies, payments, maintenance, and communication.",
+  keywords: [
+    "Nigeria rental management",
+    "landlord platform Nigeria",
+    "tenant management",
+    "rent reminders Nigeria",
+    "PropTech Nigeria",
+    "property management software",
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

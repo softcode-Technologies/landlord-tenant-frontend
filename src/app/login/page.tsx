@@ -116,11 +116,8 @@ function LoginContent() {
       const userResponse = await authApi.me()
       const user = userResponse.data
 
-      // Store auth
+      // Store auth (sets the proxy cookie with the JWT's actual expiry)
       setAuth(user, accessToken, refreshToken)
-
-      // Set cookie for middleware
-      document.cookie = `naijarental-token=${accessToken}; path=/; max-age=${7 * 24 * 60 * 60}`
 
       toast.success(isNew ? "Account created! Let's set up your profile." : `Welcome back${user.firstName ? `, ${user.firstName}` : ""}!`)
 
@@ -341,7 +338,7 @@ function LoginContent() {
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className="w-12 h-14 text-center text-xl font-bold border-2 rounded-xl transition-all duration-150 focus:outline-none focus:border-[#1a3c5e] bg-white shadow-sm"
+                        className="w-12 h-14 text-center text-xl font-bold text-slate-900 border-2 rounded-xl transition-all duration-150 focus:outline-none focus:border-[#1a3c5e] bg-white shadow-sm"
                         style={{
                           borderColor: digit ? "#1a3c5e" : "#e2e8f0",
                         }}

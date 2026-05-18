@@ -5,10 +5,11 @@ import { DashboardSidebar } from "@/components/layout/dashboard-sidebar"
 import { AuthGuard } from "@/components/layout/auth-guard"
 import { useAuthStore } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
-import { LayoutDashboard, DollarSign, BarChart3, MessageCircle, User, ShieldCheck } from "lucide-react"
+import { LayoutDashboard, DollarSign, BarChart3, MessageCircle, User, ShieldCheck, Building2 } from "lucide-react"
 
 const navItems = [
   { label: "Dashboard", href: "/agent", icon: LayoutDashboard },
+  { label: "Properties", href: "/agent/properties", icon: Building2 },
   { label: "Commissions", href: "/agent/commissions", icon: DollarSign },
   { label: "Analytics", href: "/agent/analytics", icon: BarChart3 },
   { label: "Messages", href: "/agent/messages", icon: MessageCircle },

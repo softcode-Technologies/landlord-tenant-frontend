@@ -19,6 +19,8 @@ import {
   Bell,
   User,
   ShieldCheck,
+  Wallet,
+  DollarSign,
 } from "lucide-react"
 
 function LandlordNav({ children }: { children: React.ReactNode }) {
@@ -33,10 +35,12 @@ function LandlordNav({ children }: { children: React.ReactNode }) {
     { label: "Dashboard", href: "/landlord", icon: LayoutDashboard },
     { label: "Properties", href: "/landlord/properties", icon: Building2 },
     { label: "Listings", href: "/landlord/listings", icon: List },
-    { label: "Tenant Invites", href: "/landlord/invites", icon: UserPlus },
+    { label: "Tenancy Invites", href: "/landlord/invites", icon: UserPlus },
     { label: "Tenancies", href: "/landlord/tenancies", icon: Users },
     { label: "Maintenance", href: "/landlord/maintenance", icon: Wrench },
     { label: "Inspections", href: "/landlord/inspections", icon: Calendar },
+    { label: "Wallet", href: "/landlord/wallet", icon: Wallet },
+    { label: "Commissions", href: "/landlord/commissions", icon: DollarSign },
     { label: "Analytics", href: "/landlord/analytics", icon: BarChart3 },
     { label: "Messages", href: "/landlord/messages", icon: MessageCircle },
     {

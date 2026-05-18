@@ -12,10 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAuthStore, getRoleDashboardPath } from "@/lib/store/auth"
+import { useAuthStore, getRoleDashboardPath, getAvailableRoles } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
 import { getInitials } from "@/lib/utils"
-import { Building2, LogOut, User, LayoutDashboard, Menu, X, Sun, Moon } from "lucide-react"
+import { Building2, LogOut, User, LayoutDashboard, Menu, X, Sun, Moon, Repeat, ShieldCheck, Home, Briefcase, Key } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useTheme } from "next-themes"
 import { toast } from "sonner"
@@ -44,8 +44,17 @@ export function Navbar() {
   }
 
   const dashboardPath = getRoleDashboardPath(user)
+  const availableRoles = getAvailableRoles(user)
+  const isMultiRole = availableRoles.length > 1
   const fullName = user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "User" : ""
   const isDark = resolvedTheme === "dark"
+
+  const roleIcon = {
+    admin: ShieldCheck,
+    landlord: Home,
+    agent: Briefcase,
+    tenant: Key,
+  } as const
 
   return (
     <nav className={`sticky top-0 z-50 transition-all duration-300 border-b ${
@@ -129,6 +138,32 @@ export function Navbar() {
                         <User className="h-4 w-4 mr-2" />Profile
                       </Link>
                     </DropdownMenuItem>
+                    {isMultiRole && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1.5">
+                          <Repeat className="h-3 w-3" /> Switch role
+                        </DropdownMenuLabel>
+                        {availableRoles.map((r) => {
+                          const Icon = roleIcon[r.role]
+                          const isActive = dashboardPath === r.path
+                          return (
+                            <DropdownMenuItem key={r.role} asChild>
+                              <Link
+                                href={r.path}
+                                className={`cursor-pointer ${isActive ? "bg-slate-50 font-semibold" : ""}`}
+                              >
+                                <Icon className="h-4 w-4 mr-2" />
+                                {r.label}
+                                {isActive && (
+                                  <span className="ml-auto text-[10px] text-[#f97316]">Current</span>
+                                )}
+                              </Link>
+                            </DropdownMenuItem>
+                          )
+                        })}
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={handleLogout}>
                       <LogOut className="h-4 w-4 mr-2" />Log out
@@ -196,6 +231,35 @@ export function Navbar() {
                 >
                   Dashboard
                 </Link>
+                {isMultiRole && (
+                  <div className="pt-2 mt-1 border-t border-slate-100 dark:border-white/10">
+                    <p className="px-3 pt-2 pb-1 text-[10px] uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1.5">
+                      <Repeat className="h-3 w-3" /> Switch role
+                    </p>
+                    {availableRoles.map((r) => {
+                      const Icon = roleIcon[r.role]
+                      const isActive = dashboardPath === r.path
+                      return (
+                        <Link
+                          key={r.role}
+                          href={r.path}
+                          onClick={() => setMobileOpen(false)}
+                          className={`flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg ${
+                            isActive
+                              ? "bg-slate-100 dark:bg-white/10 font-semibold text-slate-900 dark:text-white"
+                              : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                          }`}
+                        >
+                          <Icon className="h-4 w-4" />
+                          {r.label}
+                          {isActive && (
+                            <span className="ml-auto text-[10px] text-[#f97316]">Current</span>
+                          )}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"

@@ -3,481 +3,320 @@ import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 import {
-  Search, Shield, Star, Users, Building, CheckCircle2, MapPin,
-  Zap, TrendingUp, MessageCircle, ArrowRight, Home, BadgeCheck,
-  ChevronRight, PlayCircle, Wallet, FileText,
+  ArrowRight, ChevronRight, ShieldCheck, BadgeCheck, Building2, Users,
+  Bell, Wallet, MessageSquare, Wrench, LineChart, KeyRound,
+  CalendarClock, UserPlus, Send, CheckCircle2, Sparkles, Lock, Zap,
+  Receipt, Layers, Globe,
 } from "lucide-react"
 
-const STATS = [
-  { value: "12,000+", label: "Active Listings", icon: Building },
-  { value: "5,400+", label: "Verified Landlords", icon: BadgeCheck },
-  { value: "28,000+", label: "Happy Tenants", icon: Users },
-  { value: "36", label: "States Covered", icon: MapPin },
+// ─────────────────────────────────────────────────────────────────────────────
+// Data
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TRUST_METRICS = [
+  { value: "5,400+", label: "Landlords on platform" },
+  { value: "28,000+", label: "Tenancies managed" },
+  { value: "₦2.1B+", label: "Rent processed" },
+  { value: "100%", label: "KYC-verified listings" },
 ]
 
-const STEPS = [
+const LANDLORD_FEATURES = [
+  { icon: Users, title: "Manage tenants from one dashboard", desc: "See every lease, payment status, and renewal date across all your properties at a glance." },
+  { icon: CalendarClock, title: "Never miss a rent expiry", desc: "Automated reminders for you and your tenants — 60, 30, and 7 days before expiry." },
+  { icon: UserPlus, title: "Onboard existing tenants", desc: "Already have tenants? Add them in minutes. The platform takes over the management lifecycle." },
+  { icon: Building2, title: "Track vacant units in real time", desc: "Know which units are empty, occupied, or due for turnover — across every property you own." },
+  { icon: Send, title: "Send announcements at scale", desc: "Notify a single unit, one property, or every tenant — instantly, in-app and via SMS." },
+  { icon: ShieldCheck, title: "Reduce agent abuse", desc: "Every listing, every rent figure, every transaction — recorded. Agents work transparently or not at all." },
+]
+
+const TENANT_FEATURES = [
+  { icon: BadgeCheck, title: "Verified properties only", desc: "Every landlord and listing goes through KYC. No ghost agents. No phantom apartments." },
+  { icon: Receipt, title: "Transparent pricing", desc: "See the real rent, agency fee, and service charge upfront — before you ever pick up a phone." },
+  { icon: Bell, title: "Rent reminders that actually help", desc: "Stay ahead of your rent cycle with smart notifications and a clear payment timeline." },
+  { icon: Wallet, title: "Permanent payment history", desc: "Every receipt, every transfer, every rent cycle — saved and downloadable, forever." },
+  { icon: MessageSquare, title: "Talk to your landlord directly", desc: "No more lost WhatsApp threads. All communication lives in one place, tied to your tenancy." },
+  { icon: Wrench, title: "Request maintenance in one tap", desc: "Log issues, track resolution, and keep a paper trail your landlord can't ignore." },
+]
+
+const FLOWS = [
   {
     step: "01",
-    icon: Search,
-    title: "Search & Discover",
-    description: "Browse thousands of verified listings filtered by location, price, bedrooms, and amenities across all 36 Nigerian states.",
-    gradient: "from-blue-500 to-blue-600",
-    glow: "shadow-blue-500/20",
+    icon: Building2,
+    tag: "For Landlords",
+    title: "List or import your property",
+    desc: "Create a listing in minutes, or skip the marketplace entirely and onboard properties you already own.",
   },
   {
     step: "02",
-    icon: Shield,
-    title: "Verify & Inspect",
-    description: "Pay a small fee to unlock verified landlord contact details and schedule a physical inspection at your convenience.",
-    gradient: "from-[#f97316] to-[#ea6b0e]",
-    glow: "shadow-orange-500/20",
+    icon: KeyRound,
+    tag: "Tenancy begins",
+    title: "Add a new or existing tenant",
+    desc: "Discover a tenant through the marketplace, or invite your current tenant straight into their dashboard.",
   },
   {
     step: "03",
-    icon: CheckCircle2,
-    title: "Move In Seamlessly",
-    description: "Accept your tenancy invite, sign a legally-binding digital agreement, and move in. We track rent, maintenance, and more.",
-    gradient: "from-emerald-500 to-emerald-600",
-    glow: "shadow-emerald-500/20",
+    icon: LineChart,
+    tag: "Ongoing",
+    title: "Run the rental relationship",
+    desc: "Rent reminders, payments, receipts, maintenance, and communication — all in one operating system.",
   },
 ]
 
-const FEATURES = [
-  { icon: Shield, title: "KYC-Verified Listings", desc: "Every landlord and property goes through our identity verification before going live.", color: "text-blue-500", bg: "bg-blue-500/10" },
-  { icon: Zap, title: "Instant OTP Login", desc: "No passwords, no friction. Sign in with just your Nigerian phone number.", color: "text-[#f97316]", bg: "bg-orange-500/10" },
-  { icon: MessageCircle, title: "In-App Messaging", desc: "Chat with landlords and agents in real-time — all within one platform.", color: "text-emerald-500", bg: "bg-emerald-500/10" },
-  { icon: TrendingUp, title: "Tenant Credit Scores", desc: "Build your rental track record and unlock better properties with a strong credit score.", color: "text-purple-500", bg: "bg-purple-500/10" },
-  { icon: Wallet, title: "Integrated Payments", desc: "Pay rent securely through the platform. Landlords receive funds directly to their wallets.", color: "text-rose-500", bg: "bg-rose-500/10" },
-  { icon: FileText, title: "Digital Agreements", desc: "Legally binding tenancy agreements created, signed, and stored entirely digitally.", color: "text-amber-500", bg: "bg-amber-500/10" },
+const FEATURE_CARDS = [
+  { icon: Bell, title: "Smart Rent Reminders", desc: "Tenants and landlords get notified weeks before expiry. No more awkward conversations." },
+  { icon: Users, title: "Tenant Management", desc: "A single dashboard for every tenancy, lease term, and renewal across your portfolio." },
+  { icon: Building2, title: "Property & Unit Listings", desc: "Publish to the marketplace or keep listings private — your call, your control." },
+  { icon: Receipt, title: "Payment Records", desc: "Every transaction, signed and timestamped. Built to settle disputes before they start." },
+  { icon: Wrench, title: "Maintenance Requests", desc: "Tenants log it. Landlords resolve it. Everyone has a record of what happened." },
+  { icon: MessageSquare, title: "Built-in Messaging", desc: "Stop hunting WhatsApp threads. Every conversation is tied to the right tenancy." },
+  { icon: LineChart, title: "Portfolio Analytics", desc: "Occupancy, revenue, renewals, vacancies — your rental P&L in one view." },
+  { icon: Layers, title: "Vacancy Management", desc: "See empty units the day they open up. List them again with one click." },
 ]
 
-const TESTIMONIALS = [
+const PILLARS = [
   {
-    name: "Amaka Okonkwo",
-    role: "Tenant · Lagos",
-    avatar: "AO",
-    quote: "I found my flat in Lekki within 3 days. The KYC verification gave me confidence the landlord was legit. No wahala at all!",
-    rating: 5,
+    icon: ShieldCheck,
+    title: "Transparency, by default",
+    desc: "Every figure, every payment, every change is logged. Landlords see what agents do. Tenants see what landlords charge.",
   },
   {
-    name: "Chukwuemeka Adeyemi",
-    role: "Landlord · Abuja",
-    avatar: "CA",
-    quote: "Managing 8 units has never been easier. I can see rent payments, send invites, and handle maintenance all from my phone.",
-    rating: 5,
+    icon: Layers,
+    title: "Centralized, not scattered",
+    desc: "One platform for listings, payments, maintenance, and communication. Stop running your rentals across five WhatsApp groups.",
   },
   {
-    name: "Fatima Suleiman",
-    role: "Tenant · Port Harcourt",
-    avatar: "FS",
-    quote: "The credit score feature motivated me to pay my rent on time every month. Landlords trust me because of my NaijaRental score.",
-    rating: 5,
+    icon: Globe,
+    title: "Built for Nigeria",
+    desc: "Naira-native, designed around how Nigerian landlords, agents, and tenants actually transact — not a foreign template.",
+  },
+  {
+    icon: Zap,
+    title: "Stress out, control in",
+    desc: "Automated reminders, structured records, and self-serve workflows. Less chasing, more renting.",
   },
 ]
 
-const FEATURED_LISTINGS = [
-  {
-    title: "Modern 3-Bedroom Flat, Lekki Phase 1",
-    location: "Lekki, Lagos",
-    price: "₦2,400,000",
-    beds: 3, baths: 2,
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop",
-    rating: 4.8,
-    tag: "Featured",
-  },
-  {
-    title: "Executive 2-Bedroom Apartment, Maitama",
-    location: "Maitama, Abuja",
-    price: "₦1,800,000",
-    beds: 2, baths: 2,
-    image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop",
-    rating: 4.9,
-    tag: "Verified",
-  },
-  {
-    title: "Luxury Penthouse, Victoria Island",
-    location: "Victoria Island, Lagos",
-    price: "₦5,000,000",
-    beds: 4, baths: 3,
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop",
-    rating: 5.0,
-    tag: "Premium",
-  },
-]
+// ─────────────────────────────────────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-[#0a0f1e]">
       <Navbar />
 
-      {/* ── HERO ──────────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#0f2d48] via-[#1a3c5e] to-[#1e4a72] text-white min-h-[92vh] flex items-center">
-        {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "32px 32px" }} />
+      {/* ─── HERO ──────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white">
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+        <div className="absolute top-1/3 -right-32 w-[640px] h-[640px] bg-[#f97316]/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute -bottom-32 left-1/4 w-[420px] h-[420px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Blobs */}
-        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-[#f97316]/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-            {/* Left */}
-            <div className="max-w-xl">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-8">
-                <span className="w-2 h-2 bg-[#f97316] rounded-full animate-pulse" />
-                <span className="text-sm font-medium text-slate-200">Nigeria&apos;s #1 Rental Platform</span>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 lg:pt-28 pb-24 lg:pb-32">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+            {/* Copy */}
+            <div className="lg:col-span-6 max-w-xl">
+              <div className="inline-flex items-center gap-2 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-full px-3.5 py-1.5 mb-7">
+                <Sparkles className="h-3.5 w-3.5 text-[#f97316]" />
+                <span className="text-xs font-medium text-slate-200 tracking-wide">
+                  The rental operating system for Nigeria
+                </span>
               </div>
 
-              <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold leading-[1.05] mb-6 tracking-tight">
-                Find Your Perfect
-                <span className="block mt-1 bg-gradient-to-r from-[#f97316] to-[#fbbf24] bg-clip-text text-transparent">
-                  Home in Nigeria
+              <h1 className="text-[2.7rem] sm:text-5xl lg:text-[3.6rem] font-bold leading-[1.05] tracking-tight mb-6">
+                Run your rentals
+                <span className="block mt-1.5 bg-gradient-to-r from-[#f97316] via-[#fb923c] to-[#fbbf24] bg-clip-text text-transparent">
+                  like a business.
                 </span>
               </h1>
 
-              <p className="text-lg text-slate-300 mb-10 leading-relaxed">
-                Discover verified rental properties across Lagos, Abuja, Port Harcourt, and all 36 states.
-                Transparent pricing. Zero hidden fees.
+              <p className="text-lg text-slate-300/90 mb-9 leading-relaxed">
+                NaijaRental is a complete platform for landlords, agents, and tenants —
+                covering listings, tenancies, payments, maintenance, and communication.
+                Whether you&apos;re renting out a new unit or managing tenants you already have,
+                this is the system that holds it all together.
               </p>
 
-              {/* Search bar */}
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-2 shadow-2xl shadow-black/30 flex flex-col sm:flex-row gap-2 max-w-lg">
-                <div className="flex-1 flex items-center gap-3 px-4 py-2.5">
-                  <MapPin className="h-4.5 w-4.5 text-[#1a3c5e] dark:text-slate-400 shrink-0" />
-                  <span className="text-sm text-slate-400 dark:text-slate-500 select-none">Search by city, state or area…</span>
-                </div>
+              <div className="flex flex-col sm:flex-row gap-3 mb-10">
+                <Link href="/login">
+                  <Button className="h-12 px-6 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl shadow-lg shadow-orange-500/25 gap-2 text-[15px]">
+                    Start managing free <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
                 <Link href="/listings">
-                  <Button className="sm:w-auto w-full h-11 px-6 text-sm bg-[#f97316] hover:bg-[#ea6b0e] text-white rounded-xl font-semibold shadow-lg shadow-orange-500/30 gap-2">
-                    <Search className="h-4 w-4" />Search
+                  <Button
+                    variant="outline"
+                    className="h-12 px-6 bg-white/[0.04] border-white/15 text-white hover:bg-white/[0.08] hover:text-white rounded-xl font-semibold gap-2 text-[15px]"
+                  >
+                    Browse marketplace
                   </Button>
                 </Link>
               </div>
 
-              {/* Quick city pills */}
-              <div className="flex flex-wrap gap-2 mt-5">
-                <span className="text-xs text-slate-400 self-center mr-1">Popular:</span>
-                {["Lagos", "Abuja", "Port Harcourt", "Ibadan", "Kano"].map((city) => (
-                  <Link key={city} href={`/listings?city=${city}`}>
-                    <span className="text-xs bg-white/10 hover:bg-white/20 border border-white/10 hover:border-white/20 text-slate-200 px-3 py-1.5 rounded-full cursor-pointer transition-all duration-200 inline-block">
-                      {city}
-                    </span>
-                  </Link>
-                ))}
+              <div className="flex items-center gap-6 text-xs text-slate-400">
+                <div className="flex items-center gap-1.5">
+                  <Lock className="h-3.5 w-3.5 text-emerald-400" />
+                  KYC-verified landlords
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Receipt className="h-3.5 w-3.5 text-emerald-400" />
+                  Naira-native
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Zap className="h-3.5 w-3.5 text-emerald-400" />
+                  Setup in minutes
+                </div>
               </div>
             </div>
 
-            {/* Right — floating property cards */}
-            <div className="relative hidden lg:block h-[480px]">
-              {/* Card 1 — back */}
-              <div className="absolute top-16 right-0 w-72 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl overflow-hidden rotate-3 shadow-2xl">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=220&fit=crop" alt="" className="w-full h-36 object-cover opacity-80" />
-                <div className="p-4">
-                  <p className="text-sm font-semibold text-white/90">Penthouse, V.I Lagos</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Victoria Island · 4 bed</p>
-                  <p className="text-lg font-bold text-[#f97316] mt-2">₦5,000,000<span className="text-xs text-slate-400">/yr</span></p>
-                </div>
-              </div>
+            {/* Dashboard mockup */}
+            <div className="lg:col-span-6 relative">
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#f97316]/20 via-transparent to-blue-500/10 rounded-[2rem] blur-3xl" />
 
-              {/* Card 2 — front */}
-              <div className="absolute top-4 right-16 w-72 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden -rotate-2 shadow-2xl z-10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=220&fit=crop" alt="" className="w-full h-36 object-cover" />
-                <div className="absolute top-3 left-3 bg-[#f97316] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">FEATURED</div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Flat, Lekki Phase 1</p>
-                    <div className="flex items-center gap-0.5">
-                      <Star className="h-3 w-3 fill-[#f97316] text-[#f97316]" />
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">4.8</span>
+              <div className="relative bg-gradient-to-br from-[#0f2d48]/90 to-[#0a1e33]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
+                {/* Top bar */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.02]">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/70" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-green-400/70" />
+                    </div>
+                    <span className="ml-3 text-xs text-slate-400">naijarental.com/landlord</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                    <span className="text-[10px] text-green-400 font-medium">Live</span>
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-5">
+                    <div>
+                      <p className="text-xs text-slate-400">Good morning, Chukwuemeka</p>
+                      <p className="text-base font-semibold text-white">Portfolio Overview</p>
+                    </div>
+                    <div className="px-2.5 py-1 rounded-md bg-[#f97316]/15 border border-[#f97316]/20 text-[10px] font-semibold text-[#f97316]">
+                      3 properties
                     </div>
                   </div>
-                  <p className="text-xs text-slate-400 flex items-center gap-1"><MapPin className="h-3 w-3" />Lekki, Lagos · 3 bed</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-lg font-bold text-[#1a3c5e] dark:text-white">₦2,400,000<span className="text-xs text-slate-400 font-normal">/yr</span></p>
-                    <span className="text-[10px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                      <BadgeCheck className="h-3 w-3" />Verified
-                    </span>
+
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    {[
+                      { label: "Active leases", value: "12", trend: "+2", trendColor: "text-emerald-400" },
+                      { label: "Vacant units", value: "3", trend: "1 new", trendColor: "text-amber-400" },
+                      { label: "Monthly inflow", value: "₦4.2M", trend: "+18%", trendColor: "text-emerald-400" },
+                    ].map((kpi) => (
+                      <div key={kpi.label} className="bg-white/[0.04] border border-white/5 rounded-xl px-3 py-3">
+                        <p className="text-[10px] text-slate-400">{kpi.label}</p>
+                        <p className="text-xl font-bold text-white mt-0.5">{kpi.value}</p>
+                        <p className={`text-[10px] mt-0.5 ${kpi.trendColor}`}>{kpi.trend}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      { icon: Bell, label: "Rent expires in 14 days", sub: "Flat 3B · Lekki", accent: "bg-amber-500/15 text-amber-400" },
+                      { icon: Wrench, label: "Maintenance request", sub: "Plumbing · Unit 2A", accent: "bg-blue-500/15 text-blue-400" },
+                      { icon: CheckCircle2, label: "Rent paid · ₦450,000", sub: "Amaka O. · Today", accent: "bg-emerald-500/15 text-emerald-400" },
+                    ].map((row) => (
+                      <div key={row.label} className="flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.06] transition-colors rounded-lg px-3 py-2.5">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${row.accent}`}>
+                          <row.icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-white truncate">{row.label}</p>
+                          <p className="text-[10px] text-slate-400 truncate">{row.sub}</p>
+                        </div>
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-500" />
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* Floating stat chips */}
-              <div className="absolute bottom-24 right-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2.5 z-20">
-                <p className="text-xs text-slate-300">New listings today</p>
-                <p className="text-2xl font-bold text-white">240+</p>
-              </div>
-              <div className="absolute bottom-8 right-48 bg-[#f97316] rounded-xl px-4 py-2.5 z-20 shadow-lg">
-                <p className="text-xs text-orange-100">Avg. time to rent</p>
-                <p className="text-xl font-bold text-white">3.2 days</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom wave */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 72" fill="none" className="w-full">
-            <path d="M0,36 C240,72 480,0 720,36 C960,72 1200,0 1440,36 L1440,72 L0,72 Z" className="fill-white dark:fill-[#0a0f1e]" />
-          </svg>
-        </div>
-      </section>
-
-      {/* ── STATS BAR ─────────────────────────────────────────────────────────── */}
-      <section className="bg-white dark:bg-[#0a0f1e] py-6">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 md:divide-x divide-slate-100 dark:divide-slate-800">
-            {STATS.map((stat) => (
-              <div key={stat.label} className="flex items-center justify-center gap-3 md:px-6 py-2">
-                <div className="w-8 h-8 rounded-lg bg-[#f97316]/10 flex items-center justify-center shrink-0">
-                  <stat.icon className="h-4 w-4 text-[#f97316]" />
+              {/* Floating chip */}
+              <div className="hidden sm:flex absolute -bottom-5 -left-4 items-center gap-2.5 bg-white text-[#0f2d48] rounded-xl px-3.5 py-2.5 shadow-xl shadow-black/20 border border-slate-100">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+                  <BadgeCheck className="h-4 w-4 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-xl font-bold text-[#1a3c5e] dark:text-white leading-tight">{stat.value}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{stat.label}</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">All tenants</p>
+                  <p className="text-xs font-bold leading-tight">KYC verified</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── TRUST BAR ─────────────────────────────────────────────────────── */}
+      <section className="border-y border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0f1e]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x divide-slate-200 dark:divide-slate-800">
+            {TRUST_METRICS.map((m) => (
+              <div key={m.label} className="text-center md:px-6">
+                <p className="text-2xl sm:text-3xl font-bold text-[#0f2d48] dark:text-white tracking-tight">
+                  {m.value}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{m.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FEATURED LISTINGS ─────────────────────────────────────────────────── */}
-      <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
+      {/* ─── FOR LANDLORDS ─────────────────────────────────────────────────── */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-900/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <p className="text-sm font-semibold text-[#f97316] uppercase tracking-wider mb-2">Hand-Picked</p>
-              <h2 className="text-4xl font-bold text-slate-900 dark:text-white">Featured Properties</h2>
-              <p className="text-slate-500 dark:text-slate-400 mt-2">Premium verified listings across Nigeria</p>
-            </div>
-            <Link href="/listings" className="hidden sm:flex items-center gap-1 text-sm font-semibold text-[#1a3c5e] dark:text-[#f97316] hover:gap-2 transition-all">
-              View All <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {FEATURED_LISTINGS.map((listing) => (
-              <Link key={listing.title} href="/listings">
-                <div className="group rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-white dark:bg-slate-800 overflow-hidden shadow-sm hover:shadow-xl dark:hover:shadow-black/30 transition-all duration-300 hover:-translate-y-1.5">
-                  <div className="relative h-52 overflow-hidden bg-slate-100 dark:bg-slate-700">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={listing.image}
-                      alt={listing.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                    <div className="absolute top-3 left-3">
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                        listing.tag === "Featured" ? "bg-[#f97316] text-white"
-                        : listing.tag === "Premium" ? "bg-[#1a3c5e] text-white"
-                        : "bg-green-500 text-white"
-                      }`}>{listing.tag}</span>
-                    </div>
-                    <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-lg px-2.5 py-1 flex items-center gap-1">
-                      <Star className="h-3.5 w-3.5 fill-[#f97316] text-[#f97316]" />
-                      <span className="text-xs font-bold text-slate-900 dark:text-white">{listing.rating}</span>
-                    </div>
-                    <div className="absolute bottom-3 left-3 flex items-center gap-1 text-white text-xs">
-                      <MapPin className="h-3 w-3" />{listing.location}
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold text-slate-900 dark:text-white mb-3 line-clamp-1 group-hover:text-[#1a3c5e] dark:group-hover:text-[#f97316] transition-colors">
-                      {listing.title}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-xl font-bold text-[#1a3c5e] dark:text-white">{listing.price}</span>
-                        <span className="text-xs text-slate-400 ml-1">/year</span>
-                      </div>
-                      <span className="text-xs text-slate-400 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 rounded-lg">
-                        {listing.beds}bd · {listing.baths}ba
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-8 text-center sm:hidden">
-            <Link href="/listings">
-              <Button variant="outline" className="gap-2 dark:border-slate-600 dark:text-slate-300">
-                View All Listings <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ─────────────────────────────────────────────────────── */}
-      <section className="py-14 bg-white dark:bg-[#0a0f1e]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-wider mb-2">Simple Process</p>
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-3">How NaijaRental Works</h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto text-sm">
-              From search to move-in in three simple steps. No stress, no hidden fees.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            <div className="hidden md:block absolute top-9 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-px bg-gradient-to-r from-blue-500 via-[#f97316] to-emerald-500 opacity-30" />
-
-            {STEPS.map((step, i) => (
-              <div key={step.step} className="relative flex flex-col items-center text-center group">
-                <div className={`relative w-16 h-16 rounded-xl bg-gradient-to-br ${step.gradient} flex items-center justify-center mb-4 shadow-lg ${step.glow} group-hover:scale-105 transition-transform duration-300`}>
-                  <step.icon className="h-7 w-7 text-white" />
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-md border-2 border-slate-100 dark:border-slate-700">
-                    <span className="text-[10px] font-black text-[#1a3c5e] dark:text-white">{i + 1}</span>
-                  </div>
-                </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">{step.title}</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed max-w-[220px]">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ─────────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-slate-50 dark:bg-slate-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            {/* Left */}
-            <div>
-              <p className="text-sm font-semibold text-[#f97316] uppercase tracking-wider mb-3">Why NaijaRental</p>
-              <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4 leading-tight">
-                Everything you need for a seamless rental experience
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            <div className="lg:col-span-5 lg:sticky lg:top-24">
+              <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">For Landlords & Agents</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-[1.15] tracking-tight mb-5">
+                Stop chasing rent.
+                <br />
+                <span className="text-[#1a3c5e] dark:text-[#fbbf24]">Start running it.</span>
               </h2>
-              <p className="text-slate-500 dark:text-slate-400 mb-10 text-lg">
-                Built specifically for Nigeria, by people who understand the rental market.
+              <p className="text-slate-600 dark:text-slate-300 text-[15px] leading-relaxed mb-7">
+                Every property, every tenant, every payment — in one place. Built so landlords
+                spend less time on the phone and more time growing their portfolio.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {FEATURES.map((feature) => (
-                  <div key={feature.title} className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/60 hover:border-[#f97316]/30 dark:hover:border-[#f97316]/30 transition-colors group">
-                    <div className={`p-2.5 rounded-xl ${feature.bg} shrink-0 group-hover:scale-110 transition-transform`}>
-                      <feature.icon className={`h-5 w-5 ${feature.color}`} />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-900 dark:text-white text-sm">{feature.title}</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{feature.desc}</p>
-                    </div>
-                  </div>
-                ))}
+
+              <div className="rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 p-5 mb-7">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1">
+                  You don&apos;t need new tenants to use this platform.
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Already manage occupied properties? Bring your existing tenants on board and
+                  let the system handle reminders, receipts, and renewals from day one.
+                </p>
               </div>
-            </div>
 
-            {/* Right — Dashboard mockup */}
-            <div className="relative">
-              {/* Glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#1a3c5e]/20 to-[#f97316]/10 rounded-3xl blur-3xl" />
-              <div className="relative bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] rounded-3xl p-8 shadow-2xl border border-white/10">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                    <Building className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-white">Landlord Dashboard</p>
-                    <p className="text-xs text-slate-400">Live platform preview</p>
-                  </div>
-                  <div className="ml-auto flex items-center gap-1">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-xs text-green-400">Live</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  {[
-                    { label: "Active Tenancies", value: "12", change: "+2 this month", color: "text-blue-400" },
-                    { label: "Monthly Revenue", value: "₦4.2M", change: "+18% vs last", color: "text-green-400" },
-                  ].map((item) => (
-                    <div key={item.label} className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                      <p className="text-xs text-slate-400">{item.label}</p>
-                      <p className={`text-2xl font-bold text-white mt-0.5`}>{item.value}</p>
-                      <p className={`text-xs mt-1 ${item.color}`}>{item.change}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {[
-                  { label: "Pending Maintenance", value: "3", sub: "2 urgent", icon: "⚡" },
-                  { label: "Avg. Tenant Credit", value: "742", sub: "Excellent", icon: "📈" },
-                  { label: "Wallet Balance", value: "₦8.4M", sub: "Available", icon: "💳" },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between bg-white/5 hover:bg-white/10 rounded-xl p-4 mb-2 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">{item.icon}</span>
-                      <div>
-                        <p className="text-xs text-slate-400">{item.label}</p>
-                        <p className="text-sm font-bold text-white">{item.value}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-slate-400">{item.sub}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FOR LANDLORDS ─────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-gradient-to-br from-[#0f2d48] via-[#1a3c5e] to-[#1e4a72] text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#f97316]/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <p className="text-sm font-semibold text-[#f97316] uppercase tracking-wider mb-3">For Landlords & Agents</p>
-              <h2 className="text-4xl font-bold mb-6 leading-tight">
-                List, manage and grow — all in one place
-              </h2>
-              <p className="text-slate-300 text-lg mb-10 leading-relaxed">
-                Create verified listings, manage tenancies, collect rent, handle maintenance requests, and track revenue — on any device.
-              </p>
-              <div className="space-y-4 mb-10">
-                {[
-                  "Unlimited property and unit listings",
-                  "Digital tenancy agreements & e-signatures",
-                  "Automated rent reminders to tenants",
-                  "Maintenance request tracking",
-                  "Real-time revenue dashboard",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-[#f97316] flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="h-3 w-3 text-white" />
-                    </div>
-                    <p className="text-slate-200 text-sm">{item}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-4">
-                <Link href="/login">
-                  <Button className="bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold px-6 shadow-lg shadow-orange-500/30 gap-2">
-                    Start for Free <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-                <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 gap-2">
-                  <PlayCircle className="h-4 w-4" />See Demo
+              <Link href="/login">
+                <Button className="h-11 px-6 bg-[#1a3c5e] hover:bg-[#0f2d48] text-white font-semibold rounded-xl gap-2">
+                  Open landlord dashboard <ArrowRight className="h-4 w-4" />
                 </Button>
-              </div>
+              </Link>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: Home, title: "Properties", value: "5,400+", desc: "Active landlords" },
-                { icon: Users, title: "Tenancies", value: "28K+", desc: "Managed agreements" },
-                { icon: TrendingUp, title: "Revenue", value: "₦2.1B+", desc: "Processed to landlords" },
-                { icon: Star, title: "Satisfaction", value: "4.9/5", desc: "Landlord rating" },
-              ].map((item) => (
-                <div key={item.title} className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/15 transition-colors">
-                  <item.icon className="h-6 w-6 text-[#f97316] mb-3" />
-                  <p className="text-xs text-slate-400 mb-1">{item.title}</p>
-                  <p className="text-2xl font-bold text-white">{item.value}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{item.desc}</p>
+
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {LANDLORD_FEATURES.map((f) => (
+                <div
+                  key={f.title}
+                  className="group rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 p-5 hover:border-[#f97316]/40 hover:shadow-lg hover:shadow-slate-200/60 dark:hover:shadow-black/30 transition-all duration-200"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-[#f97316]/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                    <f.icon className="h-5 w-5 text-[#f97316]" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1.5">{f.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
                 </div>
               ))}
             </div>
@@ -485,31 +324,254 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ─────────────────────────────────────────────────────── */}
+      {/* ─── FOR TENANTS ───────────────────────────────────────────────────── */}
       <section className="py-24 bg-white dark:bg-[#0a0f1e]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold text-[#f97316] uppercase tracking-wider mb-3">Testimonials</p>
-            <h2 className="text-4xl font-bold text-slate-900 dark:text-white">What our users say</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 hover:border-[#f97316]/30 dark:hover:border-[#f97316]/30 transition-colors">
-                <div className="flex items-center gap-0.5 mb-4">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-[#f97316] text-[#f97316]" />
-                  ))}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:order-1 order-2">
+              {TENANT_FEATURES.map((f) => (
+                <div
+                  key={f.title}
+                  className="group rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 p-5 hover:border-[#1a3c5e]/30 dark:hover:border-[#fbbf24]/30 hover:shadow-lg transition-all duration-200"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-[#1a3c5e]/10 dark:bg-[#fbbf24]/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                    <f.icon className="h-5 w-5 text-[#1a3c5e] dark:text-[#fbbf24]" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1.5">{f.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
                 </div>
-                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 italic">
-                  &quot;{t.quote}&quot;
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1a3c5e] to-[#f97316] flex items-center justify-center text-white text-sm font-bold shrink-0">
-                    {t.avatar}
+              ))}
+            </div>
+
+            <div className="lg:col-span-5 lg:sticky lg:top-24 lg:order-2 order-1">
+              <p className="text-xs font-semibold text-[#1a3c5e] dark:text-[#fbbf24] uppercase tracking-[0.18em] mb-3">For Tenants</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-[1.15] tracking-tight mb-5">
+                Rent with proof,
+                <br />
+                <span className="text-[#f97316]">not guesswork.</span>
+              </h2>
+              <p className="text-slate-600 dark:text-slate-300 text-[15px] leading-relaxed mb-7">
+                Find verified homes from real landlords. Pay through a system that keeps every
+                receipt. Talk to your landlord in one place — and walk in knowing exactly what
+                you&apos;re paying for, before you sign.
+              </p>
+
+              <Link href="/listings">
+                <Button className="h-11 px-6 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl shadow-lg shadow-orange-500/20 gap-2">
+                  Browse verified homes <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── HOW IT WORKS ──────────────────────────────────────────────────── */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-900/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 max-w-2xl mx-auto">
+            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">How it works</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
+              One platform. Two starting points. The same outcome.
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 mt-4 text-[15px] leading-relaxed">
+              Whether you&apos;re onboarding a brand-new tenancy or formalizing one that&apos;s
+              already running — the system takes it from there.
+            </p>
+          </div>
+
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-gradient-to-r from-[#f97316]/0 via-[#f97316]/40 to-[#f97316]/0" />
+            {FLOWS.map((f) => (
+              <div
+                key={f.step}
+                className="relative rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 p-7 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center text-white shadow-lg">
+                    <f.icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-3xl font-black text-slate-200 dark:text-slate-700 tracking-tighter">
+                    {f.step}
+                  </span>
+                </div>
+                <p className="text-[10px] font-semibold text-[#f97316] uppercase tracking-wider mb-2">{f.tag}</p>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-2">{f.title}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── EXISTING TENANT ONBOARDING ⭐ ─────────────────────────────────── */}
+      <section className="py-24 relative overflow-hidden bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#f97316]/12 rounded-full blur-[140px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px]" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-[#f97316]/15 border border-[#f97316]/25 rounded-full px-3.5 py-1.5 mb-6">
+                <Sparkles className="h-3.5 w-3.5 text-[#f97316]" />
+                <span className="text-xs font-semibold text-[#fbbf24] tracking-wide">
+                  Already have tenants?
+                </span>
+              </div>
+
+              <h2 className="text-3xl sm:text-[2.6rem] font-bold leading-[1.1] tracking-tight mb-6">
+                Bring your existing tenants on board in minutes.
+              </h2>
+              <p className="text-slate-300/90 text-[15px] leading-relaxed mb-8">
+                You don&apos;t need to be looking for new tenants to get value from NaijaRental.
+                If your properties are already occupied, add your tenants directly and let the
+                platform manage rent reminders, payments, communication, and renewals from day
+                one — without disrupting anything you already have in place.
+              </p>
+
+              <div className="space-y-4 mb-9">
+                {[
+                  { n: "1", t: "Add your property and units", d: "Enter what you already own — no listing required if you don't want one." },
+                  { n: "2", t: "Invite your current tenant", d: "Send them an invite by phone. They confirm with one tap." },
+                  { n: "3", t: "We take over the lifecycle", d: "Rent reminders, receipts, renewals, and communication — handled automatically." },
+                ].map((step) => (
+                  <div key={step.n} className="flex gap-4">
+                    <div className="shrink-0 w-9 h-9 rounded-lg bg-[#f97316] flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-orange-500/30">
+                      {step.n}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{step.t}</p>
+                      <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{step.d}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Link href="/login">
+                <Button className="h-12 px-7 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl shadow-xl shadow-orange-500/30 gap-2">
+                  Onboard existing tenants <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Invite mock */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/20 to-transparent rounded-3xl blur-2xl" />
+              <div className="relative bg-white text-[#0f2d48] rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
+                      <UserPlus className="h-4 w-4 text-white" />
+                    </div>
+                    <p className="text-sm font-semibold">Invite tenant</p>
+                  </div>
+                  <span className="text-[10px] bg-emerald-100 text-emerald-700 font-semibold px-2 py-1 rounded-full">
+                    Step 2 of 3
+                  </span>
+                </div>
+
+                <div className="p-5 space-y-4">
+                  <div>
+                    <p className="text-[11px] text-slate-500 mb-1.5">Property</p>
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 border border-slate-200">
+                      <Building2 className="h-4 w-4 text-[#1a3c5e]" />
+                      <p className="text-sm font-medium">Sunrise Apartments · Unit 3B</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] text-slate-500 mb-1.5">Tenant phone</p>
+                    <div className="p-3 rounded-lg border border-slate-200 text-sm font-medium">
+                      +234 803 555 0142
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-[11px] text-slate-500 mb-1.5">Rent</p>
+                      <div className="p-3 rounded-lg border border-slate-200 text-sm font-semibold">₦1,200,000/yr</div>
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-slate-500 mb-1.5">Expires</p>
+                      <div className="p-3 rounded-lg border border-slate-200 text-sm font-semibold">12 Mar 2027</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-[#f97316]/10 border border-[#f97316]/20">
+                    <Send className="h-4 w-4 text-[#f97316] shrink-0" />
+                    <p className="text-xs text-[#0f2d48]">
+                      Tenant will receive an SMS invite and confirm with one tap.
+                    </p>
+                  </div>
+
+                  <div className="h-10 rounded-xl bg-[#0f2d48] flex items-center justify-center text-white text-sm font-semibold">
+                    Send invite
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FEATURES GRID ─────────────────────────────────────────────────── */}
+      <section className="py-24 bg-white dark:bg-[#0a0f1e]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14 max-w-2xl mx-auto">
+            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Everything in the box</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
+              The full rental stack, out of the box.
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 mt-4 text-[15px] leading-relaxed">
+              Every feature is designed to replace one of the half-broken tools you&apos;re
+              currently duct-taping together.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {FEATURE_CARDS.map((f) => (
+              <div
+                key={f.title}
+                className="group rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-slate-50/60 dark:bg-slate-800/40 p-6 hover:border-[#f97316]/40 hover:bg-white dark:hover:bg-slate-800/80 hover:shadow-lg transition-all duration-200"
+              >
+                <div className="w-11 h-11 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center mb-4 group-hover:border-[#f97316]/30 transition-colors">
+                  <f.icon className="h-5 w-5 text-[#1a3c5e] dark:text-[#fbbf24] group-hover:text-[#f97316] transition-colors" />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">{f.title}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── WHY CHOOSE US ─────────────────────────────────────────────────── */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-900/40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14 max-w-2xl mx-auto">
+            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Why NaijaRental</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
+              We&apos;re not another listings site.
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 mt-4 text-[15px] leading-relaxed">
+              We&apos;re the infrastructure that makes Nigerian rentals work like they should
+              have all along — accountable, automated, and on the record.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {PILLARS.map((p) => (
+              <div
+                key={p.title}
+                className="rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 p-7 hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center text-white shadow-md">
+                    <p.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900 dark:text-white text-sm">{t.name}</p>
-                    <p className="text-xs text-slate-400">{t.role}</p>
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1.5">{p.title}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{p.desc}</p>
                   </div>
                 </div>
               </div>
@@ -518,32 +580,49 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────────────────────────────── */}
-      <section className="py-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f97316] via-[#f97316] to-[#ea6b0e]" />
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-3 py-1 mb-4">
-            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-            <span className="text-xs font-medium text-white">Join 28,000+ Nigerians</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 leading-tight">
-            Ready to find your next home?
-          </h2>
-          <p className="text-orange-100 text-sm mb-7 max-w-md mx-auto">
-            Nigeria&apos;s most trusted rental platform. Verified listings, transparent pricing, zero hidden fees.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/listings">
-              <Button size="lg" className="bg-white text-[#f97316] hover:bg-white/95 font-bold px-8 h-11 text-sm shadow-xl shadow-black/20 rounded-xl gap-2">
-                <Search className="h-4 w-4" />Browse Listings
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button size="lg" className="bg-[#0f2d48] hover:bg-[#1a3c5e] text-white font-bold px-8 h-11 text-sm rounded-xl gap-2 border-0">
-                Create Free Account <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
+      {/* ─── FINAL CTA ─────────────────────────────────────────────────────── */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e]" />
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+            backgroundSize: "32px 32px",
+          }}
+        />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#f97316]/15 rounded-full blur-[140px]" />
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <p className="text-xs font-semibold text-[#fbbf24] uppercase tracking-[0.18em] mb-4">Get started</p>
+              <h2 className="text-3xl sm:text-[2.4rem] font-bold text-white leading-[1.1] tracking-tight mb-4">
+                Your rental business deserves better than spreadsheets.
+              </h2>
+              <p className="text-slate-300/90 text-[15px] leading-relaxed">
+                Sign up free in 60 seconds. List a property, invite an existing tenant, or
+                browse the marketplace — all from the same account.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 lg:items-end">
+              <Link href="/login" className="w-full lg:w-auto">
+                <Button className="w-full h-12 px-7 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl shadow-xl shadow-orange-500/30 gap-2">
+                  I&apos;m a landlord — start free <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/listings" className="w-full lg:w-auto">
+                <Button
+                  variant="outline"
+                  className="w-full h-12 px-7 bg-white/[0.04] border-white/15 text-white hover:bg-white/[0.08] hover:text-white rounded-xl font-semibold gap-2"
+                >
+                  I&apos;m a tenant — browse homes <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <p className="text-[11px] text-slate-400 lg:text-right mt-1">
+                No card required · Free to start · Cancel anytime
+              </p>
+            </div>
           </div>
         </div>
       </section>

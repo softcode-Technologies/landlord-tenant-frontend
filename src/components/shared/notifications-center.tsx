@@ -6,7 +6,6 @@ import Link from "next/link"
 import { notificationsApi } from "@/lib/api/notifications"
 import type { Notification, NotificationType } from "@/lib/types"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -148,22 +147,20 @@ export function NotificationsCenter({ role }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Notifications</h1>
-          <p className="text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Notifications</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
             {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up!"}
           </p>
         </div>
         {unreadCount > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
+          <button
             onClick={() => markAllMutation.mutate()}
             disabled={markAllMutation.isPending}
-            className="gap-2"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             <CheckCheck className="h-4 w-4" />
             Mark all read
-          </Button>
+          </button>
         )}
       </div>
 

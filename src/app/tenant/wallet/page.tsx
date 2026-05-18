@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { formatNaira, formatDate, getStatusVariant } from "@/lib/utils"
 import { Wallet, Plus, ArrowUpRight, Loader2, TrendingUp, Download } from "lucide-react"
 import { toast } from "sonner"
+import { EscrowPanel } from "@/components/shared/escrow-panel"
 
 const QUICK_AMOUNTS = [5000, 10000, 25000, 50000, 100000]
 
@@ -65,6 +66,8 @@ function WalletContent() {
         <h1 className="text-2xl font-bold text-slate-900">Wallet</h1>
         <p className="text-slate-500 mt-1">Manage your NaijaRental wallet</p>
       </div>
+
+      <EscrowPanel side="tenant" showHistory={false} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Balance & Topup */}
