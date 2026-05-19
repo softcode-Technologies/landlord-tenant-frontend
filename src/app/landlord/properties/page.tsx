@@ -85,13 +85,16 @@ export default function LandlordPropertiesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Properties</h1>
-          <p className="text-slate-500 mt-1">Manage your property portfolio</p>
+    <div className="space-y-6 max-w-full">
+      {/* Stacks on phones so the Add Property button doesn't get pushed off-screen. */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Properties</h1>
+          <p className="text-slate-500 mt-1 text-sm sm:text-base">
+            Manage your property portfolio
+          </p>
         </div>
-        <Button onClick={() => setOpen(true)} className="gap-2">
+        <Button onClick={() => setOpen(true)} className="gap-2 self-start sm:self-auto">
           <Plus className="h-4 w-4" />
           Add Property
         </Button>

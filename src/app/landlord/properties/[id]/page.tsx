@@ -148,26 +148,37 @@ export default function PropertyDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href="/landlord/properties">
-          <Button variant="ghost" size="sm" className="gap-1">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-slate-900">{property.name}</h1>
-          <div className="flex items-center gap-1 text-sm text-slate-500 mt-0.5">
-            <MapPin className="h-3.5 w-3.5" />
-            {[property.area, property.lga, property.city, property.state].filter(Boolean).join(", ")}
+    <div className="space-y-6 max-w-full overflow-x-hidden">
+      {/* Header — stacks vertically on phones (<sm), goes side-by-side on tablet+.
+          Was previously one wide horizontal flex row that blew past 360px screens. */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <Link href="/landlord/properties" className="shrink-0">
+            <Button variant="ghost" size="sm" className="gap-1">
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          </Link>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 truncate">
+              {property.name}
+            </h1>
+            <div className="flex items-center gap-1 text-sm text-slate-500 mt-0.5 truncate">
+              <MapPin className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">
+                {[property.area, property.lga, property.city, property.state]
+                  .filter(Boolean)
+                  .join(", ")}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {property.assignedAgent ? (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-slate-500">
-                Agent: <span className="font-medium text-slate-900">
+                Agent:{" "}
+                <span className="font-medium text-slate-900">
                   {property.assignedAgent.firstName} {property.assignedAgent.lastName}
                 </span>
               </span>
@@ -187,13 +198,18 @@ export default function PropertyDetailPage() {
               </Button>
             </div>
           ) : (
-            <Button variant="outline" className="gap-2" onClick={() => setAgentOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => setAgentOpen(true)}
+            >
               <UserCheck className="h-4 w-4" />
               Assign Agent
             </Button>
           )}
           <Link href="/landlord/listings/new">
-            <Button className="gap-2">
+            <Button size="sm" className="gap-2">
               <Plus className="h-4 w-4" />
               Add Listing
             </Button>
