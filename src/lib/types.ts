@@ -152,8 +152,11 @@ export interface Property {
   units: Unit[]
   images?: string[]
   assignedAgent?: {
-    firstName?: string
-    lastName?: string
+    agentProfileId?: string
+    agencyName?: string | null
+    firstName?: string | null
+    lastName?: string | null
+    phone?: string | null
   }
   createdAt: string
   updatedAt: string
@@ -455,10 +458,12 @@ export interface KycRecord {
 export interface AgentDirectoryItem {
   id: string
   userId: string
+  agencyName?: string | null
   licenseNumber?: string
   bio?: string
   rating: number
-  totalProperties: number
+  totalDeals?: number
+  totalProperties?: number
   isVerified: boolean
   user: {
     id: string

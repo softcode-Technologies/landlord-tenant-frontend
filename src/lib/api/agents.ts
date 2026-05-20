@@ -1,6 +1,19 @@
 import apiClient from "./client"
 import type { AgentDirectoryItem, Property } from "@/lib/types"
 
+export interface AgentLookupResult {
+  found: boolean
+  isAgent: boolean
+  agent?: {
+    agentProfileId?: string
+    firstName: string | null
+    lastName: string | null
+    phone: string
+    agencyName?: string | null
+    isVerified?: boolean
+  }
+}
+
 export interface AgentManagedLandlord {
   landlordProfileId: string
   userId: string
@@ -24,14 +37,23 @@ export interface CreatePropertyAsAgentData {
 }
 
 export const agentsApi = {
-  getDirectory: (params?: { city?: string; state?: string; page?: number; limit?: number }) =>
+  getDirectory: (params?: { city?: string; state?: string; page?: number; limit?: number; all?: boolean }) =>
     apiClient.get<{
       data: AgentDirectoryItem[]
       pagination: { total: number; page: number; limit: number; totalPages: number; hasNextPage: boolean; hasPrevPage: boolean }
     }>("/agent/directory", { params }),
 
-  assignAgent: (propertyId: string, agentId: string) =>
-    apiClient.put(`/agent/assign/${propertyId}`, { agentId }),
+  // agentProfileId comes from the directory item's `id`.
+  assignAgent: (propertyId: string, agentProfileId: string) =>
+    apiClient.put(`/agent/assign/${propertyId}`, { agentProfileId }),
+
+  // Phone-first: check whether a number already belongs to an agent.
+  lookupByPhone: (phone: string) =>
+    apiClient.get<AgentLookupResult>("/agent/lookup", { params: { phone } }),
+
+  // Assign an existing user as agent (by phone) or SMS-invite a new one.
+  inviteToProperty: (data: { propertyId: string; phone: string; firstName?: string }) =>
+    apiClient.post<{ status: "assigned" | "invited"; agentProfileId?: string }>("/agent/invite", data),
 
   removeAgent: (propertyId: string) =>
     apiClient.delete(`/agent/assign/${propertyId}`),

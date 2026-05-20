@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { propertiesApi } from "@/lib/api/properties"
 import type { CreateUnitData } from "@/lib/api/properties"
-import { agentsApi } from "@/lib/api/agents"
+import { agentsApi, type AgentLookupResult } from "@/lib/api/agents"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -37,7 +37,8 @@ export default function PropertyDetailPage() {
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [agentOpen, setAgentOpen] = useState(false)
-  const [selectedAgentId, setSelectedAgentId] = useState("")
+  const [agentPhone, setAgentPhone] = useState("")
+  const [lookup, setLookup] = useState<AgentLookupResult | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ["property", id],
@@ -68,22 +69,38 @@ export default function PropertyDetailPage() {
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to upload images")),
   })
 
-  const { data: agentsData } = useQuery({
-    queryKey: ["agent-directory"],
-    queryFn: () => agentsApi.getDirectory({ limit: 50 }),
-    enabled: agentOpen,
+  const closeAgentDialog = () => {
+    setAgentOpen(false)
+    setAgentPhone("")
+    setLookup(null)
+  }
+
+  const lookupMutation = useMutation({
+    mutationFn: (phone: string) => agentsApi.lookupByPhone(phone),
+    onSuccess: (res) => setLookup(res.data),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Lookup failed")),
   })
-  const agentList = agentsData?.data?.data ?? []
 
   const assignMutation = useMutation({
-    mutationFn: () => agentsApi.assignAgent(id, selectedAgentId),
+    mutationFn: (agentProfileId: string) => agentsApi.assignAgent(id, agentProfileId),
     onSuccess: () => {
       toast.success("Agent assigned successfully")
       queryClient.invalidateQueries({ queryKey: ["property", id] })
-      setAgentOpen(false)
-      setSelectedAgentId("")
+      closeAgentDialog()
     },
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to assign agent")),
+  })
+
+  const inviteMutation = useMutation({
+    mutationFn: () => agentsApi.inviteToProperty({ propertyId: id, phone: agentPhone.trim() }),
+    onSuccess: (res) => {
+      toast.success(
+        res.data.status === "assigned" ? "Agent assigned successfully" : "Invite sent to agent",
+      )
+      queryClient.invalidateQueries({ queryKey: ["property", id] })
+      closeAgentDialog()
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to invite agent")),
   })
 
   const removeAgentMutation = useMutation({
@@ -509,53 +526,103 @@ export default function PropertyDetailPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Assign Agent Dialog */}
-      <Dialog open={agentOpen} onOpenChange={setAgentOpen}>
+      {/* Assign Agent Dialog — phone-first */}
+      <Dialog open={agentOpen} onOpenChange={(open) => (open ? setAgentOpen(true) : closeAgentDialog())}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Assign Agent</DialogTitle>
           </DialogHeader>
+
           <div className="space-y-3 py-2">
-            {agentList.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-4">Loading agents...</p>
-            ) : (
-              <div className="space-y-2 max-h-72 overflow-y-auto">
-                {agentList.map((agent) => {
-                  const name = `${agent.user?.firstName ?? ""} ${agent.user?.lastName ?? ""}`.trim() || "Agent"
-                  return (
-                    <button
-                      key={agent.id}
-                      onClick={() => setSelectedAgentId(agent.userId)}
-                      className={`w-full text-left p-3 rounded-xl border-2 transition-colors ${
-                        selectedAgentId === agent.userId
-                          ? "border-[#1a3c5e] bg-[#1a3c5e]/5"
-                          : "border-slate-100 hover:border-slate-200"
-                      }`}
-                    >
-                      <p className="font-medium text-sm text-slate-900">{name}</p>
-                      <p className="text-xs text-slate-500">{agent.city}, {agent.state}</p>
-                    </button>
-                  )
-                })}
+            <div>
+              <Label htmlFor="agent-phone">Agent phone number</Label>
+              <div className="flex gap-2 mt-1.5">
+                <Input
+                  id="agent-phone"
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="e.g. 08012345678"
+                  value={agentPhone}
+                  onChange={(e) => {
+                    setAgentPhone(e.target.value)
+                    setLookup(null)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && agentPhone.trim()) lookupMutation.mutate(agentPhone.trim())
+                  }}
+                />
+                <Button
+                  variant="outline"
+                  className="shrink-0 gap-2"
+                  disabled={!agentPhone.trim() || lookupMutation.isPending}
+                  onClick={() => lookupMutation.mutate(agentPhone.trim())}
+                >
+                  {lookupMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Check
+                </Button>
+              </div>
+              <p className="text-xs text-slate-400 mt-1.5">
+                We&apos;ll check if the agent already has an account.
+              </p>
+            </div>
+
+            {/* Result */}
+            {lookup?.found && lookup.isAgent && lookup.agent?.agentProfileId && (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-medium text-sm text-slate-900">
+                    {`${lookup.agent.firstName ?? ""} ${lookup.agent.lastName ?? ""}`.trim() || "Agent"}
+                  </p>
+                  {lookup.agent.isVerified && (
+                    <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px]">
+                      Verified
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {lookup.agent.agencyName || lookup.agent.phone} · Existing agent
+                </p>
+              </div>
+            )}
+
+            {lookup?.found && !lookup.isAgent && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-xs text-amber-800">
+                {`${lookup.agent?.firstName ?? "This user"} ${lookup.agent?.lastName ?? ""}`.trim()} has an account but
+                isn&apos;t an agent yet. Assigning will make them your agent for this property.
+              </div>
+            )}
+
+            {lookup && !lookup.found && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+                No account found for this number. We&apos;ll send an SMS inviting them to join as an
+                agent for this property.
               </div>
             )}
           </div>
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAgentOpen(false)} disabled={assignMutation.isPending}>
+            <Button variant="outline" onClick={closeAgentDialog} disabled={assignMutation.isPending || inviteMutation.isPending}>
               Cancel
             </Button>
-            <Button
-              disabled={!selectedAgentId || assignMutation.isPending}
-              onClick={() => assignMutation.mutate()}
-              className="gap-2"
-            >
-              {assignMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <UserCheck className="h-4 w-4" />
-              )}
-              Assign
-            </Button>
+            {lookup?.found && lookup.isAgent && lookup.agent?.agentProfileId ? (
+              <Button
+                className="gap-2"
+                disabled={assignMutation.isPending}
+                onClick={() => assignMutation.mutate(lookup.agent!.agentProfileId!)}
+              >
+                {assignMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserCheck className="h-4 w-4" />}
+                Assign
+              </Button>
+            ) : lookup ? (
+              <Button
+                className="gap-2"
+                disabled={inviteMutation.isPending}
+                onClick={() => inviteMutation.mutate()}
+              >
+                {inviteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserCheck className="h-4 w-4" />}
+                {lookup.found ? "Assign as agent" : "Send invite"}
+              </Button>
+            ) : null}
           </DialogFooter>
         </DialogContent>
       </Dialog>
