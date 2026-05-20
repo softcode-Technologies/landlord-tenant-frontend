@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input"
 import { authApi } from "@/lib/api/auth"
 import { useAuthStore, getRoleDashboardPath } from "@/lib/store/auth"
 import { toast } from "sonner"
+import { BrandWordmark } from "@/components/layout/brand-wordmark"
+import { BRAND_NAME } from "@/lib/config/brand"
 
 function LoginContent() {
   const router = useRouter()
@@ -163,9 +165,7 @@ function LoginContent() {
           <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
             <Building2 className="h-5 w-5 text-white" />
           </div>
-          <span className="text-2xl font-bold text-white">
-            Naija<span className="text-[#f97316]">Rental</span>
-          </span>
+          <BrandWordmark className="text-2xl font-bold text-white" />
         </Link>
 
         <div>
@@ -195,7 +195,7 @@ function LoginContent() {
         </div>
 
         <p className="text-slate-400 text-sm">
-          &copy; {new Date().getFullYear()} NaijaRental. Trusted across Nigeria.
+          &copy; {new Date().getFullYear()} {BRAND_NAME}. Trusted across Nigeria.
         </p>
       </div>
 
@@ -208,9 +208,7 @@ function LoginContent() {
               <div className="w-8 h-8 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
                 <Building2 className="h-4 w-4 text-white" />
               </div>
-              <span className="text-xl font-bold text-[#1a3c5e]">
-                Naija<span className="text-[#f97316]">Rental</span>
-              </span>
+              <BrandWordmark className="text-xl font-bold text-[#1a3c5e]" />
             </Link>
           </div>
 
@@ -235,7 +233,7 @@ function LoginContent() {
                   <Phone className="h-6 w-6 text-[#1a3c5e]" />
                 </div>
                 <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                  Welcome to NaijaRental
+                  Welcome to {BRAND_NAME}
                 </h1>
                 <p className="text-slate-500">
                   Enter your phone number to get started. We&apos;ll send you a verification code.

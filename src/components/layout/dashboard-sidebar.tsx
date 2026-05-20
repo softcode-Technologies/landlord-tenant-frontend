@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Building2, LogOut, X, Menu } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { useState } from "react"
+import { BrandWordmark } from "./brand-wordmark"
 import { toast } from "sonner"
 
 export interface NavItem {
@@ -53,9 +54,7 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
           <div className="w-8 h-8 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
             <Building2 className="h-5 w-5 text-white" />
           </div>
-          <span className="text-lg font-bold text-[#1a3c5e]">
-            Naija<span className="text-[#f97316]">Rental</span>
-          </span>
+          <BrandWordmark className="text-lg font-bold text-[#1a3c5e]" />
         </Link>
       </div>
 
@@ -128,9 +127,7 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
           <div className="w-7 h-7 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
             <Building2 className="h-4 w-4 text-white" />
           </div>
-          <span className="text-base font-bold text-[#1a3c5e]">
-            Naija<span className="text-[#f97316]">Rental</span>
-          </span>
+          <BrandWordmark className="text-base font-bold text-[#1a3c5e]" />
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}

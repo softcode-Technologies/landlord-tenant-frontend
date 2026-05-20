@@ -23,6 +23,8 @@ import { extractApiError } from "@/lib/utils"
 import { authApi } from "@/lib/api/auth"
 import { useAuthStore, getRoleDashboardPath } from "@/lib/store/auth"
 import { toast } from "sonner"
+import { BrandWordmark } from "@/components/layout/brand-wordmark"
+import { BRAND_NAME } from "@/lib/config/brand"
 
 type OnboardingRole = "tenant" | "landlord" | "agent"
 
@@ -97,7 +99,7 @@ export default function OnboardingPage() {
       try {
         const freshRes = await authApi.me()
         setUser(freshRes.data)
-        toast.success("Profile saved! Welcome to NaijaRental.")
+        toast.success(`Profile saved! Welcome to ${BRAND_NAME}.`)
         router.push(getRoleDashboardPath(freshRes.data))
       } catch {
         toast.error("Setup saved but failed to load your profile. Please log in.")
@@ -158,9 +160,7 @@ export default function OnboardingPage() {
           <div className="w-8 h-8 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
             <Building2 className="h-4 w-4 text-white" />
           </div>
-          <span className="text-xl font-bold text-[#1a3c5e]">
-            Naija<span className="text-[#f97316]">Rental</span>
-          </span>
+          <BrandWordmark className="text-xl font-bold text-[#1a3c5e]" />
         </Link>
         <span className="text-sm text-slate-500">
           Step {step} of {STEP_COUNT}
@@ -195,7 +195,7 @@ export default function OnboardingPage() {
             <h1 className="text-2xl font-bold text-slate-900">{STEP_TITLES[step - 1]}</h1>
             {step === 1 && (
               <p className="text-slate-500 mt-2">
-                Let&apos;s get your profile set up so you can make the most of NaijaRental.
+                Let&apos;s get your profile set up so you can make the most of {BRAND_NAME}.
               </p>
             )}
             {step === 2 && (

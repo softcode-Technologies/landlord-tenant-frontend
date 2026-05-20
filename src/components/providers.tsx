@@ -18,8 +18,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       })
   )
 
+  // Forced light: dark mode isn't fully implemented (cards/components are
+  // hardcoded light), so following the OS theme produced unreadable
+  // light-on-light text and stray dark surfaces.
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" forcedTheme="light" enableSystem={false} disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
         {children}
         <Toaster

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
+import { BRAND_NAME, BRAND_URL } from "@/lib/config/brand"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -9,8 +10,8 @@ const inter = Inter({
   display: "swap",
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://naijarental.com"
-const TITLE = "NaijaRental — The Rental Operating System for Nigeria"
+const SITE_URL = BRAND_URL
+const TITLE = `${BRAND_NAME} — The Rental Operating System for Nigeria`
 const DESCRIPTION =
   "List, lease, and manage your rentals from one platform. Built for Nigerian landlords, agents, and tenants — covering listings, tenancies, payments, maintenance, and communication."
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE,
-    template: "%s | NaijaRental",
+    template: `%s | ${BRAND_NAME}`,
   },
   description: DESCRIPTION,
   keywords: [
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: "website",
-    siteName: "NaijaRental",
+    siteName: BRAND_NAME,
     locale: "en_NG",
     url: SITE_URL,
     title: TITLE,

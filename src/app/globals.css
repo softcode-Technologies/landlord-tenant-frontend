@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Make `dark:` utilities key off the `.dark` class (set by next-themes),
+   NOT the OS `prefers-color-scheme`. Without this, Tailwind v4 defaults to the
+   media-query strategy, so every `dark:` utility fired whenever the user's OS
+   was in dark mode — producing light-on-light text and stray dark surfaces
+   even though the app is forced to a light theme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
     --background: 248 250 252;

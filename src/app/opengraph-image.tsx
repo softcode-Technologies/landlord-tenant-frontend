@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og"
+import { BRAND_NAME } from "@/lib/config/brand"
 
-export const alt = "NaijaRental — Run your rentals like a business"
+export const alt = `${BRAND_NAME} — Run your rentals like a business`
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -45,7 +46,13 @@ export default function Image() {
             />
           </div>
           <div style={{ display: "flex", marginLeft: 18, fontSize: 36, fontWeight: 700, color: "white" }}>
-            Naija<span style={{ color: "#f97316" }}>Rental</span>
+            {BRAND_NAME === "NaijaRental" ? (
+              <>
+                Naija<span style={{ color: "#f97316" }}>Rental</span>
+              </>
+            ) : (
+              BRAND_NAME
+            )}
           </div>
         </div>
 

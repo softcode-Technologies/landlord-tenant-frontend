@@ -13,6 +13,7 @@ import { formatNairaAmount, formatDate } from "@/lib/utils"
 import { Building2, Calendar, CheckCircle2, MapPin, Loader2, Home } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { BrandWordmark } from "@/components/layout/brand-wordmark"
 
 export default function InvitePage() {
   const { code } = useParams<{ code: string }>()
@@ -98,9 +99,7 @@ export default function InvitePage() {
             <div className="w-9 h-9 rounded-xl bg-[#1a3c5e] flex items-center justify-center">
               <Building2 className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-[#1a3c5e]">
-              Naija<span className="text-[#f97316]">Rental</span>
-            </span>
+            <BrandWordmark className="text-xl font-bold text-[#1a3c5e]" />
           </Link>
         </div>
 

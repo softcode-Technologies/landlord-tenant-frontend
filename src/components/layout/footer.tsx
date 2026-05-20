@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { Building2 } from "lucide-react"
+import { BrandWordmark } from "./brand-wordmark"
+import { BRAND_LEGAL_NAME, brandEmail } from "@/lib/config/brand"
 
 const PLATFORM_LINKS = [
   { label: "Browse Listings", href: "/listings" },
@@ -11,7 +13,7 @@ const PLATFORM_LINKS = [
 const SUPPORT_LINKS = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
-  { label: "Contact Us", href: "mailto:hello@naijarental.com" },
+  { label: "Contact Us", href: `mailto:${brandEmail("hello")}` },
 ]
 
 const SOCIALS = [
@@ -32,9 +34,7 @@ export function Footer() {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] border border-white/10 flex items-center justify-center">
                 <Building2 className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold">
-                Naija<span className="text-[#f97316]">Rental</span>
-              </span>
+              <BrandWordmark className="text-xl font-bold" />
             </div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs mb-6">
               Nigeria&apos;s most trusted PropTech rental platform. Connecting landlords,
@@ -87,7 +87,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/5 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} NaijaRental Technologies Ltd. All rights reserved.
+            &copy; {new Date().getFullYear()} {BRAND_LEGAL_NAME}. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             {[

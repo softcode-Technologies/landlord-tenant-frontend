@@ -22,6 +22,7 @@ import {
   ArrowLeft,
 } from "lucide-react"
 import { toast } from "sonner"
+import { BRAND_NAME } from "@/lib/config/brand"
 
 type KycMethod = "nin" | "bvn" | "document"
 
@@ -75,7 +76,7 @@ export default function TenantKycPage() {
         </button>
         <h1 className="text-2xl font-bold text-slate-900">Identity Verification</h1>
         <p className="text-slate-500 mt-1 text-sm">
-          Verify your identity to unlock all NaijaRental features
+          Verify your identity to unlock all {BRAND_NAME} features
         </p>
       </div>
 

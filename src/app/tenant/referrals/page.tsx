@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
 import { Gift, Users, CheckCircle2, Copy, Share2, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { BRAND_NAME } from "@/lib/config/brand"
 
 function StatCard({ icon: Icon, label, value, sub }: { icon: typeof Gift; label: string; value: string | number; sub?: string }) {
   return (
@@ -53,7 +54,7 @@ export default function ReferralsPage() {
 
   const shareCode = () => {
     if (!code) return
-    const text = `Join me on NaijaRental — Nigeria's easiest way to find and manage rentals! Use my referral code ${code} when you sign up. 🏠`
+    const text = `Join me on ${BRAND_NAME} — Nigeria's easiest way to find and manage rentals! Use my referral code ${code} when you sign up. 🏠`
     if (navigator.share) {
       navigator.share({ text }).catch(() => null)
     } else {
@@ -136,7 +137,7 @@ export default function ReferralsPage() {
         <CardContent>
           <ol className="space-y-3">
             {[
-              "Share your referral code with a friend who hasn't joined NaijaRental yet.",
+              `Share your referral code with a friend who hasn't joined ${BRAND_NAME} yet.`,
               "They sign up and enter your code during onboarding.",
               "When they pay their first month's rent, ₦5,000 is added to your wallet.",
               "No limit — invite as many friends as you want!",

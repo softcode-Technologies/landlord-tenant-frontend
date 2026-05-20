@@ -1,21 +1,21 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
 import { ListingsContent } from "./listings-content"
+import { BRAND_NAME } from "@/lib/config/brand"
 
 export const metadata: Metadata = {
   title: "Browse Rental Listings in Nigeria",
-  description:
-    "Find verified rental properties across Nigeria — Lagos, Abuja, Port Harcourt, and all 36 states. Filter by location, price, and property type on NaijaRental.",
+  description: `Find verified rental properties across Nigeria — Lagos, Abuja, Port Harcourt, and all 36 states. Filter by location, price, and property type on ${BRAND_NAME}.`,
   openGraph: {
-    title: "Browse Rental Listings in Nigeria | NaijaRental",
+    title: `Browse Rental Listings in Nigeria | ${BRAND_NAME}`,
     description:
       "Find verified rental properties across Nigeria — Lagos, Abuja, Port Harcourt, and all 36 states.",
     type: "website",
-    siteName: "NaijaRental",
+    siteName: BRAND_NAME,
   },
   twitter: {
     card: "summary",
-    title: "Browse Rental Listings in Nigeria | NaijaRental",
+    title: `Browse Rental Listings in Nigeria | ${BRAND_NAME}`,
     description:
       "Find verified rental properties across Nigeria — Lagos, Abuja, Port Harcourt, and all 36 states.",
   },

@@ -29,10 +29,53 @@ import { formatNairaAmount, formatDate, getInitials } from "@/lib/utils"
 import type { Listing } from "@/lib/types"
 import {
   MapPin, Bed, Bath, Star, Heart, Share2, Calendar, Phone,
-  CheckCircle2, ArrowLeft, User, Loader2, Eye
+  CheckCircle2, ArrowLeft, User, Loader2, Eye, ChevronLeft, ChevronRight,
+  BadgeCheck,
 } from "lucide-react"
+
+const PLACEHOLDER_IMAGE =
+  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&h=700&fit=crop"
+
+// Self-contained gallery image: holds a skeleton until the real bytes decode,
+// then fades in — so a stale/cached or wrong image never flashes before the
+// correct one. Falls back to a placeholder if the URL is broken.
+function GalleryImage({
+  src,
+  alt,
+  priority,
+}: {
+  src: string
+  alt: string
+  priority?: boolean
+}) {
+  const [loaded, setLoaded] = useState(false)
+  const [errored, setErrored] = useState(false)
+  return (
+    <>
+      {!loaded && (
+        <div className="absolute inset-0 animate-pulse bg-slate-200 dark:bg-slate-700" />
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={errored ? PLACEHOLDER_IMAGE : src}
+        alt={alt}
+        decoding="async"
+        loading={priority ? "eager" : "lazy"}
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          setErrored(true)
+          setLoaded(true)
+        }}
+        className={`w-full h-full object-cover transition-opacity duration-500 ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+      />
+    </>
+  )
+}
 import Link from "next/link"
 import { toast } from "sonner"
+import { BRAND_NAME } from "@/lib/config/brand"
 
 interface Props {
   initialListing?: Listing | null
@@ -162,7 +205,7 @@ export function ListingDetailClient({ initialListing }: Props) {
   const handleShare = () => {
     const url = window.location.href
     if (navigator.share) {
-      navigator.share({ title: listing?.title ?? "NaijaRental Listing", url })
+      navigator.share({ title: listing?.title ?? `${BRAND_NAME} Listing`, url })
     } else {
       navigator.clipboard.writeText(url)
       toast.success("Link copied to clipboard!")
@@ -172,7 +215,7 @@ export function ListingDetailClient({ initialListing }: Props) {
   const handleWhatsApp = () => {
     if (!listing) return
     const location = [listing.area, listing.city, listing.state].filter(Boolean).join(", ")
-    const text = `Check out this ${listing.bedrooms} bed ${listing.propertyType} in ${location} for ₦${Number(listing.rentPerAnnum).toLocaleString("en-NG")}/year on NaijaRental:\n${window.location.href}`
+    const text = `Check out this ${listing.bedrooms} bed ${listing.propertyType} in ${location} for ₦${Number(listing.rentPerAnnum).toLocaleString("en-NG")}/year on ${BRAND_NAME}:\n${window.location.href}`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank")
   }
 
@@ -232,10 +275,17 @@ export function ListingDetailClient({ initialListing }: Props) {
     )
   }
 
-  const images =
-    listing.images?.length > 0
-      ? listing.images
-      : ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=500&fit=crop"]
+  const validImages = Array.from(
+    new Set(
+      (listing.images ?? []).filter(
+        (u): u is string => typeof u === "string" && /^https?:\/\//.test(u),
+      ),
+    ),
+  )
+  const images = validImages.length > 0 ? validImages : [PLACEHOLDER_IMAGE]
+  const safeIndex = Math.min(activeImage, images.length - 1)
+  const goPrev = () => setActiveImage((i) => (i - 1 + images.length) % images.length)
+  const goNext = () => setActiveImage((i) => (i + 1) % images.length)
 
   const listerName =
     listing.lister
@@ -246,7 +296,7 @@ export function ListingDetailClient({ initialListing }: Props) {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8 w-full">
         <Link
           href="/listings"
           className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-6 transition-colors"
@@ -257,31 +307,57 @@ export function ListingDetailClient({ initialListing }: Props) {
 
         {/* Image Gallery */}
         <div className="mb-8">
-          <div className="relative h-80 sm:h-[500px] rounded-2xl overflow-hidden mb-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={images[activeImage]}
+          <div className="group relative h-72 sm:h-[460px] lg:h-[520px] rounded-2xl overflow-hidden mb-3 bg-slate-100 dark:bg-slate-800">
+            <GalleryImage
+              key={images[safeIndex]}
+              src={images[safeIndex]}
               alt={listing.title}
-              className="w-full h-full object-cover"
+              priority
             />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+
             {listing.isFeatured && (
-              <Badge className="absolute top-4 left-4 bg-[#f97316] text-white border-0">
+              <Badge className="absolute top-4 left-4 bg-[#f97316] text-white border-0 shadow-lg">
                 Featured
               </Badge>
             )}
+
+            {images.length > 1 && (
+              <>
+                <div className="absolute bottom-4 right-4 bg-black/55 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full">
+                  {safeIndex + 1} / {images.length}
+                </div>
+                <button
+                  onClick={goPrev}
+                  aria-label="Previous image"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 hover:bg-white text-slate-800 flex items-center justify-center shadow-md transition-opacity opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={goNext}
+                  aria-label="Next image"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 hover:bg-white text-slate-800 flex items-center justify-center shadow-md transition-opacity opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </>
+            )}
           </div>
           {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto">
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {images.map((img, index) => (
                 <button
                   key={index}
                   onClick={() => setActiveImage(index)}
-                  className={`w-20 h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-colors ${
-                    activeImage === index ? "border-[#1a3c5e]" : "border-transparent"
+                  className={`relative w-20 h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
+                    safeIndex === index
+                      ? "border-[#f97316] ring-2 ring-[#f97316]/20"
+                      : "border-transparent opacity-70 hover:opacity-100"
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={img} alt="" loading="lazy" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -295,13 +371,19 @@ export function ListingDetailClient({ initialListing }: Props) {
               <div className="flex-1">
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">{listing.title}</h1>
                 <div className="flex items-center gap-2 text-slate-500">
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className="h-4 w-4 shrink-0" />
                   <span className="text-sm">
                     {[listing.area, listing.lga, listing.city, listing.state]
                       .filter(Boolean)
                       .join(", ")}
                   </span>
                 </div>
+                {listing.isListerVerified && (
+                  <div className="inline-flex items-center gap-1.5 mt-2.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium px-2.5 py-1 rounded-full">
+                    <BadgeCheck className="h-3.5 w-3.5" />
+                    KYC-verified landlord
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <button
@@ -550,6 +632,38 @@ export function ListingDetailClient({ initialListing }: Props) {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Mobile sticky action bar — sidebar CTA is far down on phones */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white dark:bg-[#0a0f1e] border-t border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="min-w-0">
+          <p className="text-lg font-bold text-[#1a3c5e] dark:text-blue-400 leading-tight">
+            {formatNairaAmount(listing.rentPerAnnum)}
+            <span className="text-xs font-normal text-slate-400">/yr</span>
+          </p>
+        </div>
+        {contact ? (
+          <Button
+            onClick={handleBookInspection}
+            className="flex-1 h-11 bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2"
+          >
+            <Calendar className="h-4 w-4" />
+            Book Inspection
+          </Button>
+        ) : (
+          <Button
+            onClick={handleUnlock}
+            disabled={unlockMutation.isPending}
+            className="flex-1 h-11 bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2"
+          >
+            {unlockMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Phone className="h-4 w-4" />
+            )}
+            Unlock Contact
+          </Button>
+        )}
       </div>
 
       {/* Schedule Inspection Dialog */}

@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
+import { BRAND_NAME, BRAND_LEGAL_NAME, brandEmail } from "@/lib/config/brand"
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description:
-    "How NaijaRental collects, uses, and protects your personal data, in line with the Nigeria Data Protection Act.",
+  description: `How ${BRAND_NAME} collects, uses, and protects your personal data, in line with the Nigeria Data Protection Act.`,
 }
 
 const LAST_UPDATED = "20 May 2026"
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
           </p>
 
           <Section title="1. Who we are">
-            NaijaRental Technologies Ltd (&ldquo;NaijaRental&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) operates a rental
+            {BRAND_LEGAL_NAME} (&ldquo;{BRAND_NAME}&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) operates a rental
             management platform connecting landlords, agents, and tenants in Nigeria. This
             policy explains how we handle your personal data and your rights under the Nigeria
             Data Protection Act (NDPA) 2023.
@@ -99,8 +99,8 @@ export default function PrivacyPage() {
 
           <Section title="11. Contact us">
             Questions about this policy or your data? Email{" "}
-            <a href="mailto:privacy@naijarental.com" className="text-[#f97316] font-medium hover:underline">
-              privacy@naijarental.com
+            <a href={`mailto:${brandEmail("privacy")}`} className="text-[#f97316] font-medium hover:underline">
+              {brandEmail("privacy")}
             </a>.
           </Section>
         </article>

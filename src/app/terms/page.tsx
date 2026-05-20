@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
+import { BRAND_NAME, BRAND_LEGAL_NAME, brandEmail } from "@/lib/config/brand"
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description:
-    "The terms governing your use of the NaijaRental rental management platform.",
+  description: `The terms governing your use of the ${BRAND_NAME} rental management platform.`,
 }
 
 const LAST_UPDATED = "20 May 2026"
@@ -31,11 +31,11 @@ export default function TermsPage() {
           </p>
 
           <Section title="1. Acceptance of terms">
-            By creating an account or using NaijaRental, you agree to these Terms of Service and
+            By creating an account or using {BRAND_NAME}, you agree to these Terms of Service and
             our Privacy Policy. If you do not agree, please do not use the platform.
           </Section>
 
-          <Section title="2. Who can use NaijaRental">
+          <Section title={`2. Who can use ${BRAND_NAME}`}>
             You must be at least 18 years old and able to enter a binding contract. Landlords and
             agents must complete identity verification (KYC) before listing properties or
             managing tenancies.
@@ -49,7 +49,7 @@ export default function TermsPage() {
 
           <Section title="4. Listings and tenancy records">
             Landlords and agents are responsible for the accuracy of the listings, rent figures,
-            and tenancy details they publish. NaijaRental provides the tools to record and manage
+            and tenancy details they publish. {BRAND_NAME} provides the tools to record and manage
             these but is not a party to the tenancy agreement between landlord and tenant.
           </Section>
 
@@ -60,7 +60,7 @@ export default function TermsPage() {
           </Section>
 
           <Section title="6. Our role">
-            NaijaRental is a technology platform. We facilitate listings, payments, communication,
+            {BRAND_NAME} is a technology platform. We facilitate listings, payments, communication,
             and record-keeping, but we do not own the properties, guarantee any tenancy outcome, or
             act as a real-estate broker. Disputes between landlords, agents, and tenants are
             ultimately between those parties, though our records may help resolve them.
@@ -73,7 +73,7 @@ export default function TermsPage() {
           </Section>
 
           <Section title="8. Intellectual property">
-            The platform, its software, and its branding are owned by NaijaRental Technologies Ltd.
+            The platform, its software, and its branding are owned by {BRAND_LEGAL_NAME}.
             You retain ownership of the content you upload but grant us a licence to host and
             display it as needed to operate the service.
           </Section>
@@ -98,8 +98,8 @@ export default function TermsPage() {
 
           <Section title="12. Contact us">
             Questions about these terms? Email{" "}
-            <a href="mailto:legal@naijarental.com" className="text-[#f97316] font-medium hover:underline">
-              legal@naijarental.com
+            <a href={`mailto:${brandEmail("legal")}`} className="text-[#f97316] font-medium hover:underline">
+              {brandEmail("legal")}
             </a>.
           </Section>
         </article>

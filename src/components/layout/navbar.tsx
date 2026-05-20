@@ -15,21 +15,18 @@ import {
 import { useAuthStore, getRoleDashboardPath, getAvailableRoles } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
 import { getInitials } from "@/lib/utils"
-import { Building2, LogOut, User, LayoutDashboard, Menu, X, Sun, Moon, Repeat, ShieldCheck, Home, Briefcase, Key } from "lucide-react"
+import { Building2, LogOut, User, LayoutDashboard, Menu, X, Repeat, ShieldCheck, Home, Briefcase, Key } from "lucide-react"
 import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
 import { toast } from "sonner"
+import { BrandWordmark } from "./brand-wordmark"
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuthStore()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const { setTheme, resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
     const handleScroll = () => setScrolled(window.scrollY > 10)
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
@@ -47,7 +44,6 @@ export function Navbar() {
   const availableRoles = getAvailableRoles(user)
   const isMultiRole = availableRoles.length > 1
   const fullName = user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "User" : ""
-  const isDark = resolvedTheme === "dark"
 
   const roleIcon = {
     admin: ShieldCheck,
@@ -69,9 +65,7 @@ export function Navbar() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center shadow-md">
               <Building2 className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-[#1a3c5e] dark:text-white">
-              Naija<span className="text-[#f97316]">Rental</span>
-            </span>
+            <BrandWordmark className="text-xl font-bold text-[#1a3c5e] dark:text-white" />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -90,19 +84,8 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Desktop Auth + Theme Toggle */}
+          {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-2">
-            {/* Dark mode toggle */}
-            {mounted && (
-              <button
-                onClick={() => setTheme(isDark ? "light" : "dark")}
-                className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-[#1a3c5e] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </button>
-            )}
-
             {isAuthenticated && user ? (
               <>
                 <Link href={dashboardPath}>
@@ -187,16 +170,8 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile: theme + menu */}
+          {/* Mobile: menu */}
           <div className="md:hidden flex items-center gap-2">
-            {mounted && (
-              <button
-                onClick={() => setTheme(isDark ? "light" : "dark")}
-                className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10"
-              >
-                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </button>
-            )}
             <button
               className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300"
               onClick={() => setMobileOpen(!mobileOpen)}

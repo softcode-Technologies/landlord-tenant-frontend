@@ -2,9 +2,15 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 import { ListingDetailClient } from "./listing-detail-client"
 import type { Listing } from "@/lib/types"
+import { normalizeRawListing, type RawListing } from "@/lib/api/normalize-listing"
+import { BRAND_NAME } from "@/lib/config/brand"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1"
 
+// The backend returns a *raw* listing (bedrooms under `unit`, images under
+// `property`). It must be normalized here too — otherwise SSR metadata reads
+// `undefined` and the client's react-query initialData lacks images, causing a
+// placeholder image to flash before the real one loads.
 async function fetchListing(id: string): Promise<Listing | null> {
   try {
     const res = await fetch(`${API_URL}/listings/${id}`, {
@@ -12,7 +18,8 @@ async function fetchListing(id: string): Promise<Listing | null> {
     })
     if (!res.ok) return null
     const body = await res.json()
-    return body?.data ?? null
+    const raw = (body?.data ?? body) as RawListing | null
+    return raw ? normalizeRawListing(raw) : null
   } catch {
     return null
   }
@@ -29,20 +36,24 @@ export async function generateMetadata({
   if (!listing) {
     return {
       title: "Listing Not Found",
-      description: "This listing could not be found on NaijaRental.",
+      description: `This listing could not be found on ${BRAND_NAME}.`,
     }
   }
 
   const location = [listing.area, listing.lga, listing.city, listing.state]
     .filter(Boolean)
     .join(", ")
-  const title = `${listing.bedrooms} Bed ${listing.propertyType ?? "Property"} for Rent in ${location}`
+  const propertyType = listing.propertyType
+    ? listing.propertyType.charAt(0).toUpperCase() + listing.propertyType.slice(1)
+    : "Property"
+  const bedPrefix = listing.bedrooms ? `${listing.bedrooms} Bed ` : ""
+  const title = `${bedPrefix}${propertyType} for Rent${location ? ` in ${location}` : ""}`
   const price = `₦${Number(listing.rentPerAnnum).toLocaleString("en-NG")}/year`
   const extras = [
     listing.isFurnished && "Furnished",
     listing.isServiced && "Serviced",
   ].filter(Boolean).join(", ")
-  const description = `${listing.bedrooms} bedroom ${listing.propertyType} for rent in ${location}. ${price}${extras ? ` · ${extras}` : ""}. Book a viewing on NaijaRental — Nigeria's trusted rental platform.`
+  const description = `${listing.bedrooms} bedroom ${listing.propertyType} for rent in ${location}. ${price}${extras ? ` · ${extras}` : ""}. Book a viewing on ${BRAND_NAME} — Nigeria's trusted rental platform.`
 
   const ogImage = listing.images?.[0]
 
@@ -53,7 +64,7 @@ export async function generateMetadata({
       title,
       description,
       type: "website",
-      siteName: "NaijaRental",
+      siteName: BRAND_NAME,
       images: ogImage
         ? [{ url: ogImage, width: 1200, height: 630, alt: title }]
         : [],

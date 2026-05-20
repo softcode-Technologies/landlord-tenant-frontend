@@ -8,6 +8,7 @@ import {
   CalendarClock, UserPlus, Send, CheckCircle2, Sparkles, Lock, Zap,
   Receipt, Layers, Globe, Smartphone, Check, Apple, Play,
 } from "lucide-react"
+import { BRAND_NAME, BRAND_DOMAIN } from "@/lib/config/brand"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
@@ -136,7 +137,7 @@ const PRICING_PLANS = [
 
 const FAQS = [
   {
-    q: "Is NaijaRental really free?",
+    q: `Is ${BRAND_NAME} really free?`,
     a: "Yes. It's completely free for tenants. Landlords and agents start free too — you only pay a small, transparent fee when you collect rent through the platform. No monthly subscription, no card required to sign up.",
   },
   {
@@ -157,7 +158,7 @@ const FAQS = [
   },
   {
     q: "Do you have a mobile app, and where do you operate?",
-    a: "Yes — NaijaRental is available on both iOS and Android, and is built for landlords, agents, and tenants across all 36 states of Nigeria.",
+    a: `Yes — ${BRAND_NAME} is available on both iOS and Android, and is built for landlords, agents, and tenants across all 36 states of Nigeria.`,
   },
 ]
 
@@ -205,7 +206,7 @@ export default function HomePage() {
               </h1>
 
               <p className="text-lg text-slate-300/90 mb-9 leading-relaxed">
-                NaijaRental is a complete platform for landlords, agents, and tenants —
+                {BRAND_NAME} is a complete platform for landlords, agents, and tenants —
                 covering listings, tenancies, payments, maintenance, and communication.
                 Whether you&apos;re renting out a new unit or managing tenants you already have,
                 this is the system that holds it all together.
@@ -256,7 +257,7 @@ export default function HomePage() {
                       <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/70" />
                       <span className="w-2.5 h-2.5 rounded-full bg-green-400/70" />
                     </div>
-                    <span className="ml-3 text-xs text-slate-400">naijarental.com/landlord</span>
+                    <span className="ml-3 text-xs text-slate-400">{BRAND_DOMAIN}/landlord</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
@@ -491,7 +492,7 @@ export default function HomePage() {
                 Bring your existing tenants on board in minutes.
               </h2>
               <p className="text-slate-300/90 text-[15px] leading-relaxed mb-8">
-                You don&apos;t need to be looking for new tenants to get value from NaijaRental.
+                You don&apos;t need to be looking for new tenants to get value from {BRAND_NAME}.
                 If your properties are already occupied, add your tenants directly and let the
                 platform manage rent reminders, payments, communication, and renewals from day
                 one — without disrupting anything you already have in place.
@@ -617,7 +618,7 @@ export default function HomePage() {
       <section className="py-24 bg-slate-50 dark:bg-slate-900/40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 max-w-2xl mx-auto">
-            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Why NaijaRental</p>
+            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Why {BRAND_NAME}</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
               We&apos;re not another listings site.
             </h2>

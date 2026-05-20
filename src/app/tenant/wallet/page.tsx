@@ -14,6 +14,7 @@ import { formatNaira, formatDate, getStatusVariant } from "@/lib/utils"
 import { Wallet, Plus, ArrowUpRight, Loader2, TrendingUp, Download } from "lucide-react"
 import { toast } from "sonner"
 import { EscrowPanel } from "@/components/shared/escrow-panel"
+import { BRAND_NAME } from "@/lib/config/brand"
 
 const QUICK_AMOUNTS = [5000, 10000, 25000, 50000, 100000]
 
@@ -64,7 +65,7 @@ function WalletContent() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Wallet</h1>
-        <p className="text-slate-500 mt-1">Manage your NaijaRental wallet</p>
+        <p className="text-slate-500 mt-1">Manage your {BRAND_NAME} wallet</p>
       </div>
 
       <EscrowPanel side="tenant" showHistory={false} />
@@ -89,7 +90,7 @@ function WalletContent() {
               )}
               <div className="mt-4 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-green-400" />
-                <span className="text-xs text-slate-300">NaijaRental Wallet</span>
+                <span className="text-xs text-slate-300">{BRAND_NAME} Wallet</span>
               </div>
             </CardContent>
           </Card>
