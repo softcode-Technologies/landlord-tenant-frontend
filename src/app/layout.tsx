@@ -9,13 +9,18 @@ const inter = Inter({
   display: "swap",
 })
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://naijarental.com"
+const TITLE = "NaijaRental — The Rental Operating System for Nigeria"
+const DESCRIPTION =
+  "List, lease, and manage your rentals from one platform. Built for Nigerian landlords, agents, and tenants — covering listings, tenancies, payments, maintenance, and communication."
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "NaijaRental — The Rental Operating System for Nigeria",
+    default: TITLE,
     template: "%s | NaijaRental",
   },
-  description:
-    "List, lease, and manage your rentals from one platform. Built for Nigerian landlords, agents, and tenants — covering listings, tenancies, payments, maintenance, and communication.",
+  description: DESCRIPTION,
   keywords: [
     "Nigeria rental management",
     "landlord platform Nigeria",
@@ -24,6 +29,19 @@ export const metadata: Metadata = {
     "PropTech Nigeria",
     "property management software",
   ],
+  openGraph: {
+    type: "website",
+    siteName: "NaijaRental",
+    locale: "en_NG",
+    url: SITE_URL,
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

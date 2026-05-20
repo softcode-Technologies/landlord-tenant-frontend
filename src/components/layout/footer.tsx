@@ -9,17 +9,9 @@ const PLATFORM_LINKS = [
 ]
 
 const SUPPORT_LINKS = [
-  { label: "Help Center", href: "#" },
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
-  { label: "Contact Us", href: "#" },
-]
-
-const COMPANY_LINKS = [
-  { label: "About Us", href: "#" },
-  { label: "Careers", href: "#" },
-  { label: "Blog", href: "#" },
-  { label: "Press", href: "#" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Contact Us", href: "mailto:hello@naijarental.com" },
 ]
 
 const SOCIALS = [
@@ -33,7 +25,7 @@ export function Footer() {
     <footer className="bg-[#0a1628] dark:bg-[#050c18] text-white mt-auto border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main footer grid */}
-        <div className="py-14 grid grid-cols-2 md:grid-cols-5 gap-8">
+        <div className="py-14 grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand — spans 2 cols */}
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-5">
@@ -77,20 +69,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
-          <div>
-            <h4 className="font-semibold mb-4 text-xs uppercase tracking-widest text-slate-400">Company</h4>
-            <ul className="space-y-3">
-              {COMPANY_LINKS.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-slate-400 hover:text-white transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           {/* Support */}
           <div>
             <h4 className="font-semibold mb-4 text-xs uppercase tracking-widest text-slate-400">Support</h4>
@@ -112,9 +90,12 @@ export function Footer() {
             &copy; {new Date().getFullYear()} NaijaRental Technologies Ltd. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            {["Privacy", "Terms", "Cookies"].map((item) => (
-              <Link key={item} href="#" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-                {item}
+            {[
+              { label: "Privacy", href: "/privacy" },
+              { label: "Terms", href: "/terms" },
+            ].map((item) => (
+              <Link key={item.label} href={item.href} className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                {item.label}
               </Link>
             ))}
             <span className="text-xs text-slate-600">🇳🇬 Made in Nigeria</span>

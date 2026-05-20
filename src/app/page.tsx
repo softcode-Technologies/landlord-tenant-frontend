@@ -6,18 +6,22 @@ import {
   ArrowRight, ChevronRight, ShieldCheck, BadgeCheck, Building2, Users,
   Bell, Wallet, MessageSquare, Wrench, LineChart, KeyRound,
   CalendarClock, UserPlus, Send, CheckCircle2, Sparkles, Lock, Zap,
-  Receipt, Layers, Globe,
+  Receipt, Layers, Globe, Smartphone, Check, Apple, Play,
 } from "lucide-react"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Day-one-honest trust signals. NaijaRental is newly launched, so these are
+// claims that are true by design (verification, payments rail, pricing,
+// coverage) rather than usage counts we haven't earned yet. Swap in real
+// volume metrics here once they exist.
 const TRUST_METRICS = [
-  { value: "5,400+", label: "Landlords on platform" },
-  { value: "28,000+", label: "Tenancies managed" },
-  { value: "₦2.1B+", label: "Rent processed" },
   { value: "100%", label: "KYC-verified listings" },
+  { value: "₦0", label: "Free to get started" },
+  { value: "Paystack", label: "Bank-grade payments" },
+  { value: "36 States", label: "Built for all of Nigeria" },
 ]
 
 const LANDLORD_FEATURES = [
@@ -96,6 +100,67 @@ const PILLARS = [
   },
 ]
 
+const PRICING_PLANS = [
+  {
+    audience: "For Tenants",
+    name: "Always free",
+    price: "₦0",
+    blurb: "Find a verified home and run your tenancy at no cost.",
+    features: [
+      "Browse KYC-verified listings",
+      "Pay rent and get instant receipts",
+      "Rent reminders before every expiry",
+      "Message your landlord in one place",
+      "Request and track maintenance",
+    ],
+    cta: { label: "Browse homes", href: "/listings" },
+    highlight: false,
+  },
+  {
+    audience: "For Landlords & Agents",
+    name: "Free to start",
+    price: "₦0",
+    suffix: "to begin",
+    blurb: "List, onboard tenants, and manage everything — pay only a small, transparent fee when you collect rent through the platform.",
+    features: [
+      "Unlimited properties and units",
+      "Onboard existing or new tenants",
+      "Automated rent reminders & receipts",
+      "Portfolio analytics and vacancy tracking",
+      "No monthly subscription — pay as you transact",
+    ],
+    cta: { label: "Start managing free", href: "/login" },
+    highlight: true,
+  },
+]
+
+const FAQS = [
+  {
+    q: "Is NaijaRental really free?",
+    a: "Yes. It's completely free for tenants. Landlords and agents start free too — you only pay a small, transparent fee when you collect rent through the platform. No monthly subscription, no card required to sign up.",
+  },
+  {
+    q: "How do you verify landlords and listings?",
+    a: "Every landlord and agent completes identity verification (NIN, BVN, and document checks) through a licensed partner before they can list. Unverified accounts can't publish properties, so you only ever see real homes from real people.",
+  },
+  {
+    q: "Is my money safe?",
+    a: "Payments are processed by Paystack, a licensed and regulated payment provider. Every transaction is recorded and you get a downloadable receipt — so there's always a clear paper trail for both sides.",
+  },
+  {
+    q: "Can I use it for tenants I already have?",
+    a: "Absolutely. You don't need new tenants to get value. Add the properties you already own, invite your current tenant by phone, and they confirm with one tap — the platform then handles reminders, receipts, and renewals automatically.",
+  },
+  {
+    q: "What happens if there's a dispute over rent?",
+    a: "Because every payment, message, and lease detail is timestamped and stored, you always have proof of what was agreed and paid. That record settles most disagreements before they escalate.",
+  },
+  {
+    q: "Do you have a mobile app, and where do you operate?",
+    a: "Yes — NaijaRental is available on both iOS and Android, and is built for landlords, agents, and tenants across all 36 states of Nigeria.",
+  },
+]
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Page
 // ─────────────────────────────────────────────────────────────────────────────
@@ -122,10 +187,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             {/* Copy */}
             <div className="lg:col-span-6 max-w-xl">
-              <div className="inline-flex items-center gap-2 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-full px-3.5 py-1.5 mb-7">
-                <Sparkles className="h-3.5 w-3.5 text-[#f97316]" />
+              <div className="inline-flex items-center gap-2 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-full pl-2 pr-3.5 py-1.5 mb-7">
+                <span className="inline-flex items-center gap-1.5 bg-[#f97316]/15 border border-[#f97316]/25 rounded-full px-2 py-0.5">
+                  <span className="w-1.5 h-1.5 bg-[#f97316] rounded-full animate-pulse" />
+                  <span className="text-[10px] font-bold text-[#fbbf24] uppercase tracking-wide">Now live</span>
+                </span>
                 <span className="text-xs font-medium text-slate-200 tracking-wide">
-                  The rental operating system for Nigeria
+                  Join as a founding member
                 </span>
               </div>
 
@@ -575,6 +643,174 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── PRICING ───────────────────────────────────────────────────────── */}
+      <section className="py-24 bg-white dark:bg-[#0a0f1e]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14 max-w-2xl mx-auto">
+            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Pricing</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
+              Honest pricing. No surprises.
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 mt-4 text-[15px] leading-relaxed">
+              Free for tenants. Free to start for landlords. You only pay when the platform
+              helps you collect — never a kobo before that.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {PRICING_PLANS.map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative rounded-2xl p-7 border transition-all duration-200 ${
+                  plan.highlight
+                    ? "bg-gradient-to-br from-[#0f2d48] to-[#0a1e33] border-[#f97316]/30 text-white shadow-xl shadow-slate-300/40 dark:shadow-black/40"
+                    : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+                }`}
+              >
+                {plan.highlight && (
+                  <span className="absolute top-5 right-5 text-[10px] font-bold uppercase tracking-wider bg-[#f97316] text-white px-2.5 py-1 rounded-full">
+                    Most popular
+                  </span>
+                )}
+                <p className={`text-xs font-semibold uppercase tracking-[0.18em] mb-3 ${plan.highlight ? "text-[#fbbf24]" : "text-[#f97316]"}`}>
+                  {plan.audience}
+                </p>
+                <div className="flex items-end gap-1.5 mb-1">
+                  <span className={`text-4xl font-bold tracking-tight ${plan.highlight ? "text-white" : "text-slate-900 dark:text-white"}`}>
+                    {plan.price}
+                  </span>
+                  {plan.suffix && (
+                    <span className={`text-sm mb-1.5 ${plan.highlight ? "text-slate-300" : "text-slate-500 dark:text-slate-400"}`}>
+                      {plan.suffix}
+                    </span>
+                  )}
+                </div>
+                <p className={`text-sm font-semibold mb-3 ${plan.highlight ? "text-white" : "text-slate-900 dark:text-white"}`}>{plan.name}</p>
+                <p className={`text-[13px] leading-relaxed mb-6 ${plan.highlight ? "text-slate-300/90" : "text-slate-500 dark:text-slate-400"}`}>
+                  {plan.blurb}
+                </p>
+
+                <ul className="space-y-2.5 mb-7">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${plan.highlight ? "bg-[#f97316]/20" : "bg-emerald-500/15"}`}>
+                        <Check className={`h-3 w-3 ${plan.highlight ? "text-[#fbbf24]" : "text-emerald-600 dark:text-emerald-400"}`} />
+                      </span>
+                      <span className={`text-[13px] leading-snug ${plan.highlight ? "text-slate-200" : "text-slate-600 dark:text-slate-300"}`}>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link href={plan.cta.href} className="block">
+                  <Button
+                    className={`w-full h-11 rounded-xl font-semibold gap-2 ${
+                      plan.highlight
+                        ? "bg-[#f97316] hover:bg-[#ea6b0e] text-white shadow-lg shadow-orange-500/25"
+                        : "bg-[#1a3c5e] hover:bg-[#0f2d48] text-white"
+                    }`}
+                  >
+                    {plan.cta.label} <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
+            Any platform fee is always shown clearly before you confirm a payment.
+          </p>
+        </div>
+      </section>
+
+      {/* ─── MOBILE APP ────────────────────────────────────────────────────── */}
+      <section className="py-20 bg-slate-50 dark:bg-slate-900/40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white px-8 sm:px-12 py-12 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-[#f97316]/12 rounded-full blur-[130px] pointer-events-none" />
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/10 rounded-full px-3.5 py-1.5 mb-6">
+                  <Smartphone className="h-3.5 w-3.5 text-[#f97316]" />
+                  <span className="text-xs font-medium text-slate-200">iOS &amp; Android</span>
+                </div>
+                <h2 className="text-3xl sm:text-[2.4rem] font-bold leading-[1.1] tracking-tight mb-4">
+                  Your rentals, in your pocket.
+                </h2>
+                <p className="text-slate-300/90 text-[15px] leading-relaxed mb-8 max-w-md">
+                  Get instant push notifications for rent, payments, and maintenance. Pay,
+                  message, and manage every tenancy on the go — the full platform, on mobile.
+                </p>
+
+                {/* Replace hrefs with real App Store / Play Store URLs once published. */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link href="/login" className="flex items-center gap-3 bg-black hover:bg-black/80 transition-colors rounded-xl px-5 py-2.5 border border-white/10">
+                    <Apple className="h-7 w-7 text-white" />
+                    <span className="text-left leading-tight">
+                      <span className="block text-[10px] text-slate-300">Download on the</span>
+                      <span className="block text-base font-semibold text-white">App Store</span>
+                    </span>
+                  </Link>
+                  <Link href="/login" className="flex items-center gap-3 bg-black hover:bg-black/80 transition-colors rounded-xl px-5 py-2.5 border border-white/10">
+                    <Play className="h-6 w-6 text-white fill-white" />
+                    <span className="text-left leading-tight">
+                      <span className="block text-[10px] text-slate-300">Get it on</span>
+                      <span className="block text-base font-semibold text-white">Google Play</span>
+                    </span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="hidden lg:flex justify-center">
+                <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
+                  {[
+                    { icon: Bell, label: "Rent due in 7 days", accent: "bg-amber-500/15 text-amber-400" },
+                    { icon: CheckCircle2, label: "₦450,000 received", accent: "bg-emerald-500/15 text-emerald-400" },
+                    { icon: Wrench, label: "Maintenance update", accent: "bg-blue-500/15 text-blue-400" },
+                    { icon: MessageSquare, label: "New message", accent: "bg-[#f97316]/15 text-[#f97316]" },
+                  ].map((n) => (
+                    <div key={n.label} className="flex items-center gap-2.5 bg-white/[0.05] border border-white/10 rounded-xl px-3.5 py-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${n.accent}`}>
+                        <n.icon className="h-4 w-4" />
+                      </div>
+                      <span className="text-xs font-medium text-white leading-tight">{n.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FAQ ───────────────────────────────────────────────────────────── */}
+      <section className="py-24 bg-white dark:bg-[#0a0f1e]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">FAQ</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
+              Questions, answered.
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {FAQS.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 px-5 py-4 [&_summary]:list-none"
+              >
+                <summary className="flex items-center justify-between gap-4 cursor-pointer text-sm font-semibold text-slate-900 dark:text-white">
+                  {item.q}
+                  <ChevronRight className="h-4 w-4 text-slate-400 shrink-0 transition-transform group-open:rotate-90" />
+                </summary>
+                <p className="text-[14px] text-slate-600 dark:text-slate-400 leading-relaxed mt-3">
+                  {item.a}
+                </p>
+              </details>
             ))}
           </div>
         </div>
