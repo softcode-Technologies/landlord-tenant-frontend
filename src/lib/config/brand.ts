@@ -16,3 +16,14 @@ export const BRAND_LEGAL_NAME =
   process.env.NEXT_PUBLIC_BRAND_LEGAL_NAME || `${BRAND_NAME} Technologies Ltd`
 
 export const brandEmail = (mailbox: string): string => `${mailbox}@${BRAND_DOMAIN}`
+
+// Mobile apps aren't live yet. Set NEXT_PUBLIC_SHOW_APP_DOWNLOAD=true to reveal
+// the "Your rentals, in your pocket" download section (and the matching FAQ)
+// once the iOS/Android apps ship. Defaults to hidden.
+export const SHOW_APP_DOWNLOAD =
+  process.env.NEXT_PUBLIC_SHOW_APP_DOWNLOAD === "true"
+
+// App store URLs for the download badges. Set these to the real App Store /
+// Play Store listings when the apps ship. Default "#" (no-op) until then.
+export const IOS_APP_URL = process.env.NEXT_PUBLIC_IOS_APP_URL || "#"
+export const ANDROID_APP_URL = process.env.NEXT_PUBLIC_ANDROID_APP_URL || "#"

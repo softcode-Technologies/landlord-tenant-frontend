@@ -8,7 +8,7 @@ import {
   CalendarClock, UserPlus, Send, CheckCircle2, Sparkles, Lock, Zap,
   Receipt, Layers, Globe, Smartphone, Check, Apple, Play,
 } from "lucide-react"
-import { BRAND_NAME, BRAND_DOMAIN } from "@/lib/config/brand"
+import { BRAND_NAME, BRAND_DOMAIN, SHOW_APP_DOWNLOAD, IOS_APP_URL, ANDROID_APP_URL } from "@/lib/config/brand"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
@@ -158,7 +158,9 @@ const FAQS = [
   },
   {
     q: "Do you have a mobile app, and where do you operate?",
-    a: `Yes — ${BRAND_NAME} is available on both iOS and Android, and is built for landlords, agents, and tenants across all 36 states of Nigeria.`,
+    a: SHOW_APP_DOWNLOAD
+      ? `Yes — ${BRAND_NAME} is available on both iOS and Android, and is built for landlords, agents, and tenants across all 36 states of Nigeria.`
+      : `${BRAND_NAME} works in any browser today, and native iOS and Android apps are on the way. It's built for landlords, agents, and tenants across all 36 states of Nigeria.`,
   },
 ]
 
@@ -728,7 +730,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── MOBILE APP ────────────────────────────────────────────────────── */}
+      {/* ─── MOBILE APP (gated: hidden until apps ship) ────────────────────── */}
+      {SHOW_APP_DOWNLOAD && (
       <section className="py-20 bg-slate-50 dark:bg-slate-900/40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white px-8 sm:px-12 py-12 relative overflow-hidden">
@@ -747,22 +750,32 @@ export default function HomePage() {
                   message, and manage every tenancy on the go — the full platform, on mobile.
                 </p>
 
-                {/* Replace hrefs with real App Store / Play Store URLs once published. */}
+                {/* Store URLs come from NEXT_PUBLIC_IOS_APP_URL / _ANDROID_APP_URL. */}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Link href="/login" className="flex items-center gap-3 bg-black hover:bg-black/80 transition-colors rounded-xl px-5 py-2.5 border border-white/10">
+                  <a
+                    href={IOS_APP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 bg-black hover:bg-black/80 transition-colors rounded-xl px-5 py-2.5 border border-white/10"
+                  >
                     <Apple className="h-7 w-7 text-white" />
                     <span className="text-left leading-tight">
                       <span className="block text-[10px] text-slate-300">Download on the</span>
                       <span className="block text-base font-semibold text-white">App Store</span>
                     </span>
-                  </Link>
-                  <Link href="/login" className="flex items-center gap-3 bg-black hover:bg-black/80 transition-colors rounded-xl px-5 py-2.5 border border-white/10">
+                  </a>
+                  <a
+                    href={ANDROID_APP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 bg-black hover:bg-black/80 transition-colors rounded-xl px-5 py-2.5 border border-white/10"
+                  >
                     <Play className="h-6 w-6 text-white fill-white" />
                     <span className="text-left leading-tight">
                       <span className="block text-[10px] text-slate-300">Get it on</span>
                       <span className="block text-base font-semibold text-white">Google Play</span>
                     </span>
-                  </Link>
+                  </a>
                 </div>
               </div>
 
@@ -787,6 +800,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ─── FAQ ───────────────────────────────────────────────────────────── */}
       <section className="py-24 bg-white dark:bg-[#0a0f1e]">
