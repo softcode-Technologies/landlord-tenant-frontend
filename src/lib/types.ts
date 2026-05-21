@@ -214,6 +214,7 @@ export interface Tenancy {
   unit?: Unit
   tenant?: User
   landlord?: User
+  agent?: { id: string; agencyName?: string | null; user?: Pick<User, "id" | "firstName" | "lastName"> } | null
   property?: Property
   createdAt: string
   updatedAt: string
@@ -357,7 +358,8 @@ export interface Review {
   id: string
   tenancyId: string
   authorUserId: string
-  subjectType: "landlord" | "tenant" | "property"
+  reviewerUserId?: string
+  subjectType: "landlord" | "tenant" | "property" | "agent"
   subjectId: string
   rating: number
   comment?: string

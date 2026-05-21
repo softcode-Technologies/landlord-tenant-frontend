@@ -6,15 +6,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { tenanciesApi } from "@/lib/api/tenancies"
 import { paymentsApi } from "@/lib/api/payments"
 import { userApi } from "@/lib/api/user"
+import { reviewsApi } from "@/lib/api/reviews"
+import { useAuthStore } from "@/lib/store/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
-import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink, PenLine } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink, PenLine, Star, CheckCircle2 } from "lucide-react"
 import { RentHistoryCard } from "@/components/shared/rent-history-card"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -22,9 +25,12 @@ import { toast } from "sonner"
 export default function TenantTenancyDetailPage() {
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
+  const currentUser = useAuthStore((s) => s.user)
   const [signOpen, setSignOpen] = useState(false)
   const [signatureName, setSignatureName] = useState("")
   const [agreed, setAgreed] = useState(false)
+  const [stars, setStars] = useState(0)
+  const [reviewComment, setReviewComment] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["tenancy", id],
@@ -73,6 +79,39 @@ export default function TenantTenancyDetailPage() {
 
   const tenancy = data?.data
   const agreement = agreementData?.data
+  const agentId = tenancy?.agent?.id ?? null
+  const agentName = tenancy?.agent
+    ? [tenancy.agent.user?.firstName, tenancy.agent.user?.lastName].filter(Boolean).join(" ") ||
+      tenancy.agent.agencyName ||
+      "your agent"
+    : null
+
+  const { data: agentReviewsData } = useQuery({
+    queryKey: ["agent-reviews", agentId],
+    queryFn: () => reviewsApi.getReviewsBySubject("agent", agentId!),
+    enabled: !!agentId,
+  })
+  const alreadyReviewedAgent = (agentReviewsData?.data?.reviews ?? []).some(
+    (r) => r.reviewerUserId === currentUser?.id,
+  )
+
+  const reviewAgentMutation = useMutation({
+    mutationFn: () =>
+      reviewsApi.createReview({
+        tenancyId: id,
+        subjectType: "agent",
+        subjectId: agentId!,
+        rating: stars,
+        comment: reviewComment.trim() || undefined,
+      }),
+    onSuccess: () => {
+      toast.success("Thanks for rating your agent!")
+      setStars(0)
+      setReviewComment("")
+      queryClient.invalidateQueries({ queryKey: ["agent-reviews", agentId] })
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to submit review")),
+  })
 
   if (isLoading) {
     return (
@@ -320,6 +359,60 @@ export default function TenantTenancyDetailPage() {
                       ) : (
                         "Reject"
                       )}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Rate your agent */}
+          {agentId && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Rate your agent</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {alreadyReviewedAgent ? (
+                  <div className="flex items-center gap-2 text-sm text-green-700">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Thanks — you&apos;ve rated {agentName}.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-slate-500">
+                      How was your experience with {agentName}, who set up this tenancy?
+                    </p>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setStars(n)}
+                          aria-label={`${n} star${n === 1 ? "" : "s"}`}
+                          className="p-0.5"
+                        >
+                          <Star
+                            className={`h-7 w-7 transition-colors ${
+                              n <= stars ? "fill-[#f97316] text-[#f97316]" : "text-slate-300"
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    <Textarea
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder="Optional: share a few words about your experience"
+                      rows={2}
+                    />
+                    <Button
+                      className="w-full gap-2"
+                      disabled={stars < 1 || reviewAgentMutation.isPending}
+                      onClick={() => reviewAgentMutation.mutate()}
+                    >
+                      {reviewAgentMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
+                      Submit rating
                     </Button>
                   </div>
                 )}

@@ -1,15 +1,17 @@
 import apiClient from "./client"
 import type { Review } from "@/lib/types"
 
+type ReviewSubjectType = "landlord" | "tenant" | "property" | "agent"
+
 export const reviewsApi = {
-  getReviewsBySubject: (subjectType: "landlord" | "tenant" | "property", subjectId: string) =>
+  getReviewsBySubject: (subjectType: ReviewSubjectType, subjectId: string) =>
     apiClient.get<{ reviews: Review[]; total: number; averageRating: number | null }>(
       `/reviews/subject/${subjectType}/${subjectId}`
     ),
 
   createReview: (data: {
     tenancyId: string
-    subjectType: "landlord" | "tenant" | "property"
+    subjectType: ReviewSubjectType
     subjectId: string
     rating: number
     comment?: string
