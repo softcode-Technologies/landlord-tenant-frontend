@@ -44,15 +44,15 @@ export const agentsApi = {
     }>("/agent/directory", { params }),
 
   // agentProfileId comes from the directory item's `id`.
-  assignAgent: (propertyId: string, agentProfileId: string) =>
-    apiClient.put(`/agent/assign/${propertyId}`, { agentProfileId }),
+  assignAgent: (propertyId: string, agentProfileId: string, commissionPercent?: number) =>
+    apiClient.put(`/agent/assign/${propertyId}`, { agentProfileId, commissionPercent }),
 
   // Phone-first: check whether a number already belongs to an agent.
   lookupByPhone: (phone: string) =>
     apiClient.get<AgentLookupResult>("/agent/lookup", { params: { phone } }),
 
   // Assign an existing user as agent (by phone) or SMS-invite a new one.
-  inviteToProperty: (data: { propertyId: string; phone: string; firstName?: string }) =>
+  inviteToProperty: (data: { propertyId: string; phone: string; firstName?: string; commissionPercent?: number }) =>
     apiClient.post<{ status: "assigned" | "invited"; agentProfileId?: string }>("/agent/invite", data),
 
   removeAgent: (propertyId: string) =>

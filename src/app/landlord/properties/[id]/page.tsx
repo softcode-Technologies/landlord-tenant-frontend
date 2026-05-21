@@ -42,6 +42,7 @@ export default function PropertyDetailPage() {
   const [agentOpen, setAgentOpen] = useState(false)
   const [agentPhone, setAgentPhone] = useState("")
   const [lookup, setLookup] = useState<AgentLookupResult | null>(null)
+  const [agentCommission, setAgentCommission] = useState("10")
 
   const { data, isLoading } = useQuery({
     queryKey: ["property", id],
@@ -88,6 +89,7 @@ export default function PropertyDetailPage() {
     setAgentOpen(false)
     setAgentPhone("")
     setLookup(null)
+    setAgentCommission("10")
   }
 
   const lookupMutation = useMutation({
@@ -96,8 +98,13 @@ export default function PropertyDetailPage() {
     onError: (err: unknown) => toast.error(extractApiError(err, "Lookup failed")),
   })
 
+  const commissionNum = () => {
+    const n = parseInt(agentCommission)
+    return Number.isFinite(n) && n >= 0 ? n : 0
+  }
+
   const assignMutation = useMutation({
-    mutationFn: (agentProfileId: string) => agentsApi.assignAgent(id, agentProfileId),
+    mutationFn: (agentProfileId: string) => agentsApi.assignAgent(id, agentProfileId, commissionNum()),
     onSuccess: () => {
       toast.success("Agent assigned successfully")
       queryClient.invalidateQueries({ queryKey: ["property", id] })
@@ -107,7 +114,7 @@ export default function PropertyDetailPage() {
   })
 
   const inviteMutation = useMutation({
-    mutationFn: () => agentsApi.inviteToProperty({ propertyId: id, phone: agentPhone.trim() }),
+    mutationFn: () => agentsApi.inviteToProperty({ propertyId: id, phone: agentPhone.trim(), commissionPercent: commissionNum() }),
     onSuccess: (res) => {
       toast.success(
         res.data.status === "assigned" ? "Agent assigned successfully" : "Invite sent to agent",
@@ -560,6 +567,26 @@ export default function PropertyDetailPage() {
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
                 No account found for this number. We&apos;ll send an SMS inviting them to join as an
                 agent for this property.
+              </div>
+            )}
+
+            {lookup && (
+              <div>
+                <Label htmlFor="agent-commission">Agent commission (%)</Label>
+                <Input
+                  id="agent-commission"
+                  type="number"
+                  min={0}
+                  max={50}
+                  value={agentCommission}
+                  onChange={(e) => setAgentCommission(e.target.value)}
+                  className="mt-1.5"
+                  placeholder="e.g. 10"
+                />
+                <p className="text-xs text-slate-400 mt-1.5">
+                  One-time letting fee, charged on the tenant&apos;s first rent. Paid from your wallet
+                  to the agent — set 0 for none.
+                </p>
               </div>
             )}
           </div>
