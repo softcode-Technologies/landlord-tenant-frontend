@@ -172,6 +172,7 @@ export interface Unit {
   rentPerAnnum: number
   images?: string[]
   isActive: boolean
+  status?: "vacant" | "occupied" | "maintenance"
   listing?: Listing
   tenancy?: Tenancy
   property?: Property

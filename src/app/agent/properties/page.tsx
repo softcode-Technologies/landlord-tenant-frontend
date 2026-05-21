@@ -53,30 +53,29 @@ export default function AgentPropertiesPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {properties.map((p) => (
-            <Card
-              key={p.id}
-              className="overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div className="h-32 bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center">
-                {p.images && p.images[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
-                ) : (
-                  <Building2 className="h-10 w-10 text-white/40" />
-                )}
-              </div>
-              <CardContent className="p-4">
-                <p className="font-semibold text-slate-900 truncate">{p.name}</p>
-                <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 min-w-0">
-                  <MapPin className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{[p.area, p.city, p.state].filter(Boolean).join(", ")}</span>
-                </p>
-                <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                  <span>{p.units?.length ?? 0} unit{(p.units?.length ?? 0) === 1 ? "" : "s"}</span>
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+            <Link key={p.id} href={`/agent/properties/${p.id}`}>
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
+                <div className="h-32 bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center">
+                  {p.images && p.images[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Building2 className="h-10 w-10 text-white/40" />
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+                <CardContent className="p-4">
+                  <p className="font-semibold text-slate-900 truncate">{p.name}</p>
+                  <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 min-w-0">
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{[p.area, p.city, p.state].filter(Boolean).join(", ")}</span>
+                  </p>
+                  <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                    <span>{p.units?.length ?? 0} unit{(p.units?.length ?? 0) === 1 ? "" : "s"}</span>
+                    <ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
