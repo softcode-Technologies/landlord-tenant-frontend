@@ -386,8 +386,10 @@ export interface LandlordAnalytics {
 export interface AgentAnalytics {
   managedProperties: number
   totalCommissions: number
+  pendingCommissions: { count: number; totalKobo: number }
+  paidCommissions: { count: number; totalKobo: number }
+  totalDeals: number
   rating: number
-  recentActivity: unknown[]
 }
 
 // Agent Commissions
