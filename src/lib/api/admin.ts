@@ -115,6 +115,42 @@ export interface ReferralsResponse {
   }
 }
 
+export interface AnalyticsOverview {
+  kpis: {
+    totalUsers: number
+    newUsersThisMonth: number
+    totalProperties: number
+    activeTenancies: number
+    pendingKyc: number
+    pendingPayments: number
+  }
+  money: {
+    collectedToday: number
+    collected7Days: number
+    collectedThisMonth: number
+    collectedAllTime: number
+    platformEarningsAllTime: number
+    platformEarningsThisMonth: number
+    commissionPercent: number
+  }
+  breakdown: {
+    inspection_fee: number
+    rent: number
+    wallet_topup: number
+    listing_boost: number
+  }
+  daily: {
+    date: string
+    label: string
+    totalKobo: number
+    rentKobo: number
+    inspectionKobo: number
+    topupKobo: number
+    boostKobo: number
+  }[]
+  monthly: { month: string; totalKobo: number; earningsKobo: number }[]
+}
+
 export interface PaginationMeta {
   total: number
   page: number
@@ -302,6 +338,9 @@ export const adminApi = {
 
   getRevenueBreakdown: () =>
     apiClient.get<RevenueBreakdown>("/admin/payments/revenue"),
+
+  getAnalyticsOverview: () =>
+    apiClient.get<AnalyticsOverview>("/admin/analytics/overview"),
 
   refundPayment: (paymentId: string, amountKobo?: number) =>
     apiClient.post(`/admin/payments/${paymentId}/refund`, { amountKobo }),
