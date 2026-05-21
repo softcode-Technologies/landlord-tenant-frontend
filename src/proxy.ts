@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { safeRedirectPath } from "@/lib/safe-redirect"
 
 const COOKIE = "naijarental-token"
 const PROTECTED_PREFIXES = ["/tenant", "/landlord", "/agent", "/admin"]
@@ -45,7 +46,8 @@ export function proxy(request: NextRequest) {
 
   // Only bounce away from /login when the session is genuinely valid.
   if (isAuthRoute && hasValidToken) {
-    const redirectTo = request.nextUrl.searchParams.get("redirect") || "/"
+    // Only honor internal paths so ?redirect= can't bounce to an external host.
+    const redirectTo = safeRedirectPath(request.nextUrl.searchParams.get("redirect"), "/")
     return NextResponse.redirect(new URL(redirectTo, request.url))
   }
 

@@ -125,7 +125,11 @@ export default async function ListingDetailPage({
       {jsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          // Escape `<` so user-controlled fields (title/description) can't break
+          // out of the script block with `</script>` and inject markup.
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
         />
       )}
       <Suspense fallback={<div className="min-h-screen bg-[#f8fafc] dark:bg-[#0a0f1e]" />}>

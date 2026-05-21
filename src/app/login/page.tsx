@@ -11,11 +11,12 @@ import { useAuthStore, getRoleDashboardPath } from "@/lib/store/auth"
 import { toast } from "sonner"
 import { BrandWordmark } from "@/components/layout/brand-wordmark"
 import { BRAND_NAME } from "@/lib/config/brand"
+import { safeRedirectPath } from "@/lib/safe-redirect"
 
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get("redirect")
+  const redirect = safeRedirectPath(searchParams.get("redirect"), "")
   const { setAuth, setAccessToken } = useAuthStore()
 
   const [step, setStep] = useState<"phone" | "otp">("phone")
