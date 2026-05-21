@@ -16,7 +16,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatNaira, formatNairaAmount, formatDate, getStatusVariant, getInitials, extractApiError } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ArrowLeft, Calendar, DollarSign, Shield, Trash2, RefreshCw, Loader2 } from "lucide-react"
+import { ArrowLeft, Calendar, DollarSign, Shield, Trash2, RefreshCw, Loader2, Pencil } from "lucide-react"
+import { RentHistoryCard } from "@/components/shared/rent-history-card"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -34,11 +35,41 @@ export default function LandlordTenancyDetailPage() {
   const [depositAmount, setDepositAmount] = useState("")
   const [depositDate, setDepositDate] = useState("")
   const [depositNote, setDepositNote] = useState("")
+  const [editRentOpen, setEditRentOpen] = useState(false)
+  const [newRent, setNewRent] = useState("")
+  const [isCorrection, setIsCorrection] = useState(false)
+  const [rentReason, setRentReason] = useState("")
 
   const { data, isLoading } = useQuery({
     queryKey: ["tenancy", id],
     queryFn: () => tenanciesApi.getTenancy(id),
   })
+
+  const editRentMutation = useMutation({
+    mutationFn: () =>
+      tenanciesApi.updateRent(id, {
+        newRentAmount: parseInt(newRent),
+        changeType: isCorrection ? "correction" : undefined,
+        reason: rentReason.trim() || undefined,
+      }),
+    onSuccess: () => {
+      toast.success("Rent updated")
+      queryClient.invalidateQueries({ queryKey: ["tenancy", id] })
+      queryClient.invalidateQueries({ queryKey: ["rent-changes", id] })
+      setEditRentOpen(false)
+      setNewRent("")
+      setIsCorrection(false)
+      setRentReason("")
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to update rent")),
+  })
+
+  const openEditRent = (currentRent: number) => {
+    setNewRent(String(currentRent))
+    setIsCorrection(false)
+    setRentReason("")
+    setEditRentOpen(true)
+  }
 
   const renewMutation = useMutation({
     mutationFn: () => tenanciesApi.renewTenancy(id, { newEndDate }),
@@ -141,6 +172,15 @@ export default function LandlordTenancyDetailPage() {
       ? `${tenancy.tenant.firstName ?? ""} ${tenancy.tenant.lastName ?? ""}`.trim() || "Tenant"
       : "Unknown Tenant"
 
+  // Next annual rent due: the recorded date, or a projection one year after the
+  // start date if no payment has set it yet.
+  const nextRentDue = (() => {
+    if (tenancy.nextDueDate) return formatDate(tenancy.nextDueDate)
+    const d = new Date(tenancy.startDate)
+    d.setFullYear(d.getFullYear() + 1)
+    return formatDate(d.toISOString())
+  })()
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -190,6 +230,7 @@ export default function LandlordTenancyDetailPage() {
                   { label: "Annual Rent", value: formatNairaAmount(tenancy.rentAmount) },
                   { label: "Start Date", value: formatDate(tenancy.startDate) },
                   { label: "End Date", value: formatDate(tenancy.endDate) },
+                  { label: "Next Rent Due", value: nextRentDue },
                   {
                     label: "Property",
                     value: tenancy.property?.name ?? tenancy.unit?.unitNumber ?? "N/A",
@@ -262,6 +303,9 @@ export default function LandlordTenancyDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Rent History */}
+          <RentHistoryCard tenancyId={id} />
 
           {/* Agreement */}
           <Card>
@@ -384,6 +428,15 @@ export default function LandlordTenancyDetailPage() {
                 <Button
                   className="w-full gap-2"
                   variant="outline"
+                  onClick={() => openEditRent(tenancy.rentAmount)}
+                >
+                  <Pencil className="h-4 w-4" />
+                  Edit Rent
+                </Button>
+
+                <Button
+                  className="w-full gap-2"
+                  variant="outline"
                   onClick={() => setDepositOpen(true)}
                 >
                   <DollarSign className="h-4 w-4" />
@@ -434,6 +487,65 @@ export default function LandlordTenancyDetailPage() {
             >
               {renewMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               Renew
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Rent Dialog */}
+      <Dialog open={editRentOpen} onOpenChange={setEditRentOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Annual Rent</DialogTitle>
+            <DialogDescription>
+              The tenant is notified and every change is recorded in the rent history.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>New Annual Rent (₦)</Label>
+              <Input
+                type="number"
+                value={newRent}
+                onChange={(e) => setNewRent(e.target.value)}
+                placeholder="e.g. 1200000"
+                className="mt-1.5"
+              />
+            </div>
+            <label className="flex items-start gap-2.5 text-sm text-slate-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isCorrection}
+                onChange={(e) => setIsCorrection(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-[#1a3c5e]"
+              />
+              <span>
+                This is a correction (fixing a data-entry mistake), not a rent change.
+                Corrections aren&apos;t counted as increases.
+              </span>
+            </label>
+            <div>
+              <Label>Reason (optional)</Label>
+              <Textarea
+                value={rentReason}
+                onChange={(e) => setRentReason(e.target.value)}
+                placeholder={isCorrection ? "e.g. Entered the wrong figure" : "e.g. Annual review"}
+                className="mt-1.5"
+                rows={2}
+              />
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" className="flex-1" onClick={() => setEditRentOpen(false)} disabled={editRentMutation.isPending}>
+              Cancel
+            </Button>
+            <Button
+              className="flex-1 gap-2"
+              disabled={!newRent || parseInt(newRent) <= 0 || editRentMutation.isPending}
+              onClick={() => editRentMutation.mutate()}
+            >
+              {editRentMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Save
             </Button>
           </div>
         </DialogContent>

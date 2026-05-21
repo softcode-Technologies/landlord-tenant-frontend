@@ -1,5 +1,5 @@
 import apiClient from "./client"
-import type { Tenancy, CreditScore } from "@/lib/types"
+import type { Tenancy, CreditScore, RentChange } from "@/lib/types"
 
 export const tenanciesApi = {
   getLandlordTenancies: () => apiClient.get<Tenancy[]>("/tenancies/landlord"),
@@ -25,6 +25,16 @@ export const tenanciesApi = {
     apiClient.post(`/tenancies/${id}/deposit/return`, data),
 
   getDeposit: (id: string) => apiClient.get(`/tenancies/${id}/deposit`),
+
+  // Edit/increase the annual rent (naira). changeType defaults to increase/decrease
+  // by direction; pass 'correction' for fixing a mistake.
+  updateRent: (
+    id: string,
+    data: { newRentAmount: number; changeType?: "increase" | "decrease" | "correction"; reason?: string }
+  ) => apiClient.patch<RentChange>(`/tenancies/${id}/rent`, data),
+
+  getRentChanges: (id: string) =>
+    apiClient.get<RentChange[]>(`/tenancies/${id}/rent-changes`),
 
   terminateTenancy: (id: string) => apiClient.delete(`/tenancies/${id}/terminate`),
 }

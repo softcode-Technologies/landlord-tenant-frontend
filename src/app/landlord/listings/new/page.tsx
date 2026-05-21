@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { propertiesApi } from "@/lib/api/properties"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -33,6 +33,7 @@ const defaultForm: FormData = {
 
 export default function NewListingPage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [form, setForm] = useState<FormData>(defaultForm)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
@@ -75,6 +76,11 @@ export default function NewListingPage() {
         availableFrom: form.availableFrom,
       })
       toast.success("Listing created successfully!")
+      // Mark the cached lists stale so the destination page refetches on mount
+      // and the new listing shows immediately instead of after a manual refresh.
+      queryClient.invalidateQueries({ queryKey: ["my-listings"] })
+      queryClient.invalidateQueries({ queryKey: ["listings"] })
+      queryClient.invalidateQueries({ queryKey: ["properties"] })
       router.push("/landlord/listings")
     } catch {
       toast.error("Failed to create listing. Please try again.")

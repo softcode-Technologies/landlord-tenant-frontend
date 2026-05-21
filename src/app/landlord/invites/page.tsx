@@ -199,7 +199,19 @@ export default function LandlordInvitesPage() {
           >
             <div>
               <Label>Unit</Label>
-              <Select value={form.unitId} onValueChange={(val) => setField("unitId", val)}>
+              <Select
+                value={form.unitId}
+                onValueChange={(val) => {
+                  // Rent is defined on the unit — prefill it so the landlord
+                  // doesn't override what they set there.
+                  const unit = allUnits.find((u) => u.id === val)
+                  setForm((f) => ({
+                    ...f,
+                    unitId: val,
+                    rentAmount: unit?.rentPerAnnum != null ? String(unit.rentPerAnnum) : f.rentAmount,
+                  }))
+                }}
+              >
                 <SelectTrigger className="mt-1.5">
                   <SelectValue placeholder="Select unit" />
                 </SelectTrigger>
@@ -239,10 +251,13 @@ export default function LandlordInvitesPage() {
               <Input
                 type="number"
                 value={form.rentAmount}
-                onChange={(e) => setField("rentAmount", e.target.value)}
-                placeholder="e.g. 1200000"
-                className="mt-1.5"
+                readOnly
+                placeholder="Select a unit"
+                className="mt-1.5 bg-slate-50 text-slate-700 cursor-not-allowed"
               />
+              <p className="text-xs text-slate-400 mt-1.5">
+                Set from the selected unit. Edit the unit to change its rent.
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

@@ -20,6 +20,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { formatNairaAmount, extractApiError } from "@/lib/utils"
+import { compressImage } from "@/lib/image"
 import { ArrowLeft, Building2, Bed, Bath, MapPin, Plus, Loader2, Image, Upload, X as XIcon, UserCheck, UserMinus } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -34,8 +35,9 @@ export default function PropertyDetailPage() {
   const [unitBaths, setUnitBaths] = useState("")
   const [unitToilets, setUnitToilets] = useState("")
   const [unitRent, setUnitRent] = useState("")
-  const [imageFiles, setImageFiles] = useState<File[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [imagesUnitId, setImagesUnitId] = useState<string | null>(null)
+  const [unitFiles, setUnitFiles] = useState<File[]>([])
+  const unitFileRef = useRef<HTMLInputElement>(null)
   const [agentOpen, setAgentOpen] = useState(false)
   const [agentPhone, setAgentPhone] = useState("")
   const [lookup, setLookup] = useState<AgentLookupResult | null>(null)
@@ -55,18 +57,30 @@ export default function PropertyDetailPage() {
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to add unit")),
   })
 
-  const uploadImagesMutation = useMutation({
-    mutationFn: () => {
+  const uploadUnitImagesMutation = useMutation({
+    mutationFn: async () => {
       const formData = new FormData()
-      imageFiles.forEach((f) => formData.append("images", f))
-      return propertiesApi.uploadImages(id, formData)
+      const compressed = await Promise.all(unitFiles.map((f) => compressImage(f)))
+      compressed.forEach((f) => formData.append("images", f))
+      return propertiesApi.uploadUnitImages(imagesUnitId!, formData)
     },
     onSuccess: () => {
-      toast.success("Images uploaded successfully")
-      queryClient.invalidateQueries({ queryKey: ["property", id] })
-      setImageFiles([])
+      toast.success("Photos uploaded")
+      setUnitFiles([])
     },
-    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to upload images")),
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to upload photos")),
+    // Always re-sync with the server — if a slow upload actually completed, the
+    // gallery updates instead of tempting a duplicate re-upload.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["property", id] }),
+  })
+
+  const removeUnitImageMutation = useMutation({
+    mutationFn: (url: string) => propertiesApi.removeUnitImage(imagesUnitId!, url),
+    onSuccess: () => {
+      toast.success("Image removed")
+      queryClient.invalidateQueries({ queryKey: ["property", id] })
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to remove image")),
   })
 
   const closeAgentDialog = () => {
@@ -138,6 +152,12 @@ export default function PropertyDetailPage() {
   }
 
   const property = data?.data
+  const imagesUnit = property?.units?.find((u) => u.id === imagesUnitId) ?? null
+
+  const closeImagesDialog = () => {
+    setImagesUnitId(null)
+    setUnitFiles([])
+  }
 
   if (isLoading) {
     return (
@@ -284,147 +304,88 @@ export default function PropertyDetailPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {property.units.map((unit) => (
-                <div
-                  key={unit.id}
-                  className="border border-slate-100 rounded-xl p-4 hover:border-slate-200 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-slate-900">{unit.unitNumber}</h4>
-                    <div className="flex items-center gap-1.5">
-                      {unit.tenancy?.status === "active" ? (
-                        <Badge variant="default" className="text-xs">Occupied</Badge>
-                      ) : unit.listing?.isActive ? (
-                        <Badge variant="secondary" className="text-xs">Listed</Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-xs">Vacant</Badge>
-                      )}
-                      {!unit.isActive && (
-                        <Badge variant="destructive" className="text-xs">Inactive</Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
-                    <div className="flex items-center gap-1">
-                      <Bed className="h-3.5 w-3.5" />
-                      {unit.bedrooms}bd
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Bath className="h-3.5 w-3.5" />
-                      {unit.bathrooms}ba
-                    </div>
-                  </div>
-
-                  <p className="text-base font-bold text-[#1a3c5e]">
-                    {formatNairaAmount(unit.rentPerAnnum)}/yr
-                  </p>
-
-                  {unit.tenancy?.tenant && (
-                    <p className="text-xs text-slate-500 mt-2">
-                      Tenant: {unit.tenancy.tenant.firstName} {unit.tenancy.tenant.lastName}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Images */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Property Images</CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload className="h-3.5 w-3.5" />
-              Add Images
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => {
-              const files = Array.from(e.target.files ?? [])
-              setImageFiles((prev) => [...prev, ...files])
-              e.target.value = ""
-            }}
-          />
-
-          {property.images && property.images.length > 0 && (
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              {property.images.map((url, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={i}
-                  src={url}
-                  alt={`Property image ${i + 1}`}
-                  className="w-full h-24 object-cover rounded-xl"
-                />
-              ))}
-            </div>
-          )}
-
-          {imageFiles.length > 0 && (
-            <div className="space-y-3">
-              <p className="text-xs text-slate-500 font-medium">Ready to upload:</p>
-              <div className="grid grid-cols-3 gap-2">
-                {imageFiles.map((file, i) => (
-                  <div key={i} className="relative group">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={file.name}
-                      className="w-full h-24 object-cover rounded-xl"
-                    />
+              {property.units.map((unit) => {
+                const cover = unit.images?.[0]
+                const imageCount = unit.images?.length ?? 0
+                return (
+                  <div
+                    key={unit.id}
+                    className="border border-slate-200 rounded-2xl overflow-hidden hover:border-slate-300 hover:shadow-sm transition-all"
+                  >
+                    {/* Cover image */}
                     <button
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => setImageFiles((prev) => prev.filter((_, j) => j !== i))}
+                      type="button"
+                      onClick={() => setImagesUnitId(unit.id)}
+                      className="relative block w-full h-36 bg-slate-100 group"
                     >
-                      <XIcon className="h-3 w-3" />
+                      {cover ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={cover} alt={unit.unitNumber} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                          <Image className="h-7 w-7 mb-1" />
+                          <span className="text-xs">Add photos</span>
+                        </div>
+                      )}
+                      <span className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                      {imageCount > 1 && (
+                        <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-2 py-0.5 rounded-full">
+                          {imageCount} photos
+                        </span>
+                      )}
                     </button>
-                  </div>
-                ))}
-              </div>
-              <Button
-                className="w-full gap-2"
-                onClick={() => uploadImagesMutation.mutate()}
-                disabled={uploadImagesMutation.isPending}
-              >
-                {uploadImagesMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Upload className="h-4 w-4" />
-                )}
-                Upload {imageFiles.length} Image{imageFiles.length !== 1 ? "s" : ""}
-              </Button>
-            </div>
-          )}
 
-          {(!property.images || property.images.length === 0) && imageFiles.length === 0 && (
-            <div className="text-center py-6">
-              <Image className="h-10 w-10 text-slate-200 mx-auto mb-2" />
-              <p className="text-sm text-slate-400 mb-3">No images uploaded yet</p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="h-3.5 w-3.5" />
-                Upload Images
-              </Button>
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h4 className="font-semibold text-slate-900 truncate">{unit.unitNumber}</h4>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {unit.tenancy?.status === "active" ? (
+                            <Badge variant="default" className="text-xs">Occupied</Badge>
+                          ) : unit.listing?.isActive ? (
+                            <Badge variant="secondary" className="text-xs">Listed</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs">Vacant</Badge>
+                          )}
+                          {!unit.isActive && (
+                            <Badge variant="destructive" className="text-xs">Inactive</Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 text-sm text-slate-500 mb-2">
+                        <div className="flex items-center gap-1">
+                          <Bed className="h-3.5 w-3.5" />
+                          {unit.bedrooms}bd
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Bath className="h-3.5 w-3.5" />
+                          {unit.bathrooms}ba
+                        </div>
+                      </div>
+
+                      <p className="text-base font-bold text-[#1a3c5e]">
+                        {formatNairaAmount(unit.rentPerAnnum)}/yr
+                      </p>
+
+                      {unit.tenancy?.tenant && (
+                        <p className="text-xs text-slate-500 mt-2">
+                          Tenant: {unit.tenancy.tenant.firstName} {unit.tenancy.tenant.lastName}
+                        </p>
+                      )}
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-3 gap-1.5"
+                        onClick={() => setImagesUnitId(unit.id)}
+                      >
+                        <Image className="h-3.5 w-3.5" />
+                        {imageCount > 0 ? "Manage photos" : "Add photos"}
+                      </Button>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </CardContent>
@@ -623,6 +584,99 @@ export default function PropertyDetailPage() {
                 {lookup.found ? "Assign as agent" : "Send invite"}
               </Button>
             ) : null}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manage Unit Photos Dialog */}
+      <Dialog open={!!imagesUnitId} onOpenChange={(o) => !o && closeImagesDialog()}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{imagesUnit ? `Photos · ${imagesUnit.unitNumber}` : "Unit photos"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-1">
+            <input
+              ref={unitFileRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                const files = Array.from(e.target.files ?? [])
+                setUnitFiles((prev) => [...prev, ...files])
+                e.target.value = ""
+              }}
+            />
+
+            {imagesUnit?.images && imagesUnit.images.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {imagesUnit.images.map((url, i) => (
+                  <div key={url} className="relative group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={`Unit photo ${i + 1}`} className="w-full h-24 object-cover rounded-xl" />
+                    <button
+                      onClick={() => removeUnitImageMutation.mutate(url)}
+                      disabled={removeUnitImageMutation.isPending}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                      aria-label="Remove photo"
+                    >
+                      <XIcon className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-xl">
+                <Image className="h-9 w-9 text-slate-200 mx-auto mb-2" />
+                <p className="text-sm text-slate-400">No photos yet for this unit</p>
+              </div>
+            )}
+
+            {unitFiles.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-slate-500 font-medium">Ready to upload:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {unitFiles.map((file, i) => (
+                    <div key={i} className="relative group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-24 object-cover rounded-xl" />
+                      <button
+                        onClick={() => setUnitFiles((prev) => prev.filter((_, j) => j !== i))}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label="Remove"
+                      >
+                        <XIcon className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1 gap-1.5" onClick={() => unitFileRef.current?.click()}>
+                <Upload className="h-4 w-4" /> Choose photos
+              </Button>
+              {unitFiles.length > 0 && (
+                <Button
+                  className="flex-1 gap-1.5"
+                  onClick={() => uploadUnitImagesMutation.mutate()}
+                  disabled={uploadUnitImagesMutation.isPending}
+                >
+                  {uploadUnitImagesMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  Upload {unitFiles.length}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={closeImagesDialog}>Done</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

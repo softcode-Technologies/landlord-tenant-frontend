@@ -63,11 +63,17 @@ export default function LandlordWalletPage() {
   const transactions = txData?.data ?? []
   const balance = walletData?.data?.balance ?? 0
 
+  // The destination dropdown shows the default bank without firing onChange, so
+  // fall back to it when the user hasn't explicitly picked one — otherwise the
+  // withdraw submits an empty bankAccountId and fails validation.
+  const defaultBank = banks.find((b) => b.isDefault) ?? banks[0]
+  const activeBankId = selectedBankId || defaultBank?.id || ""
+
   const withdrawMutation = useMutation({
     mutationFn: () =>
       paymentsApi.withdraw({
         amountKobo: parseInt(withdrawAmount) * 100,
-        bankAccountId: selectedBankId,
+        bankAccountId: activeBankId,
       }),
     onSuccess: () => {
       toast.success("Withdrawal initiated. Funds typically arrive within 24 hours.")
@@ -156,9 +162,6 @@ export default function LandlordWalletPage() {
       queryClient.invalidateQueries({ queryKey: ["bank-accounts"] })
     },
   })
-
-  const defaultBank = banks.find((b) => b.isDefault) ?? banks[0]
-  const activeBankId = selectedBankId || defaultBank?.id || ""
 
   const amountValid = withdrawAmount && parseInt(withdrawAmount) >= 1000
   const balanceSufficient = amountValid && parseInt(withdrawAmount) * 100 <= balance

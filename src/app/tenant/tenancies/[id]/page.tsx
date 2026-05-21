@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
 import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink } from "lucide-react"
+import { RentHistoryCard } from "@/components/shared/rent-history-card"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -23,11 +24,6 @@ export default function TenantTenancyDetailPage() {
     queryFn: () => tenanciesApi.getTenancy(id),
   })
 
-  const { data: depositData } = useQuery({
-    queryKey: ["deposit", id],
-    queryFn: () => tenanciesApi.getDeposit(id),
-  })
-
   const { data: agreementData } = useQuery({
     queryKey: ["agreement", id],
     queryFn: () => userApi.getAgreement(id),
@@ -35,8 +31,8 @@ export default function TenantTenancyDetailPage() {
   })
 
   const payRentMutation = useMutation({
-    mutationFn: () =>
-      paymentsApi.payRent(id, (data?.data.rentAmount ?? 0) * 100),
+    // Full rent payment — backend charges the full amount; no kobo math here.
+    mutationFn: () => paymentsApi.payRent(id),
     onSuccess: (res) => {
       if (res.data.paymentUrl) {
         window.location.href = res.data.paymentUrl
@@ -66,7 +62,6 @@ export default function TenantTenancyDetailPage() {
   })
 
   const tenancy = data?.data
-  const deposit = depositData?.data
   const agreement = agreementData?.data
 
   if (isLoading) {
@@ -93,6 +88,15 @@ export default function TenantTenancyDetailPage() {
       </div>
     )
   }
+
+  // Next annual rent due: the recorded date, or a projection one year after the
+  // start date if no payment has set it yet.
+  const nextRentDue = (() => {
+    if (tenancy.nextDueDate) return formatDate(tenancy.nextDueDate)
+    const d = new Date(tenancy.startDate)
+    d.setFullYear(d.getFullYear() + 1)
+    return formatDate(d.toISOString())
+  })()
 
   return (
     <div className="space-y-6">
@@ -164,16 +168,23 @@ export default function TenantTenancyDetailPage() {
                 </div>
               </div>
 
-              <div className="border-t pt-4">
+              <div className="border-t pt-4 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-500">Annual Rent</span>
                   <span className="text-xl font-bold text-[#1a3c5e]">
                     {formatNairaAmount(tenancy.rentAmount)}
                   </span>
                 </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-500">Next Rent Due</span>
+                  <span className="text-sm font-medium text-slate-900">{nextRentDue}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Rent History */}
+          <RentHistoryCard tenancyId={id} />
 
           {/* Deposit Info */}
           <Card>
@@ -211,9 +222,6 @@ export default function TenantTenancyDetailPage() {
                 </div>
               ) : (
                 <p className="text-sm text-slate-400">No deposit information recorded</p>
-              )}
-              {deposit && !tenancy.depositAmount && (
-                <p className="text-sm text-slate-500">{JSON.stringify(deposit)}</p>
               )}
             </CardContent>
           </Card>

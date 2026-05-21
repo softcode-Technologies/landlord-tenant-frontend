@@ -44,8 +44,12 @@ export const paymentsApi = {
   removeBankAccount: (id: string) =>
     apiClient.delete(`/wallet/bank-accounts/${id}`),
 
-  payRent: (tenancyId: string, amountKobo: number) =>
-    apiClient.post<{ paymentUrl: string }>("/payments/rent", { tenancyId, amountKobo }),
+  // Omit amountKobo to pay the full rent; pass it (kobo) only for installments.
+  payRent: (tenancyId: string, amountKobo?: number) =>
+    apiClient.post<{ paymentUrl: string }>("/payments/rent", {
+      tenancyId,
+      ...(amountKobo !== undefined ? { amountKobo } : {}),
+    }),
 
   getPaymentHistory: () => apiClient.get<Payment[]>("/payments/history"),
 

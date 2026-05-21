@@ -26,6 +26,7 @@ export const propertiesApi = {
   uploadImages: (id: string, formData: FormData) =>
     apiClient.post<Property>(`/properties/${id}/images`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
+      timeout: 120000,
     }),
 
   createUnit: (data: CreateUnitData) =>
@@ -35,4 +36,13 @@ export const propertiesApi = {
     apiClient.patch<Unit>(`/units/${id}`, data),
 
   deactivateUnit: (id: string) => apiClient.delete(`/units/${id}`),
+
+  uploadUnitImages: (unitId: string, formData: FormData) =>
+    apiClient.post<{ images: string[] }>(`/units/${unitId}/images`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 120000,
+    }),
+
+  removeUnitImage: (unitId: string, url: string) =>
+    apiClient.delete<{ images: string[] }>(`/units/${unitId}/images`, { data: { url } }),
 }

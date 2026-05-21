@@ -170,6 +170,7 @@ export interface Unit {
   bathrooms: number
   toilets?: number
   rentPerAnnum: number
+  images?: string[]
   isActive: boolean
   listing?: Listing
   tenancy?: Tenancy
@@ -178,6 +179,22 @@ export interface Unit {
 }
 
 // Tenancies
+export interface RentChange {
+  id: string
+  tenancyId: string
+  previousAmount: number
+  newAmount: number
+  changeType: "increase" | "decrease" | "correction"
+  reason?: string | null
+  changedByUserId: string
+  changedBy?: {
+    id: string
+    firstName?: string | null
+    lastName?: string | null
+  }
+  createdAt: string
+}
+
 export interface Tenancy {
   id: string
   unitId: string
@@ -186,6 +203,8 @@ export interface Tenancy {
   startDate: string
   endDate: string
   rentAmount: number
+  nextDueDate?: string | null
+  lastPaymentDate?: string | null
   status: "active" | "terminated" | "expired"
   depositAmount?: number
   depositPaidAt?: string

@@ -25,6 +25,7 @@ export interface RawListing {
     toilets: number
     sizeM2?: number | null
     amenities?: string[]
+    images?: string[]
     status?: string
   }
   property?: {
@@ -77,7 +78,9 @@ export function normalizeRawListing(raw: RawListing): Listing {
     isFurnished: amenities.some((a) => a.toLowerCase().includes("furnished")),
     isServiced: amenities.some((a) => a.toLowerCase().includes("serviced")),
     propertyType: raw.property?.propertyType ?? "",
-    images: raw.property?.images ?? [],
+    // Prefer the unit's own photos; fall back to property-level images for
+    // listings created before per-unit images existed.
+    images: (raw.unit?.images?.length ? raw.unit.images : raw.property?.images) ?? [],
     isFeatured: raw.isFeatured,
     isActive: raw.status === "active",
     status: raw.status as Listing["status"],
