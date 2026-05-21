@@ -120,9 +120,11 @@ function LoginContent() {
     setLoading(true)
     try {
       const response = await authApi.verifyOtp(phone, otpString)
-      const { accessToken, refreshToken, isNew } = response.data
+      const { accessToken, isNew } = response.data
 
-      // Store the token first so the request interceptor includes it in /auth/me
+      // Store the token first so the request interceptor includes it in /auth/me.
+      // The refresh token is set by the backend as an httpOnly cookie — not read
+      // here, so it's never exposed to JS.
       setAccessToken(accessToken)
 
       // Get full user profile (includes landlord/tenant/agent profiles)
@@ -130,7 +132,7 @@ function LoginContent() {
       const user = userResponse.data
 
       // Store auth (sets the proxy cookie with the JWT's actual expiry)
-      setAuth(user, accessToken, refreshToken)
+      setAuth(user, accessToken)
 
       toast.success(isNew ? "Account created! Let's set up your profile." : `Welcome back${user.firstName ? `, ${user.firstName}` : ""}!`)
 

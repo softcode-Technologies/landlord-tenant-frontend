@@ -66,8 +66,8 @@ export const authApi = {
     return { ...res, data: normalizeUser(res.data) }
   },
 
-  refresh: (refreshToken: string) =>
-    apiClient.post<{ accessToken: string }>("/auth/refresh", { refreshToken }),
+  // Refresh token rides in the httpOnly cookie (sent via withCredentials).
+  refresh: () => apiClient.post<{ accessToken: string }>("/auth/refresh", {}),
 
   logout: () => apiClient.post("/auth/logout"),
 }

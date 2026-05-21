@@ -36,13 +36,14 @@ function clearProxyCookie() {
 interface AuthState {
   user: User | null
   accessToken: string | null
-  refreshToken: string | null
   isAuthenticated: boolean
   isLoading: boolean
   _hasHydrated: boolean
 
   // Actions
-  setAuth: (user: User, accessToken: string, refreshToken: string) => void
+  // The refresh token is never held in JS — it lives in an httpOnly cookie set
+  // by the backend. Only the (short-lived) access token is kept client-side.
+  setAuth: (user: User, accessToken: string) => void
   setUser: (user: User) => void
   setAccessToken: (token: string) => void
   logout: () => void
@@ -56,15 +57,14 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       accessToken: null,
-      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
       _hasHydrated: false,
 
       setHasHydrated: (value) => set({ _hasHydrated: value }),
 
-      setAuth: (user, accessToken, refreshToken) => {
-        set({ user, accessToken, refreshToken, isAuthenticated: true, isLoading: false })
+      setAuth: (user, accessToken) => {
+        set({ user, accessToken, isAuthenticated: true, isLoading: false })
         writeProxyCookie(accessToken)
       },
 
@@ -81,7 +81,6 @@ export const useAuthStore = create<AuthState>()(
         set({
           user: null,
           accessToken: null,
-          refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
         })
@@ -108,7 +107,6 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {

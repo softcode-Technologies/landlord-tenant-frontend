@@ -34,6 +34,9 @@ function processQueue(error: unknown, token: string | null = null) {
 export const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 30000,
+  // Send the httpOnly refresh cookie on auth requests (cookie is path-scoped to
+  // /auth on the API, so it isn't attached to other endpoints).
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -84,19 +87,14 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true
       isRefreshing = true
 
-      const { refreshToken, setAccessToken, logout } = useAuthStore.getState()
-
-      if (!refreshToken) {
-        logout()
-        redirectToLogin()
-        isRefreshing = false
-        return Promise.reject(error)
-      }
+      const { setAccessToken, logout } = useAuthStore.getState()
 
       try {
         // Raw axios call bypasses the apiClient interceptors intentionally.
-        // Backend wraps refresh response in { success, message, data }, so unwrap manually.
-        const response = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken })
+        // The refresh token rides in an httpOnly cookie (withCredentials), so no
+        // token is read from JS. Backend wraps the response in
+        // { success, message, data }, so unwrap manually.
+        const response = await axios.post(`${BASE_URL}/auth/refresh`, {}, { withCredentials: true })
         const payload = response.data?.data ?? response.data
         const newToken: string = payload.accessToken
         setAccessToken(newToken)
