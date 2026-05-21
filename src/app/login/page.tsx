@@ -40,6 +40,15 @@ function LoginContent() {
     return digits
   }
 
+  // Dev only: the backend echoes the generated OTP so we can prefill the boxes.
+  // In production devOtp is undefined and this is a no-op.
+  const prefillDevOtp = (devOtp?: string) => {
+    if (!devOtp) return
+    const code = devOtp.replace(/\D/g, "").slice(0, 6)
+    setOtp(Array.from({ length: 6 }, (_, i) => code[i] ?? ""))
+    toast.info(`Dev mode: code ${code} prefilled`)
+  }
+
   const handlePhoneSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const digits = formatPhone(phone)
@@ -55,11 +64,12 @@ function LoginContent() {
       if (digits.startsWith("0")) {
         normalizedPhone = "234" + digits.slice(1)
       }
-      await authApi.requestOtp(normalizedPhone)
+      const res = await authApi.requestOtp(normalizedPhone)
       toast.success("OTP sent to your phone!")
       setPhone(normalizedPhone)
       setStep("otp")
       setCountdown(60)
+      prefillDevOtp(res.data?.devOtp)
     } catch (err: unknown) {
       const error = err as { response?: { data?: { error?: { message?: string }; message?: string } } }
       toast.error(error.response?.data?.error?.message ?? error.response?.data?.message ?? "Failed to send OTP. Try again.")
@@ -145,11 +155,12 @@ function LoginContent() {
     if (countdown > 0) return
     setLoading(true)
     try {
-      await authApi.requestOtp(phone)
+      const res = await authApi.requestOtp(phone)
       toast.success("New OTP sent!")
       setCountdown(60)
       setOtp(["", "", "", "", "", ""])
       otpRefs.current[0]?.focus()
+      prefillDevOtp(res.data?.devOtp)
     } catch {
       toast.error("Failed to resend OTP")
     } finally {

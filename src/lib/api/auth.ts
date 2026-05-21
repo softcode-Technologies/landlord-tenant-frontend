@@ -53,8 +53,10 @@ export function normalizeUser(raw: RawUser): User {
 }
 
 export const authApi = {
+  // devOtp is only present in development (backend echoes the code so the
+  // login form can prefill it). It is never returned in production.
   requestOtp: (phone: string) =>
-    apiClient.post<{ message: string }>("/auth/request-otp", { phone }),
+    apiClient.post<{ phone: string; devOtp?: string }>("/auth/request-otp", { phone }),
 
   verifyOtp: (phone: string, otp: string) =>
     apiClient.post<AuthResponse>("/auth/verify-otp", { phone, otp }),
