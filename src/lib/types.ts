@@ -376,7 +376,7 @@ export interface TenantAnalytics {
 export interface LandlordAnalytics {
   totalRevenue: number
   totalProperties: number
-  activetenancies: number
+  activeTenancies: number
   pendingMaintenance: number
   monthlyRevenue: { month: string; amountKobo: number }[]
   recentPayments: Payment[]
@@ -440,9 +440,12 @@ export interface TenancyAgreement {
   id: string
   tenancyId: string
   documentUrl: string
+  documentName?: string | null
   status: "draft" | "sent" | "signed_tenant" | "signed_both" | "rejected"
   tenantSignedAt?: string | null
   landlordSignedAt?: string | null
+  tenantSignatureName?: string | null
+  landlordSignatureName?: string | null
   createdAt: string
   updatedAt: string
 }

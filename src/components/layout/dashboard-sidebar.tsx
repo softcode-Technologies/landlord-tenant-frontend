@@ -7,7 +7,7 @@ import { useAuthStore } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Building2, LogOut, X, Menu } from "lucide-react"
+import { Building2, LogOut, X, Menu, Lock } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { useState } from "react"
 import { BrandWordmark } from "./brand-wordmark"
@@ -18,6 +18,10 @@ export interface NavItem {
   href: string
   icon: LucideIcon
   badge?: number
+  // When locked, the item is shown but not navigable — a padlock appears and
+  // hovering it reveals `lockedHint` (e.g. "Coming soon").
+  locked?: boolean
+  lockedHint?: string
 }
 
 interface DashboardSidebarProps {
@@ -75,6 +79,27 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
       {/* Nav Items */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
+          if (item.locked) {
+            return (
+              <div
+                key={item.href}
+                className="group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 cursor-not-allowed select-none"
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+                <span className="flex-1">{item.label}</span>
+                {/* Padlock + hover tooltip */}
+                <span className="relative flex items-center">
+                  <Lock className="h-3.5 w-3.5 text-slate-400" />
+                  <span
+                    role="tooltip"
+                    className="pointer-events-none absolute right-0 bottom-full mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 z-50"
+                  >
+                    {item.lockedHint ?? "Coming soon"}
+                  </span>
+                </span>
+              </div>
+            )
+          }
           const isActive =
             pathname === item.href || (pathname.startsWith(item.href + "/") && item.href !== `/${role}`)
           return (

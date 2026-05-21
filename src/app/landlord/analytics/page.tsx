@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { analyticsApi } from "@/lib/api/analytics"
-import { paymentsApi } from "@/lib/api/payments"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatNaira, formatDate, getStatusVariant } from "@/lib/utils"
@@ -10,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { TrendingUp, DollarSign, Users, Building } from "lucide-react"
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, BarChart, Bar
+  Tooltip
 } from "recharts"
 
 export default function LandlordAnalyticsPage() {
@@ -19,13 +18,8 @@ export default function LandlordAnalyticsPage() {
     queryFn: () => analyticsApi.getLandlordAnalytics(),
   })
 
-  const { data: paymentsData } = useQuery({
-    queryKey: ["payment-history"],
-    queryFn: () => paymentsApi.getPaymentHistory(),
-  })
-
   const analytics = analyticsData?.data
-  const payments = paymentsData?.data ?? []
+  const payments = analytics?.recentPayments ?? []
 
   const revenueData = analytics?.monthlyRevenue?.map((m) => ({
     month: m.month,
@@ -65,7 +59,7 @@ export default function LandlordAnalyticsPage() {
           },
           {
             label: "Active Tenancies",
-            value: analytics?.activetenancies ?? 0,
+            value: analytics?.activeTenancies ?? 0,
             icon: Users,
             color: "text-green-600",
             bg: "bg-green-50",

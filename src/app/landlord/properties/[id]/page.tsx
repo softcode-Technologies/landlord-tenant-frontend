@@ -24,6 +24,7 @@ import { compressImage } from "@/lib/image"
 import { ArrowLeft, Building2, Bed, Bath, MapPin, Plus, Loader2, Image, Upload, X as XIcon, UserCheck, UserMinus } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { RentFeeBreakdown } from "@/components/shared/rent-fee-breakdown"
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -465,6 +466,8 @@ export default function PropertyDetailPage() {
               />
               <p className="text-xs text-slate-400">Enter amount in Naira</p>
             </div>
+
+            <RentFeeBreakdown rentNaira={Number(unitRent) || 0} />
 
             <DialogFooter>
               <Button

@@ -14,6 +14,7 @@ import { ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import apiClient from "@/lib/api/client"
+import { RentFeeBreakdown } from "@/components/shared/rent-fee-breakdown"
 
 interface FormData {
   unitId: string
@@ -204,7 +205,7 @@ export default function NewListingPage() {
                   className="mt-1.5"
                 />
                 <p className="text-xs text-slate-400 mt-1">
-                  Asking price shown to tenants — can differ from the unit's base rent
+                  Asking price shown to tenants — can differ from the unit&apos;s base rent
                 </p>
                 {errors.rentPerAnnum && (
                   <p className="text-xs text-red-500 mt-1">{errors.rentPerAnnum}</p>
@@ -223,6 +224,8 @@ export default function NewListingPage() {
                 )}
               </div>
             </div>
+
+            <RentFeeBreakdown rentNaira={Number(form.rentPerAnnum) || 0} />
           </CardContent>
         </Card>
 

@@ -76,14 +76,25 @@ export default function AdminUsersPage() {
   })
 
   const users = (data?.data?.data ?? []) as UserWithWallet[]
-  const meta = data?.data?.meta
+  const pagination = data?.data?.pagination
 
-  const getUserRole = (user: UserWithWallet) => {
-    if (user.isAdmin) return "admin"
-    if (user.agentProfile) return "agent"
-    if (user.landlordProfile) return "landlord"
-    if (user.tenantProfile) return "tenant"
-    return "user"
+  const getUserRoles = (user: UserWithWallet): string[] => {
+    if (user.isAdmin) return ["admin"]
+    const roles: string[] = []
+    if (user.landlordProfile) roles.push("landlord")
+    if (user.agentProfile) roles.push("agent")
+    if (user.tenantProfile) roles.push("tenant")
+    return roles.length ? roles : ["user"]
+  }
+
+  const roleBadgeClass = (role: string) => {
+    switch (role) {
+      case "admin": return "bg-[#1a3c5e] text-white border-transparent"
+      case "landlord": return "bg-blue-50 text-blue-700 border-blue-200"
+      case "agent": return "bg-purple-50 text-purple-700 border-purple-200"
+      case "tenant": return "bg-green-50 text-green-700 border-green-200"
+      default: return "text-slate-600 border-slate-200"
+    }
   }
 
   const handleCredit = () => {
@@ -99,7 +110,7 @@ export default function AdminUsersPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">User Management</h1>
           <p className="text-slate-500 mt-1">
-            {meta?.total ? `${meta.total.toLocaleString()} total users` : "Manage platform users"}
+            {pagination?.total ? `${pagination.total.toLocaleString()} total users` : "Manage platform users"}
           </p>
         </div>
       </div>
@@ -161,7 +172,7 @@ export default function AdminUsersPage() {
               <TableBody>
                 {users.map((user) => {
                   const name = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "User"
-                  const role = getUserRole(user)
+                  const roles = getUserRoles(user)
                   return (
                     <TableRow key={user.id} className="hover:bg-slate-50/50">
                       <TableCell>
@@ -179,12 +190,17 @@ export default function AdminUsersPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={role === "admin" ? "default" : "outline"}
-                          className="capitalize text-xs"
-                        >
-                          {role}
-                        </Badge>
+                        <div className="flex flex-wrap gap-1">
+                          {roles.map((role) => (
+                            <Badge
+                              key={role}
+                              variant="outline"
+                              className={`capitalize text-xs ${roleBadgeClass(role)}`}
+                            >
+                              {role}
+                            </Badge>
+                          ))}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -264,11 +280,11 @@ export default function AdminUsersPage() {
       </Card>
 
       {/* Pagination */}
-      {meta && meta.totalPages > 1 && (
+      {pagination && pagination.totalPages > 1 && (
         <div className="flex justify-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>Previous</Button>
-          <span className="flex items-center text-sm text-slate-600 px-2">{page} of {meta.totalPages}</span>
-          <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= meta.totalPages}>Next</Button>
+          <span className="flex items-center text-sm text-slate-600 px-2">{page} of {pagination.totalPages}</span>
+          <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= pagination.totalPages}>Next</Button>
         </div>
       )}
 

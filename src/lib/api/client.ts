@@ -9,6 +9,17 @@ let failedQueue: Array<{
   reject: (error: unknown) => void
 }> = []
 
+// Send a dead session to the login page so the user isn't stranded on a
+// broken protected page (the old behaviour required clearing cookies by hand).
+// Guarded against loops and runs client-side only.
+function redirectToLogin() {
+  if (typeof window === "undefined") return
+  const { pathname, search } = window.location
+  if (pathname.startsWith("/login")) return
+  const redirect = encodeURIComponent(pathname + search)
+  window.location.href = `/login?redirect=${redirect}`
+}
+
 function processQueue(error: unknown, token: string | null = null) {
   failedQueue.forEach((promise) => {
     if (error) {
@@ -77,6 +88,7 @@ apiClient.interceptors.response.use(
 
       if (!refreshToken) {
         logout()
+        redirectToLogin()
         isRefreshing = false
         return Promise.reject(error)
       }
@@ -96,6 +108,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null)
         logout()
+        redirectToLogin()
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false

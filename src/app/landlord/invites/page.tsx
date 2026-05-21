@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/shared/empty-state"
 import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
 import { UserPlus, Plus, Copy, Loader2, Trash2 } from "lucide-react"
 import { toast } from "sonner"
+import { RentFeeBreakdown } from "@/components/shared/rent-fee-breakdown"
 
 interface InviteFormData {
   unitId: string
@@ -258,6 +259,9 @@ export default function LandlordInvitesPage() {
               <p className="text-xs text-slate-400 mt-1.5">
                 Set from the selected unit. Edit the unit to change its rent.
               </p>
+              {Number(form.rentAmount) > 0 && (
+                <RentFeeBreakdown rentNaira={Number(form.rentAmount)} className="mt-2.5" />
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">

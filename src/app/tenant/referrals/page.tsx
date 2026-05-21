@@ -6,9 +6,9 @@ import { referralApi, ReferralRecord } from "@/lib/api/referral"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
-import { Gift, Users, CheckCircle2, Copy, Share2, Loader2 } from "lucide-react"
+import { Gift, Users, CheckCircle2, Copy, Share2, Loader2, Lock } from "lucide-react"
 import { toast } from "sonner"
-import { BRAND_NAME } from "@/lib/config/brand"
+import { BRAND_NAME, REFERRALS_ENABLED } from "@/lib/config/brand"
 
 function StatCard({ icon: Icon, label, value, sub }: { icon: typeof Gift; label: string; value: string | number; sub?: string }) {
   return (
@@ -29,7 +29,42 @@ function StatCard({ icon: Icon, label, value, sub }: { icon: typeof Gift; label:
   )
 }
 
+// Locked "coming soon" state shown when NEXT_PUBLIC_REFER is not "true".
+function ReferralsLocked() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Refer & Earn</h1>
+        <p className="text-slate-500 mt-1">Invite friends and earn wallet credit.</p>
+      </div>
+      <Card>
+        <CardContent className="p-12 flex flex-col items-center text-center">
+          <div className="group relative h-16 w-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-5">
+            <Lock className="h-7 w-7 text-slate-400" />
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute bottom-full mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100"
+            >
+              Coming soon
+            </span>
+          </div>
+          <h2 className="text-lg font-semibold text-slate-900">Coming Soon</h2>
+          <p className="text-sm text-slate-500 mt-2 max-w-sm">
+            Refer & Earn isn&apos;t available just yet. We&apos;re putting the finishing
+            touches on it — check back soon to start earning wallet credit for inviting friends.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 export default function ReferralsPage() {
+  if (!REFERRALS_ENABLED) return <ReferralsLocked />
+  return <ReferralsContent />
+}
+
+function ReferralsContent() {
   const { user } = useAuthStore()
 
   const { data: statsRes, isLoading: statsLoading } = useQuery({

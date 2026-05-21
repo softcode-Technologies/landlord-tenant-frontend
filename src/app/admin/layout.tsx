@@ -7,16 +7,22 @@ import {
   Users,
   Shield,
   Home,
+  Building2,
   CreditCard,
+  Landmark,
+  Gift,
   BarChart3,
 } from "lucide-react"
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Users", href: "/admin/users", icon: Users },
+  { label: "Landlords", href: "/admin/landlords", icon: Building2 },
   { label: "KYC Queue", href: "/admin/kyc", icon: Shield },
   { label: "Tenancies", href: "/admin/tenancies", icon: Home },
   { label: "Payments", href: "/admin/payments", icon: CreditCard },
+  { label: "Treasury", href: "/admin/treasury", icon: Landmark },
+  { label: "Referrals", href: "/admin/referrals", icon: Gift },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
 ]
 

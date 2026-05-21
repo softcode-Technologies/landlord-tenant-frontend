@@ -1,30 +1,80 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { adminApi } from "@/lib/api/admin"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatNaira, formatDate, getStatusVariant } from "@/lib/utils"
-import { Home } from "lucide-react"
+import { Home, Search } from "lucide-react"
 
 export default function AdminTenanciesPage() {
+  const [page, setPage] = useState(1)
+  const [statusTab, setStatusTab] = useState("all")
+  const [search, setSearch] = useState("")
+  const [searchInput, setSearchInput] = useState("")
+
+  const params = {
+    page,
+    limit: 20,
+    status: statusTab === "all" ? undefined : statusTab,
+    search: search || undefined,
+  }
+
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-tenancies"],
-    queryFn: () => adminApi.getAllTenancies(),
+    queryKey: ["admin-tenancies", params],
+    queryFn: () => adminApi.getAllTenancies(params),
   })
 
   const tenancies = data?.data?.data ?? []
+  const pagination = data?.data?.pagination
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">All Tenancies</h1>
-        <p className="text-slate-500 mt-1">{tenancies.length} total tenancies on the platform</p>
+        <p className="text-slate-500 mt-1">
+          {pagination?.total
+            ? `${pagination.total.toLocaleString()} tenancies on the platform`
+            : "Active tenancies across the platform"}
+        </p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Tabs value={statusTab} onValueChange={(v) => { setStatusTab(v); setPage(1) }}>
+          <TabsList className="bg-slate-100">
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="active">Active</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsTrigger value="ended">Ended</TabsTrigger>
+            <TabsTrigger value="terminated">Terminated</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <div className="flex gap-2 max-w-sm flex-1 min-w-[220px]">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Tenant name or phone..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { setSearch(searchInput); setPage(1) } }}
+              className="pl-10"
+            />
+          </div>
+          <Button onClick={() => { setSearch(searchInput); setPage(1) }} variant="outline">Search</Button>
+          {search && (
+            <Button variant="ghost" onClick={() => { setSearch(""); setSearchInput(""); setPage(1) }}>Clear</Button>
+          )}
+        </div>
       </div>
 
       <Card>
@@ -39,8 +89,8 @@ export default function AdminTenanciesPage() {
             <div className="p-6">
               <EmptyState
                 icon={Home}
-                title="No tenancies yet"
-                description="Active tenancies will appear here."
+                title="No tenancies found"
+                description="Try adjusting the filters or search."
               />
             </div>
           ) : (
@@ -93,6 +143,15 @@ export default function AdminTenanciesPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex justify-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>Previous</Button>
+          <span className="flex items-center text-sm text-slate-600 px-2">{page} of {pagination.totalPages}</span>
+          <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= pagination.totalPages}>Next</Button>
+        </div>
+      )}
     </div>
   )
 }

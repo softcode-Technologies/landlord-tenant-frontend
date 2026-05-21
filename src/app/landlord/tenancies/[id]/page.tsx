@@ -18,6 +18,7 @@ import { formatNaira, formatNairaAmount, formatDate, getStatusVariant, getInitia
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Calendar, DollarSign, Shield, Trash2, RefreshCw, Loader2, Pencil } from "lucide-react"
 import { RentHistoryCard } from "@/components/shared/rent-history-card"
+import { RentFeeBreakdown } from "@/components/shared/rent-fee-breakdown"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -28,6 +29,10 @@ export default function LandlordTenancyDetailPage() {
 
   const [agreementOpen, setAgreementOpen] = useState(false)
   const [docUrl, setDocUrl] = useState("")
+  const [agreementFile, setAgreementFile] = useState<File | null>(null)
+  const [useUrlMode, setUseUrlMode] = useState(false)
+  const [countersignOpen, setCountersignOpen] = useState(false)
+  const [signatureName, setSignatureName] = useState("")
   const [renewOpen, setRenewOpen] = useState(false)
   const [depositOpen, setDepositOpen] = useState(false)
   const [terminateOpen, setTerminateOpen] = useState(false)
@@ -111,16 +116,32 @@ export default function LandlordTenancyDetailPage() {
     retry: false,
   })
 
-  const createAgreementMutation = useMutation({
-    mutationFn: () =>
-      userApi.createAgreement({ tenancyId: id, documentUrl: docUrl.trim() }),
-    onSuccess: () => {
-      toast.success("Agreement created and saved")
-      queryClient.invalidateQueries({ queryKey: ["agreement", id] })
-      setAgreementOpen(false)
-      setDocUrl("")
+  const closeAgreementModal = () => {
+    setAgreementOpen(false)
+    setDocUrl("")
+    setAgreementFile(null)
+    setUseUrlMode(false)
+  }
+
+  // Upload a file OR replace an existing draft/rejected doc OR (fallback) save a URL.
+  const saveAgreementMutation = useMutation({
+    mutationFn: async () => {
+      if (useUrlMode) {
+        if (agreement) return userApi.updateAgreementDocument(agreement.id, docUrl.trim())
+        return userApi.createAgreement({ tenancyId: id, documentUrl: docUrl.trim() })
+      }
+      const formData = new FormData()
+      formData.append("document", agreementFile as File)
+      if (agreement) return userApi.replaceAgreementDocumentFile(agreement.id, formData)
+      formData.append("tenancyId", id)
+      return userApi.uploadAgreement(formData)
     },
-    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to create agreement")),
+    onSuccess: () => {
+      toast.success(agreement ? "Agreement document updated" : "Agreement uploaded")
+      queryClient.invalidateQueries({ queryKey: ["agreement", id] })
+      closeAgreementModal()
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to save agreement")),
   })
 
   const sendAgreementMutation = useMutation({
@@ -133,10 +154,12 @@ export default function LandlordTenancyDetailPage() {
   })
 
   const signAgreementMutation = useMutation({
-    mutationFn: () => userApi.signAgreement(agreement!.id),
+    mutationFn: () => userApi.signAgreement(agreement!.id, signatureName.trim()),
     onSuccess: () => {
       toast.success("Agreement countersigned successfully!")
       queryClient.invalidateQueries({ queryKey: ["agreement", id] })
+      setCountersignOpen(false)
+      setSignatureName("")
     },
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to sign agreement")),
   })
@@ -337,16 +360,25 @@ export default function LandlordTenancyDetailPage() {
                       href={agreement.documentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-[#1a3c5e] hover:underline"
+                      className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#1a3c5e] hover:bg-slate-50"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      View Document
+                      <FileText className="h-4 w-4 shrink-0" />
+                      <span className="truncate flex-1">{agreement.documentName ?? "View Document"}</span>
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                     </a>
+                  )}
+
+                  {agreement.status === "signed_both" && (
+                    <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700 flex items-center gap-2">
+                      <PenLine className="h-4 w-4" /> Fully executed by both parties.
+                    </div>
                   )}
 
                   {agreement.tenantSignedAt && (
                     <div className="flex justify-between p-3 bg-green-50 rounded-xl">
-                      <span className="text-sm text-green-700">Tenant Signed</span>
+                      <span className="text-sm text-green-700">
+                        Tenant Signed{agreement.tenantSignatureName ? ` — ${agreement.tenantSignatureName}` : ""}
+                      </span>
                       <span className="text-sm font-medium text-green-800">
                         {formatDate(agreement.tenantSignedAt)}
                       </span>
@@ -355,14 +387,27 @@ export default function LandlordTenancyDetailPage() {
 
                   {agreement.landlordSignedAt && (
                     <div className="flex justify-between p-3 bg-blue-50 rounded-xl">
-                      <span className="text-sm text-blue-700">Your Signature</span>
+                      <span className="text-sm text-blue-700">
+                        Your Signature{agreement.landlordSignatureName ? ` — ${agreement.landlordSignatureName}` : ""}
+                      </span>
                       <span className="text-sm font-medium text-blue-800">
                         {formatDate(agreement.landlordSignedAt)}
                       </span>
                     </div>
                   )}
 
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {(agreement.status === "draft" || agreement.status === "rejected") && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1"
+                        onClick={() => { setUseUrlMode(false); setAgreementOpen(true) }}
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                        Replace Document
+                      </Button>
+                    )}
                     {agreement.status === "draft" && (
                       <Button
                         className="flex-1 gap-2"
@@ -378,19 +423,19 @@ export default function LandlordTenancyDetailPage() {
                         Send to Tenant
                       </Button>
                     )}
+                    {agreement.status === "sent" && (
+                      <div className="w-full rounded-xl bg-amber-50 border border-amber-200 p-3 text-sm text-amber-700">
+                        Waiting for the tenant to review and sign.
+                      </div>
+                    )}
                     {agreement.status === "signed_tenant" && !agreement.landlordSignedAt && (
                       <Button
                         className="flex-1 gap-2"
                         size="sm"
-                        onClick={() => signAgreementMutation.mutate()}
-                        disabled={signAgreementMutation.isPending}
+                        onClick={() => { setSignatureName(""); setCountersignOpen(true) }}
                       >
-                        {signAgreementMutation.isPending ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <PenLine className="h-3.5 w-3.5" />
-                        )}
-                        Countersign
+                        <PenLine className="h-3.5 w-3.5" />
+                        Review & Countersign
                       </Button>
                     )}
                   </div>
@@ -512,6 +557,7 @@ export default function LandlordTenancyDetailPage() {
                 className="mt-1.5"
               />
             </div>
+            <RentFeeBreakdown rentNaira={Number(newRent) || 0} />
             <label className="flex items-start gap-2.5 text-sm text-slate-700 cursor-pointer">
               <input
                 type="checkbox"
@@ -634,49 +680,140 @@ export default function LandlordTenancyDetailPage() {
       </Dialog>
 
       {/* Upload Agreement Dialog */}
-      <Dialog open={agreementOpen} onOpenChange={setAgreementOpen}>
+      <Dialog open={agreementOpen} onOpenChange={(o) => { if (!o) closeAgreementModal() }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Upload Tenancy Agreement</DialogTitle>
+            <DialogTitle>{agreement ? "Replace Agreement Document" : "Upload Tenancy Agreement"}</DialogTitle>
             <DialogDescription>
-              Paste the URL of your agreement document (Google Drive, Dropbox, etc.)
+              Upload the signed/blank agreement (PDF, Word, or image). The tenant will review and sign it online.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="doc-url">Document URL</Label>
-              <Input
-                id="doc-url"
-                value={docUrl}
-                onChange={(e) => setDocUrl(e.target.value)}
-                placeholder="https://drive.google.com/..."
-                autoFocus
-              />
-              <p className="text-xs text-slate-400">
-                Make sure the link is publicly accessible or shared with the tenant.
-              </p>
+
+          {!useUrlMode ? (
+            <div className="space-y-3 py-2">
+              <label
+                htmlFor="agreement-file"
+                className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 p-6 text-center cursor-pointer hover:border-[#1a3c5e]/40 hover:bg-slate-50 transition-colors"
+              >
+                <FileText className="h-8 w-8 text-slate-300" />
+                {agreementFile ? (
+                  <span className="text-sm font-medium text-slate-700 break-all">{agreementFile.name}</span>
+                ) : (
+                  <>
+                    <span className="text-sm font-medium text-slate-600">Click to choose a file</span>
+                    <span className="text-xs text-slate-400">PDF, Word or image · up to 15MB</span>
+                  </>
+                )}
+                <input
+                  id="agreement-file"
+                  type="file"
+                  accept=".pdf,.doc,.docx,image/*,application/pdf"
+                  className="hidden"
+                  onChange={(e) => setAgreementFile(e.target.files?.[0] ?? null)}
+                />
+              </label>
+              <button
+                type="button"
+                className="text-xs text-slate-400 hover:text-[#1a3c5e] underline"
+                onClick={() => { setUseUrlMode(true); setAgreementFile(null) }}
+              >
+                Or paste a link instead
+              </button>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-3 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="doc-url">Document URL</Label>
+                <Input
+                  id="doc-url"
+                  value={docUrl}
+                  onChange={(e) => setDocUrl(e.target.value)}
+                  placeholder="https://drive.google.com/..."
+                  autoFocus
+                />
+                <p className="text-xs text-slate-400">Make sure the link is shared with the tenant.</p>
+              </div>
+              <button
+                type="button"
+                className="text-xs text-slate-400 hover:text-[#1a3c5e] underline"
+                onClick={() => { setUseUrlMode(false); setDocUrl("") }}
+              >
+                Or upload a file instead
+              </button>
+            </div>
+          )}
+
           <div className="flex gap-3">
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => setAgreementOpen(false)}
-              disabled={createAgreementMutation.isPending}
+              onClick={closeAgreementModal}
+              disabled={saveAgreementMutation.isPending}
             >
               Cancel
             </Button>
             <Button
               className="flex-1 gap-2"
-              disabled={!docUrl.trim() || createAgreementMutation.isPending}
-              onClick={() => createAgreementMutation.mutate()}
+              disabled={
+                saveAgreementMutation.isPending ||
+                (useUrlMode ? !docUrl.trim() : !agreementFile)
+              }
+              onClick={() => saveAgreementMutation.mutate()}
             >
-              {createAgreementMutation.isPending ? (
+              {saveAgreementMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <FileText className="h-4 w-4" />
               )}
-              Save Agreement
+              {agreement ? "Update Document" : "Save Agreement"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Countersign Dialog */}
+      <Dialog open={countersignOpen} onOpenChange={(o) => { if (!o) { setCountersignOpen(false); setSignatureName("") } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Countersign Agreement</DialogTitle>
+            <DialogDescription>
+              The tenant has signed. Type your full legal name to countersign and fully execute this agreement.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            {agreement?.documentUrl && (
+              <a
+                href={agreement.documentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-[#1a3c5e] hover:underline"
+              >
+                <ExternalLink className="h-3.5 w-3.5" /> Review the document first
+              </a>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="ll-signature">Your full name</Label>
+              <Input
+                id="ll-signature"
+                value={signatureName}
+                onChange={(e) => setSignatureName(e.target.value)}
+                placeholder="e.g. John Adewale"
+                autoFocus
+              />
+              <p className="text-xs text-slate-400">Typing your name acts as your legal signature.</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" className="flex-1" onClick={() => { setCountersignOpen(false); setSignatureName("") }}>
+              Cancel
+            </Button>
+            <Button
+              className="flex-1 gap-2"
+              disabled={!signatureName.trim() || signAgreementMutation.isPending}
+              onClick={() => signAgreementMutation.mutate()}
+            >
+              {signAgreementMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <PenLine className="h-4 w-4" />}
+              Countersign
             </Button>
           </div>
         </DialogContent>

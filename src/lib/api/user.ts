@@ -63,15 +63,27 @@ export const userApi = {
   createAgreement: (data: { tenancyId: string; documentUrl: string }) =>
     apiClient.post<TenancyAgreement>("/agreements", data),
 
+  uploadAgreement: (formData: FormData) =>
+    apiClient.post<TenancyAgreement>("/agreements/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 120000,
+    }),
+
   sendAgreement: (id: string) =>
     apiClient.patch<TenancyAgreement>(`/agreements/${id}/send`),
 
-  signAgreement: (id: string) =>
-    apiClient.patch<TenancyAgreement>(`/agreements/${id}/sign`),
+  signAgreement: (id: string, signatureName: string) =>
+    apiClient.patch<TenancyAgreement>(`/agreements/${id}/sign`, { signatureName }),
 
   rejectAgreement: (id: string) =>
     apiClient.patch<TenancyAgreement>(`/agreements/${id}/reject`),
 
   updateAgreementDocument: (id: string, documentUrl: string) =>
     apiClient.patch<TenancyAgreement>(`/agreements/${id}/document`, { documentUrl }),
+
+  replaceAgreementDocumentFile: (id: string, formData: FormData) =>
+    apiClient.patch<TenancyAgreement>(`/agreements/${id}/document/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 120000,
+    }),
 }

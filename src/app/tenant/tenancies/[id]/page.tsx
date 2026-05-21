@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { tenanciesApi } from "@/lib/api/tenancies"
@@ -8,9 +9,12 @@ import { userApi } from "@/lib/api/user"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
-import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink, PenLine } from "lucide-react"
 import { RentHistoryCard } from "@/components/shared/rent-history-card"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -18,6 +22,9 @@ import { toast } from "sonner"
 export default function TenantTenancyDetailPage() {
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
+  const [signOpen, setSignOpen] = useState(false)
+  const [signatureName, setSignatureName] = useState("")
+  const [agreed, setAgreed] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ["tenancy", id],
@@ -44,10 +51,13 @@ export default function TenantTenancyDetailPage() {
   })
 
   const signMutation = useMutation({
-    mutationFn: () => userApi.signAgreement(agreement!.id),
+    mutationFn: () => userApi.signAgreement(agreement!.id, signatureName.trim()),
     onSuccess: () => {
       toast.success("Agreement signed successfully!")
       queryClient.invalidateQueries({ queryKey: ["agreement", id] })
+      setSignOpen(false)
+      setSignatureName("")
+      setAgreed(false)
     },
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to sign agreement")),
   })
@@ -248,19 +258,44 @@ export default function TenantTenancyDetailPage() {
                     href={agreement.documentUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-[#1a3c5e] hover:underline"
+                    className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#1a3c5e] hover:bg-slate-50"
                   >
-                    <FileText className="h-4 w-4" />
-                    View Agreement Document
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <FileText className="h-4 w-4 shrink-0" />
+                    <span className="truncate flex-1">{agreement.documentName ?? "View Agreement Document"}</span>
+                    <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                   </a>
+                )}
+
+                {agreement.status === "signed_both" && (
+                  <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700 flex items-center gap-2">
+                    <PenLine className="h-4 w-4" /> Fully executed by both parties.
+                  </div>
+                )}
+
+                {agreement.status === "signed_tenant" && (
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+                    You&apos;ve signed. Waiting for the landlord to countersign.
+                  </div>
                 )}
 
                 {agreement.tenantSignedAt && (
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
-                    <span className="text-sm text-green-700">Signed by you</span>
+                    <span className="text-sm text-green-700">
+                      Signed by you{agreement.tenantSignatureName ? ` — ${agreement.tenantSignatureName}` : ""}
+                    </span>
                     <span className="text-sm font-medium text-green-800">
                       {formatDate(agreement.tenantSignedAt)}
+                    </span>
+                  </div>
+                )}
+
+                {agreement.landlordSignedAt && (
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+                    <span className="text-sm text-blue-700">
+                      Landlord signed{agreement.landlordSignatureName ? ` — ${agreement.landlordSignatureName}` : ""}
+                    </span>
+                    <span className="text-sm font-medium text-blue-800">
+                      {formatDate(agreement.landlordSignedAt)}
                     </span>
                   </div>
                 )}
@@ -269,14 +304,10 @@ export default function TenantTenancyDetailPage() {
                   <div className="flex gap-2">
                     <Button
                       className="flex-1 gap-2"
-                      onClick={() => signMutation.mutate()}
-                      disabled={signMutation.isPending}
+                      onClick={() => { setSignatureName(""); setAgreed(false); setSignOpen(true) }}
                     >
-                      {signMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Sign Agreement"
-                      )}
+                      <PenLine className="h-4 w-4" />
+                      Review & Sign
                     </Button>
                     <Button
                       variant="outline"
@@ -356,6 +387,69 @@ export default function TenantTenancyDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Sign Agreement Dialog */}
+      <Dialog open={signOpen} onOpenChange={(o) => { if (!o) { setSignOpen(false); setSignatureName(""); setAgreed(false) } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sign Tenancy Agreement</DialogTitle>
+            <DialogDescription>
+              Review the document, then type your full legal name to sign it online.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            {agreement?.documentUrl && (
+              <a
+                href={agreement.documentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#1a3c5e] hover:bg-slate-50"
+              >
+                <FileText className="h-4 w-4 shrink-0" />
+                <span className="truncate flex-1">{agreement.documentName ?? "Open the agreement document"}</span>
+                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+              </a>
+            )}
+            <label className="flex items-start gap-2 text-sm text-slate-600 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-slate-300"
+              />
+              <span>I have read and agree to the terms of this tenancy agreement.</span>
+            </label>
+            <div className="space-y-2">
+              <Label htmlFor="signature">Your full name</Label>
+              <Input
+                id="signature"
+                value={signatureName}
+                onChange={(e) => setSignatureName(e.target.value)}
+                placeholder="e.g. Ada Okeke"
+                autoFocus
+              />
+              <p className="text-xs text-slate-400">Typing your name acts as your legal signature.</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => { setSignOpen(false); setSignatureName(""); setAgreed(false) }}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="flex-1 gap-2"
+              disabled={!agreed || !signatureName.trim() || signMutation.isPending}
+              onClick={() => signMutation.mutate()}
+            >
+              {signMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <PenLine className="h-4 w-4" />}
+              Sign Agreement
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

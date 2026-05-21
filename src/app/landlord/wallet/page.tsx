@@ -383,8 +383,8 @@ export default function LandlordWalletPage() {
                         <option value="">
                           {bankListLoading ? "Loading banks…" : "Select your bank"}
                         </option>
-                        {allBanks.map((b) => (
-                          <option key={b.code} value={b.code}>
+                        {allBanks.map((b, i) => (
+                          <option key={`${b.code}-${i}`} value={b.code}>
                             {b.name}
                           </option>
                         ))}

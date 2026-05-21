@@ -27,3 +27,8 @@ export const SHOW_APP_DOWNLOAD =
 // Play Store listings when the apps ship. Default "#" (no-op) until then.
 export const IOS_APP_URL = process.env.NEXT_PUBLIC_IOS_APP_URL || "#"
 export const ANDROID_APP_URL = process.env.NEXT_PUBLIC_ANDROID_APP_URL || "#"
+
+// Refer & Earn isn't ready for tenants yet. Set NEXT_PUBLIC_REFER=true to unlock
+// it (removes the padlock + reveals the feature). Defaults to locked ("coming
+// soon") — the code stays intact, just gated.
+export const REFERRALS_ENABLED = process.env.NEXT_PUBLIC_REFER === "true"

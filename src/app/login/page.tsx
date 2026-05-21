@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { Building2, Phone, ArrowLeft, Loader2, Shield } from "lucide-react"
+import { Building2, Phone, ArrowLeft, Loader2, Shield, ShieldCheck, Receipt, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { authApi } from "@/lib/api/auth"
@@ -185,21 +185,24 @@ function LoginContent() {
             <span className="text-[#f97316]">found with ease.</span>
           </h2>
           <p className="text-slate-300 text-lg mb-8">
-            Thousands of verified listings across Lagos, Abuja, Port Harcourt and more.
+            Find verified homes and manage your rentals — all in one place.
+            Across Lagos, Abuja, Port Harcourt and beyond.
           </p>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-3">
             {[
-              { value: "12,000+", label: "Listings" },
-              { value: "5,400+", label: "Landlords" },
-              { value: "28,000+", label: "Happy Tenants" },
-            ].map((stat) => (
+              { icon: ShieldCheck, text: "KYC-verified landlords & listings" },
+              { icon: Receipt, text: "Secure rent payments with receipts" },
+              { icon: Bell, text: "Smart rent reminders" },
+            ].map((f) => (
               <div
-                key={stat.label}
-                className="bg-white/10 backdrop-blur rounded-xl p-4 text-center"
+                key={f.text}
+                className="flex items-center gap-3 bg-white/[0.06] backdrop-blur rounded-xl px-4 py-3 border border-white/10"
               >
-                <p className="text-2xl font-bold text-white">{stat.value}</p>
-                <p className="text-xs text-slate-300 mt-1">{stat.label}</p>
+                <div className="w-9 h-9 rounded-lg bg-[#f97316]/20 flex items-center justify-center shrink-0">
+                  <f.icon className="h-5 w-5 text-[#fb923c]" />
+                </div>
+                <span className="text-sm font-medium text-slate-100">{f.text}</span>
               </div>
             ))}
           </div>

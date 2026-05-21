@@ -72,7 +72,6 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             {[
               { label: "Browse Listings", href: "/listings" },
-              { label: "Find Agents", href: "/agents" },
             ].map((link) => (
               <Link
                 key={link.href}
@@ -186,7 +185,6 @@ export function Navbar() {
           <div className="md:hidden py-4 border-t border-slate-100 dark:border-white/10 space-y-1">
             {[
               { label: "Browse Listings", href: "/listings" },
-              { label: "Find Agents", href: "/agents" },
             ].map((link) => (
               <Link
                 key={link.href}

@@ -5,7 +5,6 @@ import { BRAND_LEGAL_NAME, brandEmail } from "@/lib/config/brand"
 
 const PLATFORM_LINKS = [
   { label: "Browse Listings", href: "/listings" },
-  { label: "Find Agents", href: "/agents" },
   { label: "For Landlords", href: "/landlord" },
   { label: "For Tenants", href: "/tenant" },
 ]

@@ -6,6 +6,7 @@ import { AuthGuard } from "@/components/layout/auth-guard"
 import { useUnreadCount } from "@/lib/hooks/use-unread-count"
 import { useAuthStore } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
+import { REFERRALS_ENABLED } from "@/lib/config/brand"
 import {
   LayoutDashboard,
   Home,
@@ -35,7 +36,13 @@ function TenantNav({ children }: { children: React.ReactNode }) {
     { label: "Inspections", href: "/tenant/inspections", icon: Calendar },
     { label: "Maintenance", href: "/tenant/maintenance", icon: Wrench },
     { label: "Wallet", href: "/tenant/wallet", icon: Wallet },
-    { label: "Refer & Earn", href: "/tenant/referrals", icon: Gift },
+    {
+      label: "Refer & Earn",
+      href: "/tenant/referrals",
+      icon: Gift,
+      locked: !REFERRALS_ENABLED,
+      lockedHint: "Coming soon",
+    },
     { label: "Saved Listings", href: "/tenant/saved", icon: Heart },
     { label: "Messages", href: "/tenant/messages", icon: MessageCircle },
     {

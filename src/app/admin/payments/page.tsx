@@ -74,7 +74,7 @@ export default function AdminPaymentsPage() {
 
   const revenue = revenueData?.data
   const payments = data?.data?.data ?? []
-  const meta = data?.data?.meta
+  const pagination = data?.data?.pagination
 
   const revenueCards = [
     { label: "Inspection Fees", value: revenue?.inspection_fee ?? 0, icon: Eye, color: "text-purple-600", bg: "bg-purple-50" },
@@ -159,7 +159,7 @@ export default function AdminPaymentsPage() {
       <Card>
         <CardHeader className="pb-0 px-6 pt-4">
           <CardTitle className="text-sm font-medium text-slate-500">
-            {meta ? `${meta.total.toLocaleString()} transactions` : "Loading..."}
+            {pagination ? `${pagination.total.toLocaleString()} transactions` : "Loading..."}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -238,13 +238,13 @@ export default function AdminPaymentsPage() {
       </Card>
 
       {/* Pagination */}
-      {meta && meta.totalPages > 1 && (
+      {pagination && pagination.totalPages > 1 && (
         <div className="flex justify-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
             Previous
           </Button>
-          <span className="flex items-center text-sm text-slate-600 px-2">{page} of {meta.totalPages}</span>
-          <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= meta.totalPages}>
+          <span className="flex items-center text-sm text-slate-600 px-2">{page} of {pagination.totalPages}</span>
+          <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= pagination.totalPages}>
             Next
           </Button>
         </div>
