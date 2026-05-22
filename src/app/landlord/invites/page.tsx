@@ -62,7 +62,9 @@ export default function LandlordInvitesPage() {
         unitId: form.unitId,
         invitedPhone: form.invitedPhone,
         firstName: form.firstName,
-        rentAmount: parseInt(form.rentAmount) * 100,
+        // rentAmount is stored in naira (matches unit.rentPerAnnum and the
+        // payment service). The form value is already naira — do NOT ×100.
+        rentAmount: parseInt(form.rentAmount),
         startDate: form.startDate,
         endDate: form.endDate,
       }),
