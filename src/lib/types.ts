@@ -114,15 +114,27 @@ export interface Listing {
   property?: Pick<Property, "city" | "state" | "lga" | "area" | "address" | "name">
 }
 
+export type PropertyType =
+  | "flat"
+  | "duplex"
+  | "bungalow"
+  | "self_contain"
+  | "room_and_parlour"
+  | "commercial"
+  | "land"
+
 export interface ListingFilters {
   page?: number
   limit?: number
+  search?: string
   city?: string
   state?: string
   lga?: string
   area?: string
   minRent?: number
   maxRent?: number
+  bedrooms?: number
+  propertyType?: PropertyType
   featured?: boolean
 }
 

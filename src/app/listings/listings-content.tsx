@@ -13,7 +13,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton"
 import { listingsApi } from "@/lib/api/listings"
 import { NIGERIAN_STATES, getLGAs } from "@/lib/data/nigeria-geo"
+import type { PropertyType } from "@/lib/types"
 import { SlidersHorizontal, Search, ChevronLeft, ChevronRight } from "lucide-react"
+
+const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
+  { value: "flat", label: "Flat / Apartment" },
+  { value: "duplex", label: "Duplex" },
+  { value: "bungalow", label: "Bungalow" },
+  { value: "self_contain", label: "Self-Contain" },
+  { value: "room_and_parlour", label: "Room & Parlour" },
+  { value: "commercial", label: "Commercial" },
+  { value: "land", label: "Land" },
+]
+
+const BEDROOM_OPTIONS = ["1", "2", "3", "4", "5"]
 
 function ListingsContent() {
   const searchParams = useSearchParams()
@@ -21,11 +34,16 @@ function ListingsContent() {
   const [filters, setFilters] = useState({
     state: searchParams.get("state") ?? "",
     lga: searchParams.get("lga") ?? "",
-    area: searchParams.get("area") ?? "",
+    search: searchParams.get("search") ?? "",
+    propertyType: searchParams.get("propertyType") ?? "",
+    bedrooms: searchParams.get("bedrooms") ?? "",
     minRent: searchParams.get("minRent") ?? "",
     maxRent: searchParams.get("maxRent") ?? "",
     page: parseInt(searchParams.get("page") ?? "1"),
   })
+  // Decoupled from `filters.search` so typing doesn't refetch on every keystroke;
+  // committed to the query only on submit / Enter.
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") ?? "")
   const [showFilters, setShowFilters] = useState(false)
 
   const lgas = getLGAs(filters.state)
@@ -36,7 +54,9 @@ function ListingsContent() {
       listingsApi.getListings({
         state: filters.state || undefined,
         lga: filters.lga || undefined,
-        area: filters.area || undefined,
+        search: filters.search || undefined,
+        propertyType: (filters.propertyType || undefined) as PropertyType | undefined,
+        bedrooms: filters.bedrooms ? parseInt(filters.bedrooms) : undefined,
         minRent: filters.minRent ? parseInt(filters.minRent) * 100 : undefined,
         maxRent: filters.maxRent ? parseInt(filters.maxRent) * 100 : undefined,
         page: filters.page,
@@ -52,8 +72,22 @@ function ListingsContent() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const clearFilters = () =>
-    setFilters({ state: "", lga: "", area: "", minRent: "", maxRent: "", page: 1 })
+  const submitSearch = () =>
+    setFilters((f) => ({ ...f, search: searchInput.trim(), page: 1 }))
+
+  const clearFilters = () => {
+    setSearchInput("")
+    setFilters({
+      state: "",
+      lga: "",
+      search: "",
+      propertyType: "",
+      bedrooms: "",
+      minRent: "",
+      maxRent: "",
+      page: 1,
+    })
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -63,11 +97,34 @@ function ListingsContent() {
       <div className="bg-[#1a3c5e] text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-2">Browse Listings</h1>
-          <p className="text-slate-300">
+          <p className="text-slate-300 mb-6">
             {pagination?.total
-              ? `${pagination.total.toLocaleString()} properties available`
+              ? `${pagination.total.toLocaleString()} ${pagination.total === 1 ? "property" : "properties"} available`
               : "Find your perfect rental"}
           </p>
+
+          {/* Location search */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              submitSearch()
+            }}
+            className="flex gap-2 max-w-2xl"
+          >
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search by title, area, or city — e.g. 2 bedroom Lekki, GRA, Wuse"
+                className="h-12 pl-10 bg-white text-slate-900 border-0 placeholder:text-slate-400"
+              />
+            </div>
+            <Button type="submit" className="h-12 px-6 bg-[#f97316] hover:bg-[#ea6b0e] gap-2 shrink-0">
+              <Search className="h-4 w-4" />
+              <span className="hidden sm:inline">Search</span>
+            </Button>
+          </form>
         </div>
       </div>
 
@@ -135,14 +192,46 @@ function ListingsContent() {
                   </Select>
                 </div>
 
-                {/* Area / neighbourhood */}
+                {/* Property type */}
                 <div>
-                  <Label className="mb-2 block">Area / Neighbourhood</Label>
-                  <Input
-                    placeholder="e.g. Lekki Phase 1, GRA"
-                    value={filters.area}
-                    onChange={(e) => setFilters((f) => ({ ...f, area: e.target.value, page: 1 }))}
-                  />
+                  <Label className="mb-2 block">Property Type</Label>
+                  <Select
+                    value={filters.propertyType}
+                    onValueChange={(val) =>
+                      setFilters((f) => ({ ...f, propertyType: val === "all" ? "" : val, page: 1 }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any type</SelectItem>
+                      {PROPERTY_TYPES.map((t) => (
+                        <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Bedrooms */}
+                <div>
+                  <Label className="mb-2 block">Bedrooms</Label>
+                  <Select
+                    value={filters.bedrooms}
+                    onValueChange={(val) =>
+                      setFilters((f) => ({ ...f, bedrooms: val === "all" ? "" : val, page: 1 }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any</SelectItem>
+                      {BEDROOM_OPTIONS.map((b) => (
+                        <SelectItem key={b} value={b}>{b}+ {b === "1" ? "bedroom" : "bedrooms"}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Rent range */}
@@ -166,10 +255,7 @@ function ListingsContent() {
                   />
                 </div>
 
-                <Button
-                  onClick={() => setFilters((f) => ({ ...f, page: 1 }))}
-                  className="w-full gap-2"
-                >
+                <Button onClick={submitSearch} className="w-full gap-2">
                   <Search className="h-4 w-4" />
                   Apply Filters
                 </Button>

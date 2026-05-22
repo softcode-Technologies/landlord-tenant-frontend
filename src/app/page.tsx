@@ -104,15 +104,16 @@ const PILLARS = [
 const PRICING_PLANS = [
   {
     audience: "For Tenants",
-    name: "Always free",
+    name: "Free to browse",
     price: "₦0",
-    blurb: "Find a verified home and run your tenancy at no cost.",
+    suffix: "to browse",
+    blurb: "Browse, save, and message for free. Pay a one-time ₦1,500 only when you choose to unlock a landlord's verified contact and book an inspection.",
     features: [
-      "Browse KYC-verified listings",
+      "Browse all KYC-verified listings free",
+      "Save homes and message landlords in-app",
+      "₦1,500 to unlock a listing's contact + book an inspection",
       "Pay rent and get instant receipts",
-      "Rent reminders before every expiry",
-      "Message your landlord in one place",
-      "Request and track maintenance",
+      "Rent reminders, maintenance, and records included",
     ],
     cta: { label: "Browse homes", href: "/listings" },
     highlight: false,
@@ -138,7 +139,11 @@ const PRICING_PLANS = [
 const FAQS = [
   {
     q: `Is ${BRAND_NAME} really free?`,
-    a: "Yes. It's completely free for tenants. Landlords and agents start free too — you only pay a small, transparent fee when you collect rent through the platform. No monthly subscription, no card required to sign up.",
+    a: "Browsing is completely free — search every verified listing, save homes, and message landlords in-app at no cost. Tenants pay a one-time ₦1,500 only when they choose to unlock a specific landlord's verified contact and book an inspection. Landlords and agents start free too, and pay a small, transparent fee only when they collect rent through the platform. No monthly subscription, no card required to sign up.",
+  },
+  {
+    q: "Why do tenants pay ₦1,500 to unlock a contact?",
+    a: "Browsing and saving homes is always free. The one-time ₦1,500 fee unlocks a specific listing's verified landlord contact and lets you book an inspection — and your access to that listing stays open for 30 days. It keeps the marketplace free of fake enquiries and time-wasters, so landlords take your interest seriously. You only ever pay it when you decide a particular home is worth pursuing, and the amount is always shown before you confirm.",
   },
   {
     q: "How do you verify landlords and listings?",
@@ -660,8 +665,8 @@ export default function HomePage() {
               Honest pricing. No surprises.
             </h2>
             <p className="text-slate-500 dark:text-slate-400 mt-4 text-[15px] leading-relaxed">
-              Free for tenants. Free to start for landlords. You only pay when the platform
-              helps you collect — never a kobo before that.
+              Free to browse for tenants. Free to start for landlords. Any fee is small,
+              transparent, and always shown before you confirm — never hidden, never a surprise.
             </p>
           </div>
 
