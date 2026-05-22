@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { MapPin, Bed, Bath, Heart, Star, BadgeCheck, Eye } from "lucide-react"
+import { MapPin, Bed, Bath, Heart, Star, BadgeCheck, Eye, Building2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatNairaAmount } from "@/lib/utils"
@@ -19,6 +19,7 @@ interface ListingCardProps {
 export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
   const [saved, setSaved] = useState(listing.isSaved ?? false)
   const [saving, setSaving] = useState(false)
+  const [imgError, setImgError] = useState(false)
 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -42,23 +43,29 @@ export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
     }
   }
 
-  const imageUrl = listing.images?.[0] ?? "/placeholder-property.jpg"
+  const imageUrl = listing.images?.[0]
+  const showImage = Boolean(imageUrl) && !imgError
 
   return (
     <Link href={`/listings/${listing.id}`}>
       <div className="group rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
         {/* Image */}
         <div className="relative h-52 overflow-hidden bg-slate-100">
-          <Image
-            src={imageUrl}
-            alt={listing.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop"
-            }}
-          />
+          {showImage ? (
+            <Image
+              src={imageUrl as string}
+              alt={listing.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e]">
+              <Building2 className="h-10 w-10 text-[#f97316]/80" />
+              <span className="text-xs font-medium text-slate-300">No photo available</span>
+            </div>
+          )}
           <div className="absolute top-3 left-3 flex items-center gap-1.5">
             {listing.isFeatured && (
               <Badge className="bg-[#f97316] text-white">Featured</Badge>

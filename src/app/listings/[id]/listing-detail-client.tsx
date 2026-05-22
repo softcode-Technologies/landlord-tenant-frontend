@@ -33,8 +33,7 @@ import {
   BadgeCheck,
 } from "lucide-react"
 
-const PLACEHOLDER_IMAGE =
-  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&h=700&fit=crop"
+const PLACEHOLDER_IMAGE = "/placeholder-property.svg"
 
 // Self-contained gallery image: holds a skeleton until the real bytes decode,
 // then fades in — so a stale/cached or wrong image never flashes before the
