@@ -2,8 +2,15 @@ import apiClient from "./client"
 import type { InspectionSchedule } from "@/lib/types"
 
 export const inspectionsApi = {
+  // When the unlock fee is enabled, returns a paymentUrl to redirect to. When
+  // disabled (launch promo), access is granted immediately and `free` is true.
   unlockListing: (listingId: string) =>
-    apiClient.post<{ paymentUrl: string }>(`/inspections/listings/${listingId}/unlock`),
+    apiClient.post<{ free: boolean; paymentUrl?: string; feeKobo: number }>(
+      `/inspections/listings/${listingId}/unlock`,
+    ),
+
+  getUnlockConfig: () =>
+    apiClient.get<{ feeEnabled: boolean; feeKobo: number }>("/inspections/unlock-config"),
 
   getListingContact: (listingId: string) =>
     apiClient.get<{

@@ -134,13 +134,30 @@ export function ListingDetailClient({ initialListing }: Props) {
   })
   const contact = contactData?.data
 
+  // Drives the unlock copy. Default to "paid" until config loads so we never
+  // wrongly promise a free unlock.
+  const { data: unlockConfigData } = useQuery({
+    queryKey: ["unlock-config"],
+    queryFn: () => inspectionsApi.getUnlockConfig(),
+    staleTime: 5 * 60 * 1000,
+  })
+  const feeEnabled = unlockConfigData?.data?.feeEnabled ?? true
+  const feeKobo = unlockConfigData?.data?.feeKobo ?? 150000
+  const feeNaira = `₦${(feeKobo / 100).toLocaleString("en-NG")}`
+
   const unlockMutation = useMutation({
     mutationFn: () => inspectionsApi.unlockListing(id),
     onSuccess: (res) => {
-      window.location.href = res.data.paymentUrl
+      if (res.data.paymentUrl) {
+        window.location.href = res.data.paymentUrl
+        return
+      }
+      // Free unlock (promo) — access granted immediately, no payment.
+      queryClient.invalidateQueries({ queryKey: ["listing-contact", id] })
+      toast.success("Contact unlocked!")
     },
     onError: () => {
-      toast.error("Failed to initiate payment. Please try again.")
+      toast.error("Failed to unlock contact. Please try again.")
     },
   })
 
@@ -592,10 +609,12 @@ export function ListingDetailClient({ initialListing }: Props) {
                       ) : (
                         <Phone className="h-4 w-4" />
                       )}
-                      Unlock Contact
+                      {feeEnabled ? "Unlock Contact" : "Unlock Contact — Free"}
                     </Button>
                     <p className="text-xs text-slate-400 text-center">
-                      Pay ₦1,500 to unlock verified landlord contact details, then book an inspection
+                      {feeEnabled
+                        ? `Pay ${feeNaira} to unlock verified landlord contact details, then book an inspection`
+                        : "Unlock the verified landlord's contact for free, then book an inspection"}
                     </p>
                   </>
                 )}
@@ -660,7 +679,7 @@ export function ListingDetailClient({ initialListing }: Props) {
             ) : (
               <Phone className="h-4 w-4" />
             )}
-            Unlock Contact
+            {feeEnabled ? "Unlock Contact" : "Unlock Contact — Free"}
           </Button>
         )}
       </div>
