@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
+import { formatNairaAmount, formatNaira, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
 import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink, PenLine, Star, CheckCircle2 } from "lucide-react"
 import { RentHistoryCard } from "@/components/shared/rent-history-card"
 import Link from "next/link"
@@ -246,7 +246,7 @@ export default function TenantTenancyDetailPage() {
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                     <span className="text-sm text-slate-600">Deposit Amount</span>
                     <span className="font-bold text-slate-900">
-                      {formatNairaAmount(tenancy.depositAmount)}
+                      {formatNaira(tenancy.depositAmount)}
                     </span>
                   </div>
                   {tenancy.depositPaidAt && (
