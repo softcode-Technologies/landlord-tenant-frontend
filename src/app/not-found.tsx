@@ -1,14 +1,13 @@
 import Link from "next/link"
-import { Building2, Home, ArrowLeft } from "lucide-react"
+import { Home, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { BrandLogo } from "@/components/layout/brand-logo"
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center px-4">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 rounded-2xl bg-[#1a3c5e] flex items-center justify-center mx-auto mb-6">
-          <Building2 className="h-8 w-8 text-white" />
-        </div>
+        <BrandLogo className="w-16 h-16 rounded-2xl bg-[#1a3c5e] mx-auto mb-6" iconClassName="h-8 w-8 text-white" />
 
         <h1 className="text-6xl font-black text-[#1a3c5e] mb-3">404</h1>
         <h2 className="text-2xl font-bold text-slate-900 mb-3">Page Not Found</h2>

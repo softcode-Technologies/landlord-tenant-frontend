@@ -55,8 +55,16 @@ export function normalizeUser(raw: RawUser): User {
 export const authApi = {
   // devOtp is only present in development (backend echoes the code so the
   // login form can prefill it). It is never returned in production.
+  // `channel` tells the client where the code went: SMS for first-time users,
+  // email for returning users who completed onboarding. `destination` is a
+  // masked hint (e.g. "ja***@gmail.com" or "+234809***5678").
   requestOtp: (phone: string) =>
-    apiClient.post<{ phone: string; devOtp?: string }>("/auth/request-otp", { phone }),
+    apiClient.post<{
+      phone: string
+      channel: "sms" | "email"
+      destination: string
+      devOtp?: string
+    }>("/auth/request-otp", { phone }),
 
   verifyOtp: (phone: string, otp: string) =>
     apiClient.post<AuthResponse>("/auth/verify-otp", { phone, otp }),

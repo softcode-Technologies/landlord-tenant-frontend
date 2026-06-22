@@ -1,5 +1,5 @@
 import apiClient from "./client"
-import type { Tenancy, CreditScore, RentChange } from "@/lib/types"
+import type { Tenancy, CreditScore, RentChange, ScreeningReport } from "@/lib/types"
 
 export const tenanciesApi = {
   getLandlordTenancies: () => apiClient.get<Tenancy[]>("/tenancies/landlord"),
@@ -11,7 +11,7 @@ export const tenanciesApi = {
   getCreditScore: () => apiClient.get<CreditScore>("/tenancies/credit-score"),
 
   screenTenant: (tenantUserId: string) =>
-    apiClient.get(`/tenancies/screening/${tenantUserId}`),
+    apiClient.get<ScreeningReport>(`/tenancies/screening/${tenantUserId}`),
 
   renewTenancy: (id: string, data: { newEndDate: string; newRentAmount?: number }) =>
     apiClient.post(`/tenancies/${id}/renew`, data),

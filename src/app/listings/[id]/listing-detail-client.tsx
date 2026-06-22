@@ -30,7 +30,7 @@ import type { Listing } from "@/lib/types"
 import {
   MapPin, Bed, Bath, Star, Heart, Share2, Calendar, Phone,
   CheckCircle2, ArrowLeft, User, Loader2, Eye, ChevronLeft, ChevronRight,
-  BadgeCheck,
+  BadgeCheck, Clock,
 } from "lucide-react"
 
 const PLACEHOLDER_IMAGE = "/placeholder-property.svg"
@@ -134,6 +134,37 @@ export function ListingDetailClient({ initialListing }: Props) {
   })
   const contact = contactData?.data
 
+  // The tenant's inspection requests (used to reflect a booked inspection on the
+  // CTA). Only relevant once the contact is unlocked, since that's when booking
+  // is possible.
+  const { data: mySchedulesData } = useQuery({
+    queryKey: ["my-schedules"],
+    queryFn: () => inspectionsApi.getMySchedules(),
+    enabled: isAuthenticated && !!contact,
+  })
+
+  // An inspection for THIS listing that should block re-booking. A request only
+  // blocks while it's still upcoming and unresolved (pending/confirmed). Once the
+  // scheduled time passes with no landlord response — or the landlord
+  // cancelled/closed it — the tenant is free to book again.
+  const activeInspection = (mySchedulesData?.data ?? [])
+    .filter(
+      (s) =>
+        s.listingId === id &&
+        (s.status === "pending" || s.status === "confirmed") &&
+        new Date(s.scheduledAt).getTime() > Date.now(),
+    )
+    .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0]
+
+  const formatInspectionSlot = (iso: string) =>
+    new Date(iso).toLocaleString("en-NG", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      hour: "numeric",
+      minute: "2-digit",
+    })
+
   // Drives the unlock copy. Default to "paid" until config loads so we never
   // wrongly promise a free unlock.
   const { data: unlockConfigData } = useQuery({
@@ -191,10 +222,12 @@ export function ListingDetailClient({ initialListing }: Props) {
         note: scheduleNote,
       }),
     onSuccess: () => {
-      toast.success("Inspection scheduled successfully!")
+      toast.success("Inspection request sent! You'll be notified when the landlord responds.")
       setScheduleOpen(false)
       setScheduledAt("")
       setScheduleNote("")
+      // Reflect the new request on the CTA right away.
+      queryClient.invalidateQueries({ queryKey: ["my-schedules"] })
     },
     onError: () => {
       toast.error("Failed to schedule inspection. Please try again.")
@@ -237,6 +270,11 @@ export function ListingDetailClient({ initialListing }: Props) {
 
   const handleBookInspection = () => {
     if (!isAuthenticated) { router.push("/login?redirect=/listings/" + id); return }
+    // An upcoming, unresolved inspection already exists — don't allow a duplicate.
+    if (activeInspection) {
+      toast.info("You already have an inspection request for this listing.")
+      return
+    }
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     tomorrow.setHours(10, 0, 0, 0)
@@ -589,13 +627,40 @@ export function ListingDetailClient({ initialListing }: Props) {
                         </a>
                       </div>
                     </div>
-                    <Button
-                      onClick={handleBookInspection}
-                      className="w-full h-12 bg-[#f97316] hover:bg-[#f97316]/90 text-white"
-                    >
-                      <Calendar className="h-4 w-4" />
-                      Book Inspection
-                    </Button>
+                    {activeInspection ? (
+                      <div>
+                        <div
+                          className={`w-full h-12 rounded-md flex items-center justify-center gap-2 px-3 text-sm font-medium ${
+                            activeInspection.status === "confirmed"
+                              ? "bg-green-50 text-green-700 border border-green-200"
+                              : "bg-amber-50 text-amber-700 border border-amber-200"
+                          }`}
+                        >
+                          {activeInspection.status === "confirmed" ? (
+                            <CheckCircle2 className="h-4 w-4" />
+                          ) : (
+                            <Clock className="h-4 w-4" />
+                          )}
+                          {activeInspection.status === "confirmed"
+                            ? "Inspection confirmed"
+                            : "Inspection requested"}
+                        </div>
+                        <p className="text-xs text-slate-400 text-center mt-1.5">
+                          {formatInspectionSlot(activeInspection.scheduledAt)}
+                          {activeInspection.status === "pending"
+                            ? " · awaiting landlord confirmation"
+                            : ""}
+                        </p>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={handleBookInspection}
+                        className="w-full h-12 bg-[#f97316] hover:bg-[#f97316]/90 text-white"
+                      >
+                        <Calendar className="h-4 w-4" />
+                        Book Inspection
+                      </Button>
+                    )}
                   </>
                 ) : (
                   <>
@@ -661,13 +726,30 @@ export function ListingDetailClient({ initialListing }: Props) {
           </p>
         </div>
         {contact ? (
-          <Button
-            onClick={handleBookInspection}
-            className="flex-1 h-11 bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2"
-          >
-            <Calendar className="h-4 w-4" />
-            Book Inspection
-          </Button>
+          activeInspection ? (
+            <div
+              className={`flex-1 h-11 rounded-md flex items-center justify-center gap-2 px-3 text-sm font-medium ${
+                activeInspection.status === "confirmed"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-amber-50 text-amber-700 border border-amber-200"
+              }`}
+            >
+              {activeInspection.status === "confirmed" ? (
+                <CheckCircle2 className="h-4 w-4" />
+              ) : (
+                <Clock className="h-4 w-4" />
+              )}
+              {activeInspection.status === "confirmed" ? "Inspection confirmed" : "Inspection requested"}
+            </div>
+          ) : (
+            <Button
+              onClick={handleBookInspection}
+              className="flex-1 h-11 bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2"
+            >
+              <Calendar className="h-4 w-4" />
+              Book Inspection
+            </Button>
+          )
         ) : (
           <Button
             onClick={handleUnlock}

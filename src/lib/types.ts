@@ -242,6 +242,37 @@ export interface CreditScore {
   }
 }
 
+// Tenant screening report (landlord views a tenant's on-platform track record).
+export interface ScreeningReport {
+  creditScore: number
+  totalRentPayments: number
+  onTimePayments: number
+  latePayments: number
+  onTimeRate: number | null
+  activeTenancies: number
+  totalTenancies: number
+  identity: {
+    fullName: string | null
+    memberSince: string | null
+    kycStatus: "none" | "pending" | "approved" | "rejected"
+    kycMethod: "nin" | "bvn" | "document" | null
+    isPhoneVerified: boolean
+    isEmailVerified: boolean
+  }
+  affordability: {
+    employmentStatus: string | null
+    monthlyIncome: number | null
+    previousRentals: number
+  }
+  paymentHistory: {
+    id: string
+    amount: number
+    paidAt: string | null
+    status: string
+    dueDate: string | null
+  }[]
+}
+
 // Invites
 export interface Invite {
   id: string

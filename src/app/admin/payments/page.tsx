@@ -273,7 +273,7 @@ export default function AdminPaymentsPage() {
                 </div>
               </div>
               <p className="text-sm text-slate-500">
-                This will initiate a full refund via Paystack. The payment status will be updated to <strong>refunded</strong>.
+                This credits the full amount to the user&apos;s wallet and marks the payment as <strong>refunded</strong>.
               </p>
             </div>
           )}

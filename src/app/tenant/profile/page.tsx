@@ -1,20 +1,24 @@
 "use client"
 
+import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 import { useAuthStore } from "@/lib/store/auth"
 import { userApi } from "@/lib/api/user"
 import { authApi } from "@/lib/api/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ProfileEditDialog } from "@/components/shared/profile-edit-dialog"
 import { getInitials, formatDate, extractApiError } from "@/lib/utils"
-import { User, AlertCircle, ShieldCheck, MessageCircle } from "lucide-react"
+import { User, AlertCircle, ShieldCheck, MessageCircle, Camera, Pencil } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 
 export default function TenantProfilePage() {
   const { user, setUser } = useAuthStore()
+  const [editOpen, setEditOpen] = useState(false)
 
   const whatsappMutation = useMutation({
     mutationFn: (optIn: boolean) => userApi.toggleWhatsappOptIn(optIn),
@@ -42,9 +46,15 @@ export default function TenantProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">My Profile</h1>
-        <p className="text-slate-500 mt-1">Manage your personal information and verification</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">My Profile</h1>
+          <p className="text-slate-500 mt-1">Manage your personal information and verification</p>
+        </div>
+        <Button variant="outline" className="gap-2 shrink-0" onClick={() => setEditOpen(true)}>
+          <Pencil className="h-4 w-4" />
+          Edit Profile
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -52,12 +62,20 @@ export default function TenantProfilePage() {
         <div className="lg:col-span-1">
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="relative inline-block mb-4">
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                className="relative inline-block mb-4 group rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                aria-label="Change profile picture"
+              >
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={user.avatarUrl} />
                   <AvatarFallback className="text-xl">{getInitials(fullName)}</AvatarFallback>
                 </Avatar>
-              </div>
+                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="h-5 w-5 text-white" />
+                </span>
+              </button>
               <h2 className="text-lg font-bold text-slate-900">{fullName}</h2>
               <p className="text-sm text-slate-500 mb-3">{user.phone}</p>
 
@@ -181,6 +199,8 @@ export default function TenantProfilePage() {
 
         </div>
       </div>
+
+      <ProfileEditDialog open={editOpen} onOpenChange={setEditOpen} />
     </div>
   )
 }

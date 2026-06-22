@@ -21,7 +21,7 @@ import { BRAND_NAME, BRAND_DOMAIN, SHOW_APP_DOWNLOAD, IOS_APP_URL, ANDROID_APP_U
 const TRUST_METRICS = [
   { value: "100%", label: "KYC-verified listings" },
   { value: "₦0", label: "Free to get started" },
-  { value: "Paystack", label: "Bank-grade payments" },
+  { value: "Secure", label: "Bank-grade payments" },
   { value: "36 States", label: "Built for all of Nigeria" },
 ]
 
@@ -151,7 +151,7 @@ const FAQS = [
   },
   {
     q: "Is my money safe?",
-    a: "Payments are processed by Paystack, a licensed and regulated payment provider. Every transaction is recorded and you get a downloadable receipt — so there's always a clear paper trail for both sides.",
+    a: "Payments are processed through a licensed, regulated payment provider. Every transaction is recorded and you get a downloadable receipt — so there's always a clear paper trail for both sides.",
   },
   {
     q: "Can I use it for tenants I already have?",

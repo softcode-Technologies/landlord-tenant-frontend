@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { Building2, Phone, ArrowLeft, Loader2, Shield, ShieldCheck, Receipt, Bell } from "lucide-react"
+import { Phone, ArrowLeft, Loader2, Shield, ShieldCheck, Receipt, Bell } from "lucide-react"
+import { BrandLogo } from "@/components/layout/brand-logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { authApi } from "@/lib/api/auth"
@@ -21,6 +22,10 @@ function LoginContent() {
 
   const [step, setStep] = useState<"phone" | "otp">("phone")
   const [phone, setPhone] = useState("")
+  // Where the OTP was delivered — SMS for first-time users, email for returning
+  // users who completed onboarding. `otpDestination` is a masked hint.
+  const [otpChannel, setOtpChannel] = useState<"sms" | "email">("sms")
+  const [otpDestination, setOtpDestination] = useState("")
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [loading, setLoading] = useState(false)
   const [countdown, setCountdown] = useState(0)
@@ -66,7 +71,10 @@ function LoginContent() {
         normalizedPhone = "234" + digits.slice(1)
       }
       const res = await authApi.requestOtp(normalizedPhone)
-      toast.success("OTP sent to your phone!")
+      const channel = res.data?.channel ?? "sms"
+      setOtpChannel(channel)
+      setOtpDestination(res.data?.destination ?? "")
+      toast.success(channel === "email" ? "OTP sent to your email!" : "OTP sent to your phone!")
       setPhone(normalizedPhone)
       setStep("otp")
       setCountdown(60)
@@ -138,7 +146,10 @@ function LoginContent() {
 
       // New users go to onboarding; existing users go to their dashboard (or the requested redirect)
       if (isNew) {
-        router.push("/onboarding")
+        // Carry the redirect through onboarding so a first-timer who came here to
+        // unlock a listing lands back on that listing once their profile is set
+        // up — not the bare dashboard.
+        router.push(redirect ? `/onboarding?redirect=${encodeURIComponent(redirect)}` : "/onboarding")
       } else if (redirect) {
         router.push(redirect)
       } else {
@@ -159,6 +170,8 @@ function LoginContent() {
     setLoading(true)
     try {
       const res = await authApi.requestOtp(phone)
+      setOtpChannel(res.data?.channel ?? otpChannel)
+      setOtpDestination(res.data?.destination ?? otpDestination)
       toast.success("New OTP sent!")
       setCountdown(60)
       setOtp(["", "", "", "", "", ""])
@@ -176,9 +189,7 @@ function LoginContent() {
       {/* Left: Decorative panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1a3c5e] via-[#1e4a72] to-[#0f2d48] flex-col justify-between p-12">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-            <Building2 className="h-5 w-5 text-white" />
-          </div>
+          <BrandLogo className="w-9 h-9 rounded-xl bg-white/20" iconClassName="h-5 w-5 text-white" />
           <BrandWordmark className="text-2xl font-bold text-white" />
         </Link>
 
@@ -222,9 +233,7 @@ function LoginContent() {
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
-                <Building2 className="h-4 w-4 text-white" />
-              </div>
+              <BrandLogo className="w-8 h-8 rounded-lg bg-[#1a3c5e]" iconClassName="h-4 w-4 text-white" />
               <BrandWordmark className="text-xl font-bold text-[#1a3c5e]" />
             </Link>
           </div>
@@ -326,12 +335,14 @@ function LoginContent() {
                   <Shield className="h-6 w-6 text-[#f97316]" />
                 </div>
                 <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                  Verify your number
+                  {otpChannel === "email" ? "Verify your email" : "Verify your number"}
                 </h1>
                 <p className="text-slate-500">
                   We sent a 6-digit code to{" "}
                   <span className="font-semibold text-slate-900">
-                    +{phone}
+                    {otpChannel === "email"
+                      ? otpDestination || "your email"
+                      : otpDestination || `+${phone}`}
                   </span>
                 </p>
               </div>

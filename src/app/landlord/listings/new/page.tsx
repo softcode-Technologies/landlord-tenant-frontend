@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Loader2 } from "lucide-react"
+import { ArrowLeft, Loader2, Bed, Bath, DoorOpen, Banknote } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import apiClient from "@/lib/api/client"
@@ -150,6 +150,60 @@ export default function NewListingPage() {
                   Add Property
                 </Link>
               </p>
+            )}
+
+            {/* Selected unit details — so the landlord can confirm they're
+                listing the right unit and don't enter mismatched info. */}
+            {selectedUnit && (
+              <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {selectedUnit.propertyName} — {selectedUnit.unitNumber}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      Confirm these are the right unit details before publishing
+                    </p>
+                  </div>
+                  {selectedUnit.status && (
+                    <span className="shrink-0 rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium capitalize text-slate-700">
+                      {selectedUnit.status}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="flex items-center gap-2">
+                    <Bed className="h-4 w-4 text-slate-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{selectedUnit.bedrooms}</p>
+                      <p className="text-xs text-slate-500">Bedrooms</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Bath className="h-4 w-4 text-slate-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{selectedUnit.bathrooms}</p>
+                      <p className="text-xs text-slate-500">Bathrooms</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DoorOpen className="h-4 w-4 text-slate-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{selectedUnit.toilets ?? 0}</p>
+                      <p className="text-xs text-slate-500">Toilets</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Banknote className="h-4 w-4 text-slate-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">
+                        ₦{Number(selectedUnit.rentPerAnnum).toLocaleString()}
+                      </p>
+                      <p className="text-xs text-slate-500">Base rent / yr</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>

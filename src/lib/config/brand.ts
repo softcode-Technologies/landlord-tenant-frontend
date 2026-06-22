@@ -9,6 +9,13 @@ export const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME || "NaijaRental"
 
 export const BRAND_DOMAIN = process.env.NEXT_PUBLIC_BRAND_DOMAIN || "naijarental.com"
 
+// Brand logo image. Empty by default → the app renders the built-in Building2
+// icon mark (via the <BrandLogo /> component). To switch to a real uploaded logo
+// everywhere at once, set NEXT_PUBLIC_BRAND_LOGO_URL to its URL/path (e.g.
+// "/brand/logo.svg" after dropping the file in /public, or a remote CDN URL).
+// No other code changes needed — every logo across the app reads from here.
+export const BRAND_LOGO_URL = process.env.NEXT_PUBLIC_BRAND_LOGO_URL || ""
+
 export const BRAND_URL =
   process.env.NEXT_PUBLIC_SITE_URL || `https://${BRAND_DOMAIN}`
 

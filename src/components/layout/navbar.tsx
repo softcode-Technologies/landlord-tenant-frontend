@@ -15,7 +15,8 @@ import {
 import { useAuthStore, getRoleDashboardPath, getAvailableRoles } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
 import { getInitials } from "@/lib/utils"
-import { Building2, LogOut, User, LayoutDashboard, Menu, X, Repeat, ShieldCheck, Home, Briefcase, Key } from "lucide-react"
+import { LogOut, User, LayoutDashboard, Menu, X, Repeat, ShieldCheck, Home, Briefcase, Key } from "lucide-react"
+import { BrandLogo } from "@/components/layout/brand-logo"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { BrandWordmark } from "./brand-wordmark"
@@ -62,9 +63,10 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center shadow-md">
-              <Building2 className="h-5 w-5 text-white" />
-            </div>
+            <BrandLogo
+              className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] shadow-md"
+              iconClassName="h-5 w-5 text-white"
+            />
             <BrandWordmark className="text-xl font-bold text-[#1a3c5e] dark:text-white" />
           </Link>
 

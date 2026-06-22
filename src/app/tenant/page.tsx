@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { tenanciesApi } from "@/lib/api/tenancies"
 import { paymentsApi } from "@/lib/api/payments"
 import { analyticsApi } from "@/lib/api/analytics"
+import { savingsApi } from "@/lib/api/savings"
 import { useAuthStore } from "@/lib/store/auth"
 import { StatCard } from "@/components/shared/stat-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,7 +14,8 @@ import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatNaira, formatNairaAmount, formatDate } from "@/lib/utils"
 import {
-  Home, Wallet, Wrench, Calendar, ArrowRight, TrendingUp, ShieldAlert, Clock, ShieldX
+  Home, Wallet, Wrench, Calendar, ArrowRight, TrendingUp, ShieldAlert, Clock, ShieldX,
+  PiggyBank, AlertTriangle
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -72,7 +74,15 @@ export default function TenantDashboard() {
     queryFn: () => analyticsApi.getTenantAnalytics(),
   })
 
+  const { data: savingsData } = useQuery({
+    queryKey: ["savings-goals"],
+    queryFn: () => savingsApi.getGoals(),
+  })
+
   const tenancies = tenanciesData?.data ?? []
+  const savingsGoals = savingsData?.data ?? []
+  const topSavingsGoal =
+    savingsGoals.find((g) => g.status === "active" || g.status === "needs_method") ?? savingsGoals[0]
   const activeTenancy = tenancies.find((t) => t.status === "active")
   const creditScore = creditData?.data?.score ?? 0
   const walletBalance = walletData?.data?.balance ?? 0
@@ -279,6 +289,61 @@ export default function TenantDashboard() {
 
         {/* Credit Score */}
         <div className="space-y-4">
+          {/* Rent Savings widget */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <PiggyBank className="h-4 w-4 text-[#f97316]" /> Rent Savings
+              </CardTitle>
+              {topSavingsGoal && (
+                <Link href={`/tenant/savings/${topSavingsGoal.id}`}>
+                  <Button variant="ghost" size="sm" className="gap-1">
+                    Manage <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </Link>
+              )}
+            </CardHeader>
+            <CardContent>
+              {topSavingsGoal ? (
+                <div className="space-y-3">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-lg font-bold text-slate-900">
+                      {formatNaira(topSavingsGoal.savedAmount)}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      of {formatNaira(topSavingsGoal.targetAmount)}
+                    </span>
+                  </div>
+                  <Progress value={topSavingsGoal.progressPercent} className="h-2" />
+                  {topSavingsGoal.status === "needs_method" ? (
+                    <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-2">
+                      <AlertTriangle className="h-3.5 w-3.5 text-amber-600 mt-0.5 shrink-0" />
+                      <p className="text-xs text-amber-700">
+                        Card stopped working — your money is safe. Add a card or transfer to keep saving.
+                      </p>
+                    </div>
+                  ) : topSavingsGoal.status === "active" && topSavingsGoal.nextChargeDate ? (
+                    <p className="text-xs text-slate-500">
+                      Next auto-save: {formatNaira(topSavingsGoal.monthlyAmount)} on {formatDate(topSavingsGoal.nextChargeDate)}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-slate-500 capitalize">{topSavingsGoal.status}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-2">
+                  <p className="text-sm text-slate-600 font-medium">Never scramble for rent again</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Save monthly toward your annual rent — we auto-save from your card.
+                  </p>
+                  <Link href="/tenant/savings" className="mt-3 inline-block">
+                    <Button size="sm">Start saving</Button>
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Credit Score</CardTitle>

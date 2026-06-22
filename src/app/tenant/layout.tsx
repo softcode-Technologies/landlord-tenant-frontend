@@ -19,6 +19,7 @@ import {
   User,
   Gift,
   KeyRound,
+  PiggyBank,
 } from "lucide-react"
 
 function TenantNav({ children }: { children: React.ReactNode }) {
@@ -36,6 +37,7 @@ function TenantNav({ children }: { children: React.ReactNode }) {
     { label: "Inspections", href: "/tenant/inspections", icon: Calendar },
     { label: "Maintenance", href: "/tenant/maintenance", icon: Wrench },
     { label: "Wallet", href: "/tenant/wallet", icon: Wallet },
+    { label: "Rent Savings", href: "/tenant/savings", icon: PiggyBank },
     {
       label: "Refer & Earn",
       href: "/tenant/referrals",

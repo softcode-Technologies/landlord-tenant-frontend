@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
 import Link from "next/link"
 import {
@@ -24,7 +24,9 @@ import { authApi } from "@/lib/api/auth"
 import { useAuthStore, getRoleDashboardPath } from "@/lib/store/auth"
 import { toast } from "sonner"
 import { BrandWordmark } from "@/components/layout/brand-wordmark"
+import { BrandLogo } from "@/components/layout/brand-logo"
 import { BRAND_NAME } from "@/lib/config/brand"
+import { safeRedirectPath } from "@/lib/safe-redirect"
 
 type OnboardingRole = "tenant" | "landlord" | "agent"
 
@@ -74,8 +76,12 @@ const STEP_TITLES = [
 
 const STEP_COUNT = 3
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // Where to land after onboarding — e.g. the listing a first-timer was unlocking
+  // when they were prompted to sign up. Falls back to the role dashboard.
+  const redirect = safeRedirectPath(searchParams.get("redirect"), "")
   const { user, setUser } = useAuthStore()
 
   const [step, setStep] = useState(1)
@@ -100,7 +106,9 @@ export default function OnboardingPage() {
         const freshRes = await authApi.me()
         setUser(freshRes.data)
         toast.success(`Profile saved! Welcome to ${BRAND_NAME}.`)
-        router.push(getRoleDashboardPath(freshRes.data))
+        // Resume where they started (e.g. the listing they were unlocking),
+        // otherwise drop them on their role dashboard.
+        router.push(redirect || getRoleDashboardPath(freshRes.data))
       } catch {
         toast.error("Setup saved but failed to load your profile. Please log in.")
         router.push("/login")
@@ -115,6 +123,15 @@ export default function OnboardingPage() {
     e.preventDefault()
     if (!firstName.trim()) {
       toast.error("First name is required")
+      return
+    }
+    if (!email.trim()) {
+      toast.error("Email address is required")
+      return
+    }
+    // Basic shape check; the backend validates strictly.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      toast.error("Please enter a valid email address")
       return
     }
     setStep(2)
@@ -135,7 +152,7 @@ export default function OnboardingPage() {
     const data: OnboardData = {
       firstName: firstName.trim(),
       lastName: lastName.trim() || undefined,
-      email: email.trim() || undefined,
+      email: email.trim(),
       bio: bio.trim() || undefined,
       role: selectedRole,
       referredByCode: referredByCode.trim().toUpperCase() || undefined,
@@ -157,9 +174,7 @@ export default function OnboardingPage() {
       {/* Header */}
       <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
-            <Building2 className="h-4 w-4 text-white" />
-          </div>
+          <BrandLogo className="w-8 h-8 rounded-lg bg-[#1a3c5e]" iconClassName="h-4 w-4 text-white" />
           <BrandWordmark className="text-xl font-bold text-[#1a3c5e]" />
         </Link>
         <span className="text-sm text-slate-500">
@@ -240,14 +255,20 @@ export default function OnboardingPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address <span className="text-slate-400 text-xs">(optional)</span></Label>
+                <Label htmlFor="email">
+                  Email Address <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
+                <p className="text-xs text-slate-400">
+                  We&apos;ll send your login codes here from now on.
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -434,5 +455,13 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">Loading...</div>}>
+      <OnboardingContent />
+    </Suspense>
   )
 }

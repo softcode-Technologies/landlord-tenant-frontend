@@ -68,7 +68,7 @@ function WalletContent() {
     enabled: addOpen,
   })
 
-  // Show success toast and refetch after Paystack top-up redirect
+  // Show success toast and refetch after the payment-gateway top-up redirect
   useEffect(() => {
     if (searchParams.get("topup") === "success") {
       toast.success("Wallet topped up successfully!")
@@ -275,7 +275,7 @@ function WalletContent() {
                 disabled={!topupAmount || parseInt(topupAmount) < 100 || topupMutation.isPending}
               >
                 {topupMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                Top Up with Paystack
+                Top Up Wallet
               </Button>
             </CardContent>
           </Card>

@@ -165,9 +165,9 @@ export default function AdminKycPage() {
                           </span>
                         )}
                         {(method === "nin" || method === "bvn") && record.kycIdentifier && (
-                          <span className="flex items-center gap-1 text-xs text-slate-400 font-mono">
+                          <span className="flex items-center gap-1 text-xs text-slate-700 font-mono font-medium">
                             <CreditCard className="h-3 w-3" />
-                            {METHOD_LABELS[method]}: •••••{record.kycIdentifier.slice(-4)}
+                            {METHOD_LABELS[method]}: {record.kycIdentifier}
                           </span>
                         )}
                         {record.landlordProfile?.companyName && (
@@ -313,6 +313,9 @@ export default function AdminKycPage() {
                   { icon: Mail, label: "Email", value: detailTarget.email ?? "—" },
                   { icon: Calendar, label: "Joined", value: formatDate(detailTarget.createdAt) },
                   { icon: Shield, label: "KYC Method", value: detailTarget.kycMethod ? METHOD_LABELS[detailTarget.kycMethod] : "—" },
+                  ...((detailTarget.kycMethod === "nin" || detailTarget.kycMethod === "bvn")
+                    ? [{ icon: CreditCard, label: `${METHOD_LABELS[detailTarget.kycMethod]} Number`, value: detailTarget.kycIdentifier || "—" }]
+                    : []),
                   { icon: Calendar, label: "Submitted", value: detailTarget.kycSubmittedAt ? formatDate(detailTarget.kycSubmittedAt) : "—" },
                   ...(detailTarget.landlordProfile?.companyName ? [{ icon: Building, label: "Company", value: detailTarget.landlordProfile.companyName }] : []),
                   ...(detailTarget.agentProfile?.licenseNumber ? [{ icon: UserCheck, label: "License No.", value: detailTarget.agentProfile.licenseNumber }] : []),
@@ -325,6 +328,13 @@ export default function AdminKycPage() {
                   </div>
                 ))}
               </div>
+              {detailTarget.kycMethod === "document" && detailTarget.kycDocumentUrl && (
+                <a href={detailTarget.kycDocumentUrl} target="_blank" rel="noopener noreferrer" className="block">
+                  <Button variant="outline" className="w-full gap-2">
+                    <ExternalLink className="h-4 w-4" />View Uploaded Document
+                  </Button>
+                </a>
+              )}
               {detailTarget.kycStatus === "pending" && (
                 <div className="flex gap-2 pt-2">
                   <Button

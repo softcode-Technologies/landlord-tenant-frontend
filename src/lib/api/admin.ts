@@ -87,6 +87,75 @@ export interface PaystackBank {
   code: string
 }
 
+// ── Treasury (provider-agnostic — reflects the active payment gateway) ──────────
+export interface TreasuryCapabilities {
+  transactions: boolean
+  settlements: boolean
+  transfers: boolean
+  manualPayout: boolean
+}
+
+export interface TreasuryBalance {
+  currency: string
+  balanceKobo: number
+  pendingKobo?: number
+}
+
+export interface TreasuryOverview {
+  provider: string
+  configured: boolean
+  testMode: boolean
+  capabilities: TreasuryCapabilities
+  configHint: string
+  balance: TreasuryBalance[]
+}
+
+export interface TreasuryListMeta {
+  page: number
+  perPage: number
+  pageCount: number
+  total?: number
+}
+
+export interface TreasuryList<T> {
+  data: T[]
+  meta: TreasuryListMeta | null
+}
+
+export interface TreasuryTransaction {
+  id: string
+  label: string
+  amountKobo: number
+  channel: string | null
+  reference: string | null
+  date: string | null
+  status: string
+  direction?: "credit" | "debit"
+}
+
+export interface TreasurySettlement {
+  id: string
+  netKobo: number
+  feesKobo: number | null
+  date: string | null
+  status: string
+}
+
+export interface TreasuryTransfer {
+  id: string
+  recipientName: string
+  recipientDetail: string | null
+  amountKobo: number
+  reason: string | null
+  date: string | null
+  status: string
+}
+
+export interface TreasuryBank {
+  name: string
+  code: string
+}
+
 export interface ReferralParty {
   id: string
   name: string
@@ -386,6 +455,35 @@ export const adminApi = {
     amountKobo: number
     reason?: string
   }) => apiClient.post<{ reference: string; transferCode: string; status: string }>("/admin/paystack/transfer", data),
+
+  // ── Treasury (active gateway — Paystack, Korapay, …) ───────────────────────────
+  getTreasuryOverview: () =>
+    apiClient.get<TreasuryOverview>("/admin/treasury/overview"),
+
+  getTreasuryTransactions: (params?: { page?: number }) =>
+    apiClient.get<TreasuryList<TreasuryTransaction>>("/admin/treasury/transactions", { params }),
+
+  getTreasurySettlements: (params?: { page?: number }) =>
+    apiClient.get<TreasuryList<TreasurySettlement>>("/admin/treasury/settlements", { params }),
+
+  getTreasuryTransfers: (params?: { page?: number }) =>
+    apiClient.get<TreasuryList<TreasuryTransfer>>("/admin/treasury/transfers", { params }),
+
+  getTreasuryBanks: () =>
+    apiClient.get<TreasuryBank[]>("/admin/treasury/banks"),
+
+  resolveTreasuryAccount: (accountNumber: string, bankCode: string) =>
+    apiClient.get<{ accountName: string; accountNumber: string }>("/admin/treasury/resolve-account", {
+      params: { accountNumber, bankCode },
+    }),
+
+  treasuryTransfer: (data: {
+    accountNumber: string
+    bankCode: string
+    accountName: string
+    amountKobo: number
+    reason?: string
+  }) => apiClient.post<{ reference: string; transferCode: string; status: string }>("/admin/treasury/transfer", data),
 
   // ── Refer & Earn ──────────────────────────────────────────────────────────────
   getReferrals: (params?: { page?: number; limit?: number; status?: string }) =>

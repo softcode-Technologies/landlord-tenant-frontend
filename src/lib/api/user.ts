@@ -6,6 +6,7 @@ export interface UpdateProfileData {
   firstName?: string
   lastName?: string
   email?: string
+  phone?: string
   bio?: string
   occupation?: string
   companyName?: string
@@ -23,7 +24,7 @@ export interface UpdateLandlordProfileData {
 export interface OnboardData {
   firstName: string
   lastName?: string
-  email?: string
+  email: string
   bio?: string
   role: "tenant" | "landlord" | "agent"
   occupation?: string
@@ -37,6 +38,14 @@ export const userApi = {
 
   updateProfile: (data: UpdateProfileData) =>
     apiClient.patch<User>("/user/profile", data),
+
+  uploadAvatar: (file: File) => {
+    const formData = new FormData()
+    formData.append("avatar", file)
+    return apiClient.post<{ id: string; avatar: string | null }>("/user/avatar", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+  },
 
   updateLandlordProfile: (data: UpdateLandlordProfileData) =>
     apiClient.patch<User>("/user/landlord-profile", data),

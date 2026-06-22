@@ -1,6 +1,6 @@
 import Link from "next/link"
-import { Building2 } from "lucide-react"
 import { BrandWordmark } from "./brand-wordmark"
+import { BrandLogo } from "./brand-logo"
 import { BRAND_NAME, BRAND_LEGAL_NAME, brandEmail } from "@/lib/config/brand"
 
 // Support WhatsApp line — all customer chats route here.
@@ -46,9 +46,10 @@ export function Footer() {
           {/* Brand — spans 2 cols */}
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] border border-white/10 flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-white" />
-              </div>
+              <BrandLogo
+                className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] border border-white/10"
+                iconClassName="h-5 w-5 text-white"
+              />
               <BrandWordmark className="text-xl font-bold" />
             </div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs mb-5">

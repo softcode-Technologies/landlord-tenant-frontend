@@ -11,13 +11,15 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { ProfileEditDialog } from "@/components/shared/profile-edit-dialog"
 import { getInitials, formatDate, extractApiError } from "@/lib/utils"
-import { CheckCircle2, Star, Pencil, Loader2, X } from "lucide-react"
+import { CheckCircle2, Star, Pencil, Loader2, X, Camera } from "lucide-react"
 import { toast } from "sonner"
 
 export default function AgentProfilePage() {
   const { user, setUser } = useAuthStore()
   const [editing, setEditing] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
 
   const [firstName, setFirstName] = useState(user?.firstName ?? "")
   const [lastName, setLastName] = useState(user?.lastName ?? "")
@@ -77,12 +79,29 @@ export default function AgentProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-6 text-center">
-            <Avatar className="h-20 w-20 mx-auto mb-4">
-              <AvatarImage src={user.avatarUrl} />
-              <AvatarFallback className="text-xl">{getInitials(fullName)}</AvatarFallback>
-            </Avatar>
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              className="relative inline-block mb-4 group rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              aria-label="Change profile picture"
+            >
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={user.avatarUrl} />
+                <AvatarFallback className="text-xl">{getInitials(fullName)}</AvatarFallback>
+              </Avatar>
+              <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="h-5 w-5 text-white" />
+              </span>
+            </button>
             <h2 className="text-lg font-bold text-slate-900">{fullName}</h2>
-            <p className="text-sm text-slate-500 mb-3">{user.phone}</p>
+            <p className="text-sm text-slate-500 mb-1">{user.phone}</p>
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              className="text-xs text-[#1a3c5e] underline underline-offset-2 hover:text-[#f97316] transition-colors mb-3"
+            >
+              Edit photo & details
+            </button>
             {agentProfile?.isVerified && (
               <Badge className="gap-1">
                 <CheckCircle2 className="h-3 w-3" />
@@ -232,6 +251,8 @@ export default function AgentProfilePage() {
           )}
         </div>
       </div>
+
+      <ProfileEditDialog open={editOpen} onOpenChange={setEditOpen} />
     </div>
   )
 }

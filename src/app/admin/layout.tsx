@@ -12,6 +12,7 @@ import {
   Landmark,
   Gift,
   BarChart3,
+  UserCircle,
 } from "lucide-react"
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { label: "Treasury", href: "/admin/treasury", icon: Landmark },
   { label: "Referrals", href: "/admin/referrals", icon: Gift },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { label: "Profile", href: "/admin/profile", icon: UserCircle },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
