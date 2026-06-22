@@ -97,6 +97,12 @@ export async function fetchLocationListings(opts: {
   lga?: string
   limit?: number
 }): Promise<{ listings: Listing[]; total: number }> {
+  // Hard cap the request so a slow/unreachable API at BUILD time can't hang the
+  // static generation of these SEO pages past Next's 60s limit and fail the
+  // whole deploy. On timeout/error we fall back to empty — the page (ISR,
+  // revalidate=300) repopulates from the live API at runtime.
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 8000)
   try {
     const qs = new URLSearchParams()
     if (opts.state) qs.set("state", opts.state)
@@ -105,6 +111,7 @@ export async function fetchLocationListings(opts: {
 
     const res = await fetch(`${API_URL}/listings?${qs.toString()}`, {
       next: { revalidate: 300 },
+      signal: controller.signal,
     })
     if (!res.ok) return { listings: [], total: 0 }
 
@@ -114,5 +121,7 @@ export async function fetchLocationListings(opts: {
     return { listings: raw.map(normalizeRawListing), total }
   } catch {
     return { listings: [], total: 0 }
+  } finally {
+    clearTimeout(timeout)
   }
 }
