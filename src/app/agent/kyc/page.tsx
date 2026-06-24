@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { extractApiError } from "@/lib/utils"
+import { compressImage } from "@/lib/image"
 import {
   ShieldCheck, AlertCircle, Clock, ShieldX, ShieldAlert, Loader2, CheckCircle2, ArrowLeft,
 } from "lucide-react"
@@ -24,13 +25,16 @@ export default function AgentKycPage() {
   const [kycMethod, setKycMethod] = useState<KycMethod>("nin")
   const [ninValue, setNinValue] = useState("")
   const [bvnValue, setBvnValue] = useState("")
-  const [kycUrl, setKycUrl] = useState("")
+  const [kycFile, setKycFile] = useState<File | null>(null)
 
   const kycMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (kycMethod === "nin") return userApi.submitKyc({ method: "nin", nin: ninValue })
       if (kycMethod === "bvn") return userApi.submitKyc({ method: "bvn", bvn: bvnValue })
-      return userApi.submitKyc({ method: "document", kycDocumentUrl: kycUrl })
+      const file = kycFile!.type.startsWith("image/")
+        ? await compressImage(kycFile!)
+        : kycFile!
+      return userApi.uploadKycDocument(file)
     },
     onSuccess: async (res) => {
       const status = res.data?.kycStatus
@@ -45,7 +49,7 @@ export default function AgentKycPage() {
       setUser(fresh.data)
       setNinValue("")
       setBvnValue("")
-      setKycUrl("")
+      setKycFile(null)
     },
     onError: (err: unknown) =>
       toast.error(extractApiError(err, "Failed to submit KYC. Please try again.")),
@@ -191,17 +195,36 @@ export default function AgentKycPage() {
 
             {kycMethod === "document" && (
               <div className="space-y-1.5">
-                <Label htmlFor="doc-input">Government ID Document URL</Label>
-                <Input
-                  id="doc-input"
-                  value={kycUrl}
-                  onChange={(e) => setKycUrl(e.target.value)}
-                  placeholder="https://drive.google.com/..."
-                  autoComplete="off"
-                />
-                <p className="text-xs text-slate-400">
-                  Upload your ID to Google Drive or Dropbox and paste the shareable link
-                </p>
+                <Label htmlFor="doc-input">Government ID document</Label>
+                <label
+                  htmlFor="doc-input"
+                  className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 py-6 text-center hover:border-[#1a3c5e]"
+                >
+                  {kycFile ? (
+                    <>
+                      <CheckCircle2 className="h-6 w-6 text-green-600" />
+                      <span className="text-sm font-medium text-slate-700">{kycFile.name}</span>
+                      <span className="text-xs text-slate-400">Tap to choose a different file</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="h-6 w-6 text-slate-400" />
+                      <span className="text-sm font-medium text-slate-600">
+                        Upload a photo or PDF of your ID
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        NIN slip, driver&apos;s licence, or passport
+                      </span>
+                    </>
+                  )}
+                  <input
+                    id="doc-input"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    className="hidden"
+                    onChange={(e) => setKycFile(e.target.files?.[0] ?? null)}
+                  />
+                </label>
               </div>
             )}
 
@@ -211,7 +234,7 @@ export default function AgentKycPage() {
                 kycMutation.isPending ||
                 (kycMethod === "nin" && ninValue.length !== 11) ||
                 (kycMethod === "bvn" && bvnValue.length !== 11) ||
-                (kycMethod === "document" && !kycUrl.trim())
+                (kycMethod === "document" && !kycFile)
               }
               className="w-full gap-2"
             >

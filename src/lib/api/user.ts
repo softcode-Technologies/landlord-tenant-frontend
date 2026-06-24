@@ -66,6 +66,18 @@ export const userApi = {
       | { method: "document"; kycDocumentUrl: string }
   ) => apiClient.post<{ kycStatus?: string; reason?: string }>("/user/kyc", data),
 
+  // Direct ID document/photo upload — the backend stores the file and queues a
+  // manual review, so the client no longer needs to host the file itself.
+  uploadKycDocument: (file: File) => {
+    const formData = new FormData()
+    formData.append("document", file)
+    return apiClient.post<{ kycStatus?: string; kycDocumentUrl?: string; reason?: string }>(
+      "/user/kyc/document",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    )
+  },
+
   getAgreement: (tenancyId: string) =>
     apiClient.get<TenancyAgreement>(`/agreements/${tenancyId}`),
 
