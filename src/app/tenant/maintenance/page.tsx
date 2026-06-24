@@ -18,8 +18,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
 import { formatDate, getStatusVariant } from "@/lib/utils"
-import { Wrench, Plus, Loader2, AlertTriangle } from "lucide-react"
+import { compressImage } from "@/lib/image"
+import { Wrench, Plus, Loader2, AlertTriangle, ImagePlus, X } from "lucide-react"
 import { toast } from "sonner"
+import type { CreateMaintenanceData } from "@/lib/api/maintenance"
 
 const schema = z.object({
   tenancyId: z.string().min(1, "Please select a tenancy"),
@@ -39,7 +41,14 @@ const PRIORITY_COLORS: Record<string, string> = {
 
 export default function TenantMaintenancePage() {
   const [open, setOpen] = useState(false)
+  const [photos, setPhotos] = useState<File[]>([])
+  const [submitting, setSubmitting] = useState(false)
   const queryClient = useQueryClient()
+
+  const addPhotos = (files: FileList | null) => {
+    if (!files) return
+    setPhotos((prev) => [...prev, ...Array.from(files)].slice(0, 5))
+  }
 
   const { data: requestsData, isLoading } = useQuery({
     queryKey: ["maintenance-requests"],
@@ -63,17 +72,30 @@ export default function TenantMaintenancePage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: (data: FormData) => maintenanceApi.createRequest(data),
+    mutationFn: (data: CreateMaintenanceData) => maintenanceApi.createRequest(data),
     onSuccess: () => {
       toast.success("Maintenance request submitted!")
       queryClient.invalidateQueries({ queryKey: ["maintenance-requests"] })
       setOpen(false)
       reset()
+      setPhotos([])
     },
     onError: () => {
       toast.error("Failed to submit request")
     },
   })
+
+  const onSubmit = async (data: FormData) => {
+    setSubmitting(true)
+    try {
+      // Compress phone photos in the browser before upload to stay under the
+      // server's 5MB-per-image cap.
+      const compressed = await Promise.all(photos.map((p) => compressImage(p)))
+      await createMutation.mutateAsync({ ...data, photos: compressed })
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const requests = requestsData?.data ?? []
   const tenancies = tenanciesData?.data ?? []
@@ -126,6 +148,26 @@ export default function TenantMaintenancePage() {
                     <p className="text-sm text-slate-500 mb-3 line-clamp-2">
                       {req.description}
                     </p>
+                    {req.images && req.images.length > 0 && (
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        {req.images.map((url, i) => (
+                          <a
+                            key={i}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block h-16 w-16 overflow-hidden rounded-lg"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={url}
+                              alt={`Attachment ${i + 1}`}
+                              className="h-16 w-16 object-cover"
+                            />
+                          </a>
+                        ))}
+                      </div>
+                    )}
                     <div className="flex items-center gap-3 text-xs text-slate-400">
                       <span>{formatDate(req.createdAt)}</span>
                       {req.landlordNote && (
@@ -173,7 +215,7 @@ export default function TenantMaintenancePage() {
           <DialogHeader>
             <DialogTitle>Submit Maintenance Request</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit((d) => createMutation.mutate(d))} className="space-y-4 pt-2">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
             <div>
               <Label>Property / Tenancy</Label>
               <Select onValueChange={(val) => setValue("tenancyId", val)}>
@@ -243,12 +285,56 @@ export default function TenantMaintenancePage() {
               </Select>
             </div>
 
+            <div>
+              <Label>Photos (optional)</Label>
+              <p className="text-xs text-slate-400 mt-1">
+                Add up to 5 photos to help your landlord see the issue.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {photos.map((file, i) => (
+                  <div key={i} className="relative h-20 w-20">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Photo ${i + 1}`}
+                      className="h-20 w-20 rounded-lg object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPhotos((prev) => prev.filter((_, j) => j !== i))}
+                      className="absolute -right-1.5 -top-1.5 rounded-full bg-slate-900/70 p-0.5 text-white"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+                {photos.length < 5 && (
+                  <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 text-slate-400 hover:border-slate-400">
+                    <ImagePlus className="h-5 w-5" />
+                    <span className="text-[10px]">Add</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        addPhotos(e.target.files)
+                        e.target.value = ""
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="outline" className="flex-1" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" className="flex-1" disabled={createMutation.isPending}>
-                {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              <Button type="submit" className="flex-1" disabled={submitting || createMutation.isPending}>
+                {(submitting || createMutation.isPending) && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
                 Submit
               </Button>
             </div>

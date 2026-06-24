@@ -167,6 +167,23 @@ export default function LandlordMaintenancePage() {
                 <p className="text-sm text-slate-600">{selected.description}</p>
               </div>
 
+              {selected.images && selected.images.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selected.images.map((url, i) => (
+                    <a
+                      key={i}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block h-20 w-20 overflow-hidden rounded-lg"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt={`Photo ${i + 1}`} className="h-20 w-20 object-cover" />
+                    </a>
+                  ))}
+                </div>
+              )}
+
               <div>
                 <Label>Update Status</Label>
                 <Select value={newStatus} onValueChange={setNewStatus}>

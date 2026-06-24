@@ -297,6 +297,7 @@ export interface MaintenanceRequest {
   tenantUserId: string
   title: string
   description: string
+  images?: string[]
   priority: "low" | "medium" | "high" | "urgent"
   status: "open" | "in_progress" | "resolved" | "closed"
   landlordNote?: string

@@ -6,6 +6,8 @@ export interface CreateMaintenanceData {
   title: string
   description: string
   priority: "low" | "medium" | "high" | "urgent"
+  /** Optional photos of the issue — sent as multipart when present. */
+  photos?: File[]
 }
 
 export interface UpdateMaintenanceData {
@@ -23,8 +25,20 @@ export const maintenanceApi = {
 
   getRequest: (id: string) => apiClient.get<MaintenanceRequest>(`/maintenance/${id}`),
 
-  createRequest: (data: CreateMaintenanceData) =>
-    apiClient.post<MaintenanceRequest>("/maintenance", data),
+  createRequest: ({ photos, ...data }: CreateMaintenanceData) => {
+    if (photos && photos.length > 0) {
+      const formData = new FormData()
+      formData.append("tenancyId", data.tenancyId)
+      formData.append("title", data.title)
+      formData.append("description", data.description)
+      formData.append("priority", data.priority)
+      photos.forEach((file) => formData.append("images", file))
+      return apiClient.post<MaintenanceRequest>("/maintenance", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+    }
+    return apiClient.post<MaintenanceRequest>("/maintenance", data)
+  },
 
   updateRequest: (id: string, data: UpdateMaintenanceData) =>
     apiClient.patch<MaintenanceRequest>(`/maintenance/${id}`, data),
