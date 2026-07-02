@@ -4,10 +4,11 @@ import type { Property, Unit } from "@/lib/types"
 export interface CreateUnitData {
   propertyId: string
   unitNumber: string
-  bedrooms: number
-  bathrooms: number
+  bedrooms?: number
+  bathrooms?: number
   toilets?: number
   rentPerAnnum: number
+  rentCycle?: "monthly" | "yearly"
 }
 
 export const propertiesApi = {

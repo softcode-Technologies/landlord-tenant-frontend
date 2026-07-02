@@ -58,6 +58,14 @@ export default function LandlordDashboard() {
     (r) => r.status === "open" || r.status === "in_progress"
   )
 
+  // Brand-new landlord: nothing to show yet. Replace the empty analytics with a
+  // simple two-step "get started" instead of zero-value charts.
+  const firstRun =
+    !tenanciesLoading &&
+    propertiesData !== undefined &&
+    properties.length === 0 &&
+    tenancies.length === 0
+
   const chartData = analytics?.monthlyRevenue?.map((m) => ({
     month: m.month,
     revenue: m.amountKobo / 100,
@@ -74,14 +82,59 @@ export default function LandlordDashboard() {
               Here&apos;s your property portfolio overview
             </p>
           </div>
-          <Link href="/landlord/listings/new">
-            <Button className="bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2">
-              <Plus className="h-4 w-4" />
-              New Listing
-            </Button>
-          </Link>
+          {!firstRun && (
+            <Link href="/landlord/listings/new">
+              <Button className="bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2">
+                <Plus className="h-4 w-4" />
+                New Listing
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
+
+      {/* First-run: two clear ways to get the first bit of value */}
+      {firstRun && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Get started</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Link
+              href="/landlord/tenancies"
+              className="rounded-xl border border-[#1a3c5e]/20 bg-[#1a3c5e]/[0.04] p-4 hover:bg-[#1a3c5e]/[0.07] transition-colors"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <Users className="h-5 w-5 text-[#1a3c5e]" />
+                <span className="font-semibold text-slate-900">Add a tenant you already have</span>
+              </div>
+              <p className="text-sm text-slate-500">
+                Start tracking rent, receipts and renewals in minutes. Your tenant doesn&apos;t need
+                to sign up first.
+              </p>
+              <span className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#1a3c5e]">
+                Add tenant <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </Link>
+
+            <Link
+              href="/landlord/properties"
+              className="rounded-xl border border-slate-200 p-4 hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <Building2 className="h-5 w-5 text-slate-700" />
+                <span className="font-semibold text-slate-900">Add a property to list</span>
+              </div>
+              <p className="text-sm text-slate-500">
+                Add a building and its units, then list a vacant one to find new tenants.
+              </p>
+              <span className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-slate-700">
+                Add property <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* KYC banner */}
       {kycStatus === "none" && (
@@ -132,6 +185,8 @@ export default function LandlordDashboard() {
         </div>
       )}
 
+      {!firstRun && (
+      <>
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
@@ -299,6 +354,8 @@ export default function LandlordDashboard() {
           )}
         </CardContent>
       </Card>
+      </>
+      )}
     </div>
   )
 }

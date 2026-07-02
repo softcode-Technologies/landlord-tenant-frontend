@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
+import { formatNairaAmount, formatDate, getStatusVariant, extractApiError, rentAmountLabel } from "@/lib/utils"
 import { Home, MapPin, ArrowRight, Mail, CheckCircle2, Loader2, MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -98,7 +98,7 @@ export default function TenantTenanciesPage() {
                         </div>
                       )}
                       <div>
-                        <p className="text-xs text-slate-400">Annual Rent</p>
+                        <p className="text-xs text-slate-400">{rentAmountLabel(invite.rentCycle)}</p>
                         <p className="text-base font-bold text-[#1a3c5e]">
                           {formatNairaAmount(invite.rentAmount)}
                         </p>
@@ -187,7 +187,7 @@ export default function TenantTenanciesPage() {
 
                     <div className="flex flex-wrap gap-4">
                       <div>
-                        <p className="text-xs text-slate-400">Annual Rent</p>
+                        <p className="text-xs text-slate-400">{rentAmountLabel(tenancy.rentCycle)}</p>
                         <p className="text-base font-bold text-[#1a3c5e]">
                           {formatNairaAmount(tenancy.rentAmount)}
                         </p>

@@ -45,6 +45,24 @@ export function formatNairaAmount(naira: number): string {
   }).format(naira)
 }
 
+export type RentCycle = "monthly" | "yearly"
+
+// Rent display helpers. Default to yearly when the cycle is absent, so existing
+// residential data keeps showing "/yr" / "Annual" exactly as before — only
+// monthly (shop) leases render differently.
+export function rentCycleSuffix(cycle?: RentCycle | null): string {
+  return cycle === "monthly" ? "/mo" : "/yr"
+}
+
+export function rentCycleWord(cycle?: RentCycle | null): string {
+  return cycle === "monthly" ? "month" : "year"
+}
+
+// "Monthly rent" | "Annual rent" — for labels.
+export function rentAmountLabel(cycle?: RentCycle | null): string {
+  return cycle === "monthly" ? "Monthly rent" : "Annual rent"
+}
+
 /** Convert naira to kobo */
 export function toKobo(naira: number): number {
   return Math.round(naira * 100)

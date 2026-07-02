@@ -2,10 +2,10 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { MapPin, Bed, Bath, Heart, Star, BadgeCheck, Eye, Building2 } from "lucide-react"
+import { MapPin, Bed, Bath, Heart, Star, BadgeCheck, Eye, Building2, Store } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { formatNairaAmount } from "@/lib/utils"
+import { formatNairaAmount, rentCycleWord } from "@/lib/utils"
 import type { Listing } from "@/lib/types"
 import { useState } from "react"
 import { listingsApi } from "@/lib/api/listings"
@@ -118,18 +118,27 @@ export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
           </div>
 
           <div className="flex items-center gap-3 text-xs text-slate-500 mb-4">
-            <div className="flex items-center gap-1">
-              <Bed className="h-3.5 w-3.5" />
-              <span>{listing.bedrooms} bed{listing.bedrooms !== 1 ? "s" : ""}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Bath className="h-3.5 w-3.5" />
-              <span>{listing.bathrooms} bath{listing.bathrooms !== 1 ? "s" : ""}</span>
-            </div>
-            {listing.isFurnished && (
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                Furnished
-              </Badge>
+            {listing.propertyType === "commercial" ? (
+              <div className="flex items-center gap-1">
+                <Store className="h-3.5 w-3.5" />
+                <span>Shop / commercial space</span>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-1">
+                  <Bed className="h-3.5 w-3.5" />
+                  <span>{listing.bedrooms} bed{listing.bedrooms !== 1 ? "s" : ""}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Bath className="h-3.5 w-3.5" />
+                  <span>{listing.bathrooms} bath{listing.bathrooms !== 1 ? "s" : ""}</span>
+                </div>
+                {listing.isFurnished && (
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                    Furnished
+                  </Badge>
+                )}
+              </>
             )}
           </div>
 
@@ -138,7 +147,7 @@ export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
               <span className="text-lg font-bold text-[#1a3c5e]">
                 {formatNairaAmount(listing.rentPerAnnum)}
               </span>
-              <span className="text-xs text-slate-400">/year</span>
+              <span className="text-xs text-slate-400">/{rentCycleWord(listing.rentCycle)}</span>
             </div>
             <Button size="sm" variant="outline" className="text-xs h-7 px-3">
               View

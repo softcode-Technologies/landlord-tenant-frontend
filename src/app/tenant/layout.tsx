@@ -20,6 +20,7 @@ import {
   Gift,
   KeyRound,
   PiggyBank,
+  Search,
 } from "lucide-react"
 
 function TenantNav({ children }: { children: React.ReactNode }) {
@@ -32,28 +33,35 @@ function TenantNav({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { label: "Dashboard", href: "/tenant", icon: LayoutDashboard },
-    { label: "My Tenancies", href: "/tenant/tenancies", icon: Home },
-    { label: "Tenancy Invites", href: "/tenant/invites", icon: KeyRound },
-    { label: "Inspections", href: "/tenant/inspections", icon: Calendar },
-    { label: "Maintenance", href: "/tenant/maintenance", icon: Wrench },
-    { label: "Wallet", href: "/tenant/wallet", icon: Wallet },
-    { label: "Rent Savings", href: "/tenant/savings", icon: PiggyBank },
+
+    { label: "Find a home", href: "/listings", icon: Search, section: "Find a home" },
+    { label: "Saved homes", href: "/tenant/saved", icon: Heart, section: "Find a home" },
+
+    { label: "My tenancies", href: "/tenant/tenancies", icon: Home, section: "My renting" },
+    { label: "Invites", href: "/tenant/invites", icon: KeyRound, section: "My renting" },
+    { label: "Inspections", href: "/tenant/inspections", icon: Calendar, section: "My renting" },
+    { label: "Maintenance", href: "/tenant/maintenance", icon: Wrench, section: "My renting" },
+
+    { label: "Wallet", href: "/tenant/wallet", icon: Wallet, section: "Money" },
+    { label: "Rent savings", href: "/tenant/savings", icon: PiggyBank, section: "Money" },
     {
-      label: "Refer & Earn",
+      label: "Refer & earn",
       href: "/tenant/referrals",
       icon: Gift,
       locked: !REFERRALS_ENABLED,
       lockedHint: "Coming soon",
+      section: "Money",
     },
-    { label: "Saved Listings", href: "/tenant/saved", icon: Heart },
-    { label: "Messages", href: "/tenant/messages", icon: MessageCircle },
+
+    { label: "Messages", href: "/tenant/messages", icon: MessageCircle, section: "Account" },
     {
       label: "Notifications",
       href: "/tenant/notifications",
       icon: Bell,
       badge: unreadCount > 0 ? unreadCount : undefined,
+      section: "Account",
     },
-    { label: "Profile", href: "/tenant/profile", icon: User },
+    { label: "Profile", href: "/tenant/profile", icon: User, section: "Account" },
   ]
 
   return (

@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatNairaAmount, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
+import { formatNairaAmount, formatDate, getStatusVariant, extractApiError, rentAmountLabel, rentCycleWord, rentCycleSuffix } from "@/lib/utils"
 import { UserPlus, Plus, Copy, Loader2, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { RentFeeBreakdown } from "@/components/shared/rent-fee-breakdown"
@@ -23,6 +23,7 @@ interface InviteFormData {
   invitedPhone: string
   firstName: string
   rentAmount: string
+  rentCycle: "monthly" | "yearly"
   startDate: string
   endDate: string
 }
@@ -46,6 +47,7 @@ export default function LandlordInvitesPage() {
     invitedPhone: "",
     firstName: "",
     rentAmount: "",
+    rentCycle: "yearly",
     startDate: "",
     endDate: "",
   })
@@ -54,7 +56,7 @@ export default function LandlordInvitesPage() {
     setForm((f) => ({ ...f, [key]: value }))
 
   const resetForm = () =>
-    setForm({ unitId: "", invitedPhone: "", firstName: "", rentAmount: "", startDate: "", endDate: "" })
+    setForm({ unitId: "", invitedPhone: "", firstName: "", rentAmount: "", rentCycle: "yearly", startDate: "", endDate: "" })
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -65,6 +67,7 @@ export default function LandlordInvitesPage() {
         // rentAmount is stored in naira (matches unit.rentPerAnnum and the
         // payment service). The form value is already naira — do NOT ×100.
         rentAmount: parseInt(form.rentAmount),
+        rentCycle: form.rentCycle,
         startDate: form.startDate,
         endDate: form.endDate,
       }),
@@ -146,7 +149,7 @@ export default function LandlordInvitesPage() {
                       <span>{invite.unit?.unitNumber}</span>
                       <span>{invite.unit?.property?.name}</span>
                       <span className="font-semibold text-[#1a3c5e]">
-                        {formatNairaAmount(invite.rentAmount)}/yr
+                        {formatNairaAmount(invite.rentAmount)}{rentCycleSuffix(invite.rentCycle)}
                       </span>
                     </div>
 
@@ -212,6 +215,7 @@ export default function LandlordInvitesPage() {
                     ...f,
                     unitId: val,
                     rentAmount: unit?.rentPerAnnum != null ? String(unit.rentPerAnnum) : f.rentAmount,
+                    rentCycle: unit?.rentCycle ?? f.rentCycle,
                   }))
                 }}
               >
@@ -250,7 +254,7 @@ export default function LandlordInvitesPage() {
             </div>
 
             <div>
-              <Label>Annual Rent (₦)</Label>
+              <Label>{rentAmountLabel(form.rentCycle)} (₦)</Label>
               <Input
                 type="number"
                 value={form.rentAmount}
@@ -259,7 +263,7 @@ export default function LandlordInvitesPage() {
                 className="mt-1.5 bg-slate-50 text-slate-700 cursor-not-allowed"
               />
               <p className="text-xs text-slate-400 mt-1.5">
-                Set from the selected unit. Edit the unit to change its rent.
+                Set from the selected unit ({rentCycleWord(form.rentCycle)}ly). Edit the unit to change its rent.
               </p>
               {Number(form.rentAmount) > 0 && (
                 <RentFeeBreakdown rentNaira={Number(form.rentAmount)} className="mt-2.5" />

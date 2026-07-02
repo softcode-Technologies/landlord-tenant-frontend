@@ -7,6 +7,8 @@ import { tenanciesApi } from "@/lib/api/tenancies"
 import { paymentsApi } from "@/lib/api/payments"
 import { userApi } from "@/lib/api/user"
 import { reviewsApi } from "@/lib/api/reviews"
+import { escrowApi } from "@/lib/api/escrow"
+import { configApi } from "@/lib/api/config"
 import { useAuthStore } from "@/lib/store/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -16,8 +18,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { formatNairaAmount, formatNaira, formatDate, getStatusVariant, extractApiError } from "@/lib/utils"
-import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink, PenLine, Star, CheckCircle2 } from "lucide-react"
+import { formatNairaAmount, formatNaira, formatDate, getStatusVariant, extractApiError, rentAmountLabel } from "@/lib/utils"
+import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink, PenLine, Star, CheckCircle2, ShieldCheck, Clock } from "lucide-react"
 import { RentHistoryCard } from "@/components/shared/rent-history-card"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -54,6 +56,39 @@ export default function TenantTenancyDetailPage() {
     onError: () => {
       toast.error("Failed to initiate payment")
     },
+  })
+
+  const { data: configData } = useQuery({
+    queryKey: ["app-config"],
+    queryFn: () => configApi.getConfig(),
+    staleTime: 5 * 60 * 1000,
+  })
+  const depositEscrowEnabled = configData?.data?.features?.depositEscrowEnabled ?? false
+
+  // The tenant's deposit escrow for this tenancy, if any. Drives the deposit card.
+  const { data: depositEscrowsData } = useQuery({
+    queryKey: ["my-deposit-escrows"],
+    queryFn: () => escrowApi.listMyDeposits(),
+    enabled: depositEscrowEnabled,
+  })
+  const depositEscrow = (depositEscrowsData?.data?.asTenant ?? []).find((e) => e.tenancyId === id)
+
+  const payDepositMutation = useMutation({
+    mutationFn: () => paymentsApi.payDeposit(id),
+    onSuccess: (res) => {
+      if (res.data.paymentUrl) window.location.href = res.data.paymentUrl
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to start deposit payment")),
+  })
+
+  const confirmMoveInMutation = useMutation({
+    mutationFn: () => escrowApi.confirmMoveIn(depositEscrow!.id),
+    onSuccess: () => {
+      toast.success("Move-in confirmed — your deposit is secured")
+      queryClient.invalidateQueries({ queryKey: ["my-deposit-escrows"] })
+      queryClient.invalidateQueries({ queryKey: ["tenancy", id] })
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to confirm move-in")),
   })
 
   const signMutation = useMutation({
@@ -219,7 +254,7 @@ export default function TenantTenancyDetailPage() {
 
               <div className="border-t pt-4 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500">Annual Rent</span>
+                  <span className="text-sm text-slate-500">{rentAmountLabel(tenancy.rentCycle)}</span>
                   <span className="text-xl font-bold text-[#1a3c5e]">
                     {formatNairaAmount(tenancy.rentAmount)}
                   </span>
@@ -238,10 +273,104 @@ export default function TenantTenancyDetailPage() {
           {/* Deposit Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Security Deposit</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                Security Deposit
+                {depositEscrow && (depositEscrow.status === "holding" || depositEscrow.status === "secured") && (
+                  <Badge variant="outline" className="gap-1 text-[#1a3c5e] border-[#1a3c5e]/30">
+                    <ShieldCheck className="h-3 w-3" /> In escrow
+                  </Badge>
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              {tenancy.depositAmount ? (
+              {depositEscrow ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span className="text-sm text-slate-600">Deposit Amount</span>
+                    <span className="font-bold text-slate-900">
+                      {formatNaira(depositEscrow.amountKobo)}
+                    </span>
+                  </div>
+
+                  {depositEscrow.status === "holding" && (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 space-y-3">
+                      <div className="flex items-start gap-2 text-sm text-amber-800">
+                        <Clock className="h-4 w-4 mt-0.5 shrink-0" />
+                        <span>
+                          Your deposit is held safely in escrow. Confirm move-in once you have the
+                          keys to secure it. If you don&apos;t move in by{" "}
+                          <strong>{formatDate(depositEscrow.refundAfter)}</strong>, it&apos;s
+                          automatically refunded to your wallet.
+                        </span>
+                      </div>
+                      <Button
+                        className="w-full gap-2"
+                        onClick={() => confirmMoveInMutation.mutate()}
+                        disabled={confirmMoveInMutation.isPending}
+                      >
+                        {confirmMoveInMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="h-4 w-4" />
+                        )}
+                        I&apos;ve moved in — confirm
+                      </Button>
+                    </div>
+                  )}
+
+                  {depositEscrow.status === "secured" && (
+                    <div className="rounded-xl border border-green-200 bg-green-50 p-3 flex items-start gap-2 text-sm text-green-700">
+                      <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0" />
+                      <span>
+                        Move-in confirmed{depositEscrow.securedAt ? ` on ${formatDate(depositEscrow.securedAt)}` : ""}.
+                        Your deposit is held for your tenancy and refunded to you at move-out.
+                      </span>
+                    </div>
+                  )}
+
+                  {depositEscrow.status === "refunded" && (
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 flex items-start gap-2 text-sm text-blue-700">
+                      <Wallet className="h-4 w-4 mt-0.5 shrink-0" />
+                      <span>
+                        Refunded to your wallet{depositEscrow.refundedAt ? ` on ${formatDate(depositEscrow.refundedAt)}` : ""}
+                        {depositEscrow.refundReason === "auto_no_confirmation"
+                          ? " — move-in wasn't confirmed in time."
+                          : depositEscrow.refundReason === "moveout_return"
+                            ? " — returned at the end of your tenancy."
+                            : "."}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : depositEscrowEnabled && tenancy.status === "active" && tenancy.depositAmount && tenancy.depositStatus !== "held" ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span className="text-sm text-slate-600">Deposit Amount</span>
+                    <span className="font-bold text-slate-900">
+                      {formatNaira(tenancy.depositAmount)}
+                    </span>
+                  </div>
+                  <div className="rounded-xl border border-[#1a3c5e]/20 bg-[#1a3c5e]/5 p-3 flex items-start gap-2 text-sm text-[#1a3c5e]">
+                    <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0" />
+                    <span>
+                      Pay your deposit into escrow. We hold it until you confirm move-in — so you
+                      can&apos;t lose it to a no-show.
+                    </span>
+                  </div>
+                  <Button
+                    className="w-full gap-2"
+                    onClick={() => payDepositMutation.mutate()}
+                    disabled={payDepositMutation.isPending}
+                  >
+                    {payDepositMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <ShieldCheck className="h-4 w-4" />
+                    )}
+                    Pay deposit into escrow
+                  </Button>
+                </div>
+              ) : tenancy.depositAmount ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                     <span className="text-sm text-slate-600">Deposit Amount</span>

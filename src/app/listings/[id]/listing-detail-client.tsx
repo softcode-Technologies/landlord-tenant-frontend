@@ -25,7 +25,7 @@ import { inspectionsApi } from "@/lib/api/inspections"
 import { reviewsApi } from "@/lib/api/reviews"
 import { messagingApi } from "@/lib/api/messaging"
 import { useAuthStore } from "@/lib/store/auth"
-import { formatNairaAmount, formatDate, getInitials } from "@/lib/utils"
+import { formatNairaAmount, formatDate, getInitials, rentCycleSuffix, rentCycleWord } from "@/lib/utils"
 import type { Listing } from "@/lib/types"
 import {
   MapPin, Bed, Bath, Star, Heart, Share2, Calendar, Phone,
@@ -175,6 +175,22 @@ export function ListingDetailClient({ initialListing }: Props) {
   const feeEnabled = unlockConfigData?.data?.feeEnabled ?? true
   const feeKobo = unlockConfigData?.data?.feeKobo ?? 150000
   const feeNaira = `₦${(feeKobo / 100).toLocaleString("en-NG")}`
+  const firstUnlockFreePolicy = unlockConfigData?.data?.firstUnlockFree ?? false
+
+  // Per-user: is THIS user's first unlock still free? Only queried when signed in.
+  const { data: unlockStatusData } = useQuery({
+    queryKey: ["unlock-status"],
+    queryFn: () => inspectionsApi.getUnlockStatus(),
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000,
+  })
+  const firstUnlockAvailable = unlockStatusData?.data?.firstUnlockAvailable ?? false
+
+  // The fee applies, but this unlock will be free: a signed-in user with their
+  // first unlock still available, or a signed-out viewer while the promo is on
+  // (they have no account yet, so their first unlock will be free).
+  const firstFree = feeEnabled && (isAuthenticated ? firstUnlockAvailable : firstUnlockFreePolicy)
+  const willBeFree = !feeEnabled || firstFree
 
   const unlockMutation = useMutation({
     mutationFn: () => inspectionsApi.unlockListing(id),
@@ -183,9 +199,10 @@ export function ListingDetailClient({ initialListing }: Props) {
         window.location.href = res.data.paymentUrl
         return
       }
-      // Free unlock (promo) — access granted immediately, no payment.
+      // Free unlock (promo or first-unlock-free) — access granted immediately.
       queryClient.invalidateQueries({ queryKey: ["listing-contact", id] })
-      toast.success("Contact unlocked!")
+      queryClient.invalidateQueries({ queryKey: ["unlock-status"] })
+      toast.success(res.data.reason === "first_unlock_free" ? "Your first unlock is on us 🎉" : "Contact unlocked!")
     },
     onError: () => {
       toast.error("Failed to unlock contact. Please try again.")
@@ -264,7 +281,7 @@ export function ListingDetailClient({ initialListing }: Props) {
   const handleWhatsApp = () => {
     if (!listing) return
     const location = [listing.area, listing.city, listing.state].filter(Boolean).join(", ")
-    const text = `Check out this ${listing.bedrooms} bed ${listing.propertyType} in ${location} for ₦${Number(listing.rentPerAnnum).toLocaleString("en-NG")}/year on ${BRAND_NAME}:\n${window.location.href}`
+    const text = `Check out this ${listing.bedrooms} bed ${listing.propertyType} in ${location} for ₦${Number(listing.rentPerAnnum).toLocaleString("en-NG")}/${rentCycleWord(listing.rentCycle)} on ${BRAND_NAME}:\n${window.location.href}`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank")
   }
 
@@ -603,7 +620,7 @@ export function ListingDetailClient({ initialListing }: Props) {
                   <span className="text-3xl font-bold text-[#1a3c5e] dark:text-blue-400">
                     {formatNairaAmount(listing.rentPerAnnum)}
                   </span>
-                  <span className="text-slate-400 text-sm">/year</span>
+                  <span className="text-slate-400 text-sm">{rentCycleSuffix(listing.rentCycle)}</span>
                 </div>
 
                 {contact ? (
@@ -674,12 +691,14 @@ export function ListingDetailClient({ initialListing }: Props) {
                       ) : (
                         <Phone className="h-4 w-4" />
                       )}
-                      {feeEnabled ? "Unlock Contact" : "Unlock Contact — Free"}
+                      {willBeFree ? "Unlock Contact — Free" : "Unlock Contact"}
                     </Button>
                     <p className="text-xs text-slate-400 text-center">
-                      {feeEnabled
-                        ? `Pay ${feeNaira} to unlock verified landlord contact details, then book an inspection`
-                        : "Unlock the verified landlord's contact for free, then book an inspection"}
+                      {!feeEnabled
+                        ? "Unlock the verified landlord's contact for free, then book an inspection"
+                        : firstFree
+                          ? `Your first unlock is on us — then ${feeNaira} each. Unlock the verified landlord's contact, then book an inspection.`
+                          : `Pay ${feeNaira} to unlock verified landlord contact details, then book an inspection`}
                     </p>
                   </>
                 )}
@@ -722,7 +741,7 @@ export function ListingDetailClient({ initialListing }: Props) {
         <div className="min-w-0">
           <p className="text-lg font-bold text-[#1a3c5e] dark:text-blue-400 leading-tight">
             {formatNairaAmount(listing.rentPerAnnum)}
-            <span className="text-xs font-normal text-slate-400">/yr</span>
+            <span className="text-xs font-normal text-slate-400">{rentCycleSuffix(listing.rentCycle)}</span>
           </p>
         </div>
         {contact ? (
@@ -761,7 +780,7 @@ export function ListingDetailClient({ initialListing }: Props) {
             ) : (
               <Phone className="h-4 w-4" />
             )}
-            {feeEnabled ? "Unlock Contact" : "Unlock Contact — Free"}
+            {willBeFree ? "Unlock Contact — Free" : "Unlock Contact"}
           </Button>
         )}
       </div>
