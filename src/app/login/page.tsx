@@ -144,14 +144,16 @@ function LoginContent() {
 
       toast.success(isNew ? "Account created! Let's set up your profile." : `Welcome back${user.firstName ? `, ${user.firstName}` : ""}!`)
 
-      // New users go to onboarding; existing users go to their dashboard (or the requested redirect)
-      if (isNew) {
-        // Carry the redirect through onboarding so a first-timer who came here to
-        // unlock a listing lands back on that listing once their profile is set
-        // up — not the bare dashboard.
-        router.push(redirect ? `/onboarding?redirect=${encodeURIComponent(redirect)}` : "/onboarding")
-      } else if (redirect) {
+      // Invited tenants must NOT go through role-selection onboarding — accepting
+      // the invite is what makes them a tenant and fills in their profile. Send them
+      // straight back to the invite page (which auto-accepts), new or not.
+      const isInviteFlow = redirect.startsWith("/invite/")
+      if (redirect && (isInviteFlow || !isNew)) {
         router.push(redirect)
+      } else if (isNew) {
+        // Carry the redirect through onboarding so a first-timer who came here to
+        // unlock a listing lands back on that listing once their profile is set up.
+        router.push(redirect ? `/onboarding?redirect=${encodeURIComponent(redirect)}` : "/onboarding")
       } else {
         router.push(getRoleDashboardPath(user))
       }

@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { invitesApi } from "@/lib/api/invites"
@@ -34,8 +35,9 @@ export default function InvitePage() {
       toast.success("Invite accepted! Welcome to your new home.")
       router.push("/tenant/tenancies")
     },
-    onError: () => {
-      toast.error("Failed to accept invite. Please try again.")
+    onError: (err: unknown) => {
+      const ax = err as AxiosError<{ error?: { message?: string } }>
+      toast.error(ax?.response?.data?.error?.message ?? "Failed to accept invite. Please try again.")
     },
   })
 
@@ -48,6 +50,22 @@ export default function InvitePage() {
   }
 
   const invite = data?.data
+
+  // Auto-accept once the tenant returns from login — no second click needed, and
+  // no detour through onboarding/role-selection. Guarded so it fires only once.
+  const autoAcceptedRef = useRef(false)
+  useEffect(() => {
+    if (
+      isAuthenticated &&
+      invite?.status === "pending" &&
+      !acceptMutation.isPending &&
+      !autoAcceptedRef.current
+    ) {
+      autoAcceptedRef.current = true
+      acceptMutation.mutate()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, invite?.status])
 
   if (isLoading) {
     return (
