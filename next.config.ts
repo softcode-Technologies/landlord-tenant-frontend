@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare"
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -31,3 +32,6 @@ const nextConfig: NextConfig = {
 }
 
 export default nextConfig
+
+// Makes Cloudflare bindings available during `next dev` (no-op in production build).
+initOpenNextCloudflareForDev()

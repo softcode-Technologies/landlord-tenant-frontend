@@ -22,7 +22,7 @@ const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
   { value: "bungalow", label: "Bungalow" },
   { value: "self_contain", label: "Self-Contain" },
   { value: "room_and_parlour", label: "Room & Parlour" },
-  { value: "commercial", label: "Commercial" },
+  { value: "commercial", label: "Shop / Commercial" },
   { value: "land", label: "Land" },
 ]
 
@@ -236,7 +236,7 @@ function ListingsContent() {
 
                 {/* Rent range */}
                 <div>
-                  <Label className="mb-2 block">Min Rent (₦/year)</Label>
+                  <Label className="mb-2 block">Min Rent (₦)</Label>
                   <Input
                     type="number"
                     placeholder="e.g. 500,000"
@@ -246,7 +246,7 @@ function ListingsContent() {
                 </div>
 
                 <div>
-                  <Label className="mb-2 block">Max Rent (₦/year)</Label>
+                  <Label className="mb-2 block">Max Rent (₦)</Label>
                   <Input
                     type="number"
                     placeholder="e.g. 3,000,000"

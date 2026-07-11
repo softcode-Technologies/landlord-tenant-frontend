@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "krib-frontend",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  // nodejs_compat: run Next.js on the Node.js runtime (full-featured, not Edge).
+  // global_fetch_strictly_public: server-side fetch() (e.g. listings/[id] calling
+  //   api.kribhq.com) goes over the real public internet instead of being intercepted.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  }
+  // After the first deploy, add your custom domain (kribhq.com) in the Cloudflare
+  // dashboard: Workers & Pages -> krib-frontend -> Settings -> Domains & Routes.
+}

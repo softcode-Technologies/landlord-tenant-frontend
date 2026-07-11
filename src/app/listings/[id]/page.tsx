@@ -4,6 +4,7 @@ import { ListingDetailClient } from "./listing-detail-client"
 import type { Listing } from "@/lib/types"
 import { normalizeRawListing, type RawListing } from "@/lib/api/normalize-listing"
 import { BRAND_NAME } from "@/lib/config/brand"
+import { rentCycleWord } from "@/lib/utils"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1"
 
@@ -48,7 +49,7 @@ export async function generateMetadata({
     : "Property"
   const bedPrefix = listing.bedrooms ? `${listing.bedrooms} Bed ` : ""
   const title = `${bedPrefix}${propertyType} for Rent${location ? ` in ${location}` : ""}`
-  const price = `₦${Number(listing.rentPerAnnum).toLocaleString("en-NG")}/year`
+  const price = `₦${Number(listing.rentPerAnnum).toLocaleString("en-NG")}/${rentCycleWord(listing.rentCycle)}`
   const extras = [
     listing.isFurnished && "Furnished",
     listing.isServiced && "Serviced",

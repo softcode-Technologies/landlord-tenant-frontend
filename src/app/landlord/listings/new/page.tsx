@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Loader2, Bed, Bath, DoorOpen, Banknote } from "lucide-react"
+import { rentCycleWord } from "@/lib/utils"
 import Link from "next/link"
 import { toast } from "sonner"
 import apiClient from "@/lib/api/client"
@@ -199,7 +200,7 @@ export default function NewListingPage() {
                       <p className="text-sm font-semibold text-slate-900">
                         ₦{Number(selectedUnit.rentPerAnnum).toLocaleString()}
                       </p>
-                      <p className="text-xs text-slate-500">Base rent / yr</p>
+                      <p className="text-xs text-slate-500">Base rent / {rentCycleWord(selectedUnit.rentCycle)}</p>
                     </div>
                   </div>
                 </div>
@@ -244,7 +245,7 @@ export default function NewListingPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>
-                  Annual Rent (₦)
+                  {selectedUnit?.rentCycle === "monthly" ? "Monthly" : "Annual"} Rent (₦)
                   {selectedUnit?.rentPerAnnum && (
                     <span className="ml-2 text-xs font-normal text-green-600">
                       pre-filled from unit

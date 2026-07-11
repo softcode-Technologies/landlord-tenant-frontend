@@ -1,8 +1,34 @@
 import apiClient from "./client"
 import type { Tenancy, CreditScore, RentChange, ScreeningReport } from "@/lib/types"
 
+export interface AddExistingTenantData {
+  unitId: string
+  phone: string
+  firstName: string
+  lastName?: string
+  email?: string
+  rentAmount: number
+  rentCycle?: "monthly" | "yearly"
+  startDate: string
+  endDate?: string
+  paymentDayOfMonth?: number
+  depositAmount?: number
+}
+
+export interface AddExistingTenantResult {
+  tenancyId: string
+  tenantUserId: string
+  tenantIsNew: boolean
+  claimMessage: string
+}
+
 export const tenanciesApi = {
   getLandlordTenancies: () => apiClient.get<Tenancy[]>("/tenancies/landlord"),
+
+  // Onboard a tenant already living in a unit — creates a managed tenancy now,
+  // and an unclaimed phone-keyed account if they're not on the platform yet.
+  addExistingTenant: (data: AddExistingTenantData) =>
+    apiClient.post<AddExistingTenantResult>("/tenancies", data),
 
   getTenantTenancies: () => apiClient.get<Tenancy[]>("/tenancies/tenant"),
 

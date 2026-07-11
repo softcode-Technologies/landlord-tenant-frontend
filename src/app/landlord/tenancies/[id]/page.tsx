@@ -5,7 +5,9 @@ import { useParams, useRouter } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { tenanciesApi } from "@/lib/api/tenancies"
 import { userApi } from "@/lib/api/user"
-import { FileText, ExternalLink, Send, PenLine } from "lucide-react"
+import { escrowApi } from "@/lib/api/escrow"
+import { configApi } from "@/lib/api/config"
+import { FileText, ExternalLink, Send, PenLine, ShieldCheck, Clock } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -14,7 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatNaira, formatNairaAmount, formatDate, getStatusVariant, getInitials, extractApiError } from "@/lib/utils"
+import { formatNaira, formatNairaAmount, formatDate, getStatusVariant, getInitials, extractApiError, rentAmountLabel } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Calendar, DollarSign, Shield, Trash2, RefreshCw, Loader2, Pencil } from "lucide-react"
 import { RentHistoryCard } from "@/components/shared/rent-history-card"
@@ -49,6 +51,20 @@ export default function LandlordTenancyDetailPage() {
     queryKey: ["tenancy", id],
     queryFn: () => tenanciesApi.getTenancy(id),
   })
+
+  const { data: configData } = useQuery({
+    queryKey: ["app-config"],
+    queryFn: () => configApi.getConfig(),
+    staleTime: 5 * 60 * 1000,
+  })
+  const depositEscrowEnabled = configData?.data?.features?.depositEscrowEnabled ?? false
+
+  const { data: depositEscrowsData } = useQuery({
+    queryKey: ["my-deposit-escrows"],
+    queryFn: () => escrowApi.listMyDeposits(),
+    enabled: depositEscrowEnabled,
+  })
+  const depositEscrow = (depositEscrowsData?.data?.asLandlord ?? []).find((e) => e.tenancyId === id)
 
   const editRentMutation = useMutation({
     mutationFn: () =>
@@ -250,7 +266,7 @@ export default function LandlordTenancyDetailPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label: "Annual Rent", value: formatNairaAmount(tenancy.rentAmount) },
+                  { label: rentAmountLabel(tenancy.rentCycle), value: formatNairaAmount(tenancy.rentAmount) },
                   { label: "Start Date", value: formatDate(tenancy.startDate) },
                   { label: "End Date", value: formatDate(tenancy.endDate) },
                   { label: "Next Rent Due", value: nextRentDue },
@@ -272,8 +288,15 @@ export default function LandlordTenancyDetailPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Security Deposit</CardTitle>
-                {!tenancy.depositAmount && (
+                <CardTitle className="flex items-center gap-2">
+                  Security Deposit
+                  {depositEscrow && (depositEscrow.status === "holding" || depositEscrow.status === "secured") && (
+                    <Badge variant="outline" className="gap-1 text-[#1a3c5e] border-[#1a3c5e]/30">
+                      <ShieldCheck className="h-3 w-3" /> In escrow
+                    </Badge>
+                  )}
+                </CardTitle>
+                {!tenancy.depositAmount && !depositEscrow && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -285,7 +308,68 @@ export default function LandlordTenancyDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {tenancy.depositAmount ? (
+              {depositEscrow ? (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                    <span className="text-sm text-slate-600">Amount</span>
+                    <span className="font-bold text-slate-900">
+                      {formatNaira(depositEscrow.amountKobo)}
+                    </span>
+                  </div>
+
+                  {depositEscrow.status === "holding" && (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 flex items-start gap-2 text-sm text-amber-800">
+                      <Clock className="h-4 w-4 mt-0.5 shrink-0" />
+                      <span>
+                        Held in escrow. It secures as the deposit once the tenant confirms move-in,
+                        and auto-refunds to them by <strong>{formatDate(depositEscrow.refundAfter)}</strong>{" "}
+                        if they don&apos;t.
+                      </span>
+                    </div>
+                  )}
+
+                  {depositEscrow.status === "secured" && (
+                    <>
+                      <div className="rounded-xl border border-green-200 bg-green-50 p-3 flex items-start gap-2 text-sm text-green-700">
+                        <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0" />
+                        <span>
+                          Tenant moved in{depositEscrow.securedAt ? ` on ${formatDate(depositEscrow.securedAt)}` : ""}.
+                          Deposit is held for the tenancy. Returning it refunds the tenant&apos;s wallet.
+                        </span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          tenanciesApi.returnDeposit(id, {
+                            depositReturnedAt: new Date().toISOString(),
+                          }).then(() => {
+                            toast.success("Deposit refunded to tenant")
+                            queryClient.invalidateQueries({ queryKey: ["tenancy", id] })
+                            queryClient.invalidateQueries({ queryKey: ["my-deposit-escrows"] })
+                          }).catch((err: unknown) => toast.error(extractApiError(err, "Failed to return deposit")))
+                        }
+                      >
+                        Return deposit
+                      </Button>
+                    </>
+                  )}
+
+                  {depositEscrow.status === "refunded" && (
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 flex items-start gap-2 text-sm text-blue-700">
+                      <DollarSign className="h-4 w-4 mt-0.5 shrink-0" />
+                      <span>
+                        Refunded to tenant{depositEscrow.refundedAt ? ` on ${formatDate(depositEscrow.refundedAt)}` : ""}
+                        {depositEscrow.refundReason === "auto_no_confirmation"
+                          ? " — move-in wasn't confirmed in time."
+                          : depositEscrow.refundReason === "moveout_return"
+                            ? " — returned at end of tenancy."
+                            : "."}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : tenancy.depositAmount ? (
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
                     <span className="text-sm text-slate-600">Amount</span>

@@ -3,6 +3,7 @@ import apiClient from "./client"
 export interface AppConfig {
   features: {
     listingBoostEnabled: boolean
+    depositEscrowEnabled?: boolean
     kycMode: "manual" | "automatic"
     whatsappOptInDefault: boolean
   }
@@ -12,6 +13,7 @@ export interface AppConfig {
     platformCommissionPercent: number
     referralRewardKobo: number
     escrowHoldHours: number
+    depositEscrowHoldHours?: number
     listingBoostTiers: { days: number; priceKobo: number }[]
   }
   links: {

@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { formatNairaAmount, extractApiError } from "@/lib/utils"
+import { formatNairaAmount, extractApiError, rentCycleSuffix } from "@/lib/utils"
 import { compressImage } from "@/lib/image"
 import { ArrowLeft, Building2, Bed, Bath, MapPin, Plus, Loader2, Image, Upload, X as XIcon, UserCheck, UserMinus } from "lucide-react"
 import Link from "next/link"
@@ -36,6 +36,7 @@ export default function PropertyDetailPage() {
   const [unitBaths, setUnitBaths] = useState("")
   const [unitToilets, setUnitToilets] = useState("")
   const [unitRent, setUnitRent] = useState("")
+  const [unitCycle, setUnitCycle] = useState<"monthly" | "yearly">("yearly")
   const [imagesUnitId, setImagesUnitId] = useState<string | null>(null)
   const [unitFiles, setUnitFiles] = useState<File[]>([])
   const unitFileRef = useRef<HTMLInputElement>(null)
@@ -143,23 +144,34 @@ export default function PropertyDetailPage() {
     setUnitRent("")
   }
 
+  const property = data?.data
+  // Shops/commercial units have no bedrooms/bathrooms and rent monthly.
+  const isCommercial = property?.propertyType === "commercial"
+
+  // Open the add-unit dialog with the cycle defaulted from the property type
+  // (monthly for shops, yearly for homes); the landlord can still change it.
+  const openAddUnit = () => {
+    setUnitCycle(isCommercial ? "monthly" : "yearly")
+    setShowAddUnit(true)
+  }
+
   const handleAddUnit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!unitLabel.trim() || !unitBeds || !unitBaths || !unitRent) {
+    // Bedrooms/bathrooms are only required for residential units.
+    if (!unitLabel.trim() || !unitRent || (!isCommercial && (!unitBeds || !unitBaths))) {
       toast.error("Please fill in all required fields")
       return
     }
     addUnitMutation.mutate({
       propertyId: id,
       unitNumber: unitLabel.trim(),
-      bedrooms: Number(unitBeds),
-      bathrooms: Number(unitBaths),
-      toilets: unitToilets ? Number(unitToilets) : undefined,
+      bedrooms: isCommercial ? 0 : Number(unitBeds),
+      bathrooms: isCommercial ? 0 : Number(unitBaths),
+      toilets: isCommercial ? undefined : (unitToilets ? Number(unitToilets) : undefined),
       rentPerAnnum: Number(unitRent),
+      rentCycle: unitCycle,
     })
   }
-
-  const property = data?.data
   const imagesUnit = property?.units?.find((u) => u.id === imagesUnitId) ?? null
 
   const closeImagesDialog = () => {
@@ -288,7 +300,7 @@ export default function PropertyDetailPage() {
               variant="outline"
               size="sm"
               className="gap-1"
-              onClick={() => setShowAddUnit(true)}
+              onClick={openAddUnit}
             >
               <Plus className="h-3.5 w-3.5" />
               Add Unit
@@ -304,7 +316,7 @@ export default function PropertyDetailPage() {
                 variant="outline"
                 size="sm"
                 className="mt-3 gap-1"
-                onClick={() => setShowAddUnit(true)}
+                onClick={openAddUnit}
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add First Unit
@@ -372,7 +384,7 @@ export default function PropertyDetailPage() {
                       </div>
 
                       <p className="text-base font-bold text-[#1a3c5e]">
-                        {formatNairaAmount(unit.rentPerAnnum)}/yr
+                        {formatNairaAmount(unit.rentPerAnnum)}{rentCycleSuffix(unit.rentCycle)}
                       </p>
 
                       {unit.tenancy?.tenant && (
@@ -419,49 +431,66 @@ export default function PropertyDetailPage() {
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="unit-beds">
-                  Bedrooms <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="unit-beds"
-                  type="number"
-                  min={0}
-                  value={unitBeds}
-                  onChange={(e) => setUnitBeds(e.target.value)}
-                  placeholder="0"
-                />
+            {!isCommercial && (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="unit-beds">
+                    Bedrooms <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="unit-beds"
+                    type="number"
+                    min={0}
+                    value={unitBeds}
+                    onChange={(e) => setUnitBeds(e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="unit-baths">
+                    Bathrooms <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="unit-baths"
+                    type="number"
+                    min={0}
+                    value={unitBaths}
+                    onChange={(e) => setUnitBaths(e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="unit-toilets">Toilets</Label>
+                  <Input
+                    id="unit-toilets"
+                    type="number"
+                    min={0}
+                    value={unitToilets}
+                    onChange={(e) => setUnitToilets(e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
               </div>
+            )}
+
+            {isCommercial && (
               <div className="space-y-2">
-                <Label htmlFor="unit-baths">
-                  Bathrooms <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="unit-baths"
-                  type="number"
-                  min={0}
-                  value={unitBaths}
-                  onChange={(e) => setUnitBaths(e.target.value)}
-                  placeholder="0"
-                />
+                <Label htmlFor="unit-cycle">Rent cycle</Label>
+                <select
+                  id="unit-cycle"
+                  value={unitCycle}
+                  onChange={(e) => setUnitCycle(e.target.value as "monthly" | "yearly")}
+                  className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a3c5e]/30"
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="unit-toilets">Toilets</Label>
-                <Input
-                  id="unit-toilets"
-                  type="number"
-                  min={0}
-                  value={unitToilets}
-                  onChange={(e) => setUnitToilets(e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-            </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="unit-rent">
-                Annual Rent (₦) <span className="text-red-500">*</span>
+                {unitCycle === "monthly" ? "Monthly" : "Annual"} Rent (₦) <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="unit-rent"
