@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
+import { CloudflareRouteGuard } from "@/components/auth/cloudflare-route-guard"
 import { BRAND_NAME, BRAND_URL } from "@/lib/config/brand"
 
 const inter = Inter({
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-[#f8fafc] dark:bg-[#0a0f1e] antialiased transition-colors duration-300">
+        <CloudflareRouteGuard />
         <Providers>{children}</Providers>
       </body>
     </html>

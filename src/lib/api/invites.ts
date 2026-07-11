@@ -6,6 +6,7 @@ export interface CreateInviteData {
   invitedPhone: string
   firstName: string
   rentAmount: number
+  rentCycle?: "monthly" | "yearly"
   startDate: string
   endDate: string
 }

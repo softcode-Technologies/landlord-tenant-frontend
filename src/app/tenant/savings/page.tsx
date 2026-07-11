@@ -61,9 +61,13 @@ function CreateGoalDialog() {
     queryKey: ["tenant-tenancies"],
     queryFn: () => tenanciesApi.getTenantTenancies(),
   })
-  // Any non-terminated tenancy has an upcoming annual rent worth saving toward —
-  // including one that just expired but is being renewed (future nextDueDate).
-  const tenancies = (tenanciesData?.data ?? []).filter((t) => t.status !== "terminated")
+  // Any non-terminated ANNUAL tenancy has an upcoming yearly rent worth saving
+  // toward — including one that just expired but is being renewed. Monthly
+  // (shop/commercial) leases are paid as you go, so there's nothing to save up
+  // for — exclude them from the vault picker.
+  const tenancies = (tenanciesData?.data ?? []).filter(
+    (t) => t.status !== "terminated" && t.rentCycle !== "monthly",
+  )
   const selected = tenancies.find((t) => t.id === tenancyId)
 
   const createMutation = useMutation({

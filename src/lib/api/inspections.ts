@@ -5,12 +5,23 @@ export const inspectionsApi = {
   // When the unlock fee is enabled, returns a paymentUrl to redirect to. When
   // disabled (launch promo), access is granted immediately and `free` is true.
   unlockListing: (listingId: string) =>
-    apiClient.post<{ free: boolean; paymentUrl?: string; feeKobo: number }>(
+    apiClient.post<{ free: boolean; paymentUrl?: string; feeKobo: number; reason?: "first_unlock_free" }>(
       `/inspections/listings/${listingId}/unlock`,
     ),
 
   getUnlockConfig: () =>
-    apiClient.get<{ feeEnabled: boolean; feeKobo: number }>("/inspections/unlock-config"),
+    apiClient.get<{ feeEnabled: boolean; feeKobo: number; firstUnlockFree: boolean }>(
+      "/inspections/unlock-config",
+    ),
+
+  // Authed: per-user unlock state, so we can show "your first unlock is free".
+  getUnlockStatus: () =>
+    apiClient.get<{
+      feeEnabled: boolean
+      feeKobo: number
+      firstUnlockFree: boolean
+      firstUnlockAvailable: boolean
+    }>("/inspections/unlock-status"),
 
   getListingContact: (listingId: string) =>
     apiClient.get<{

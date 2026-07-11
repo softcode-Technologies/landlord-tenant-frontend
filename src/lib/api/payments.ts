@@ -51,6 +51,14 @@ export const paymentsApi = {
       ...(amountKobo !== undefined ? { amountKobo } : {}),
     }),
 
+  // Pay a security deposit into escrow (move-in protection). Omit amountKobo to
+  // use the deposit amount recorded on the tenancy.
+  payDeposit: (tenancyId: string, amountKobo?: number) =>
+    apiClient.post<{ paymentUrl: string; reference: string }>("/payments/deposit", {
+      tenancyId,
+      ...(amountKobo !== undefined ? { amountKobo } : {}),
+    }),
+
   getPaymentHistory: () => apiClient.get<Payment[]>("/payments/history"),
 
   getReceipt: (paymentId: string) =>

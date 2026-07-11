@@ -50,4 +50,39 @@ export const escrowApi = {
   // Admin-only at the backend; surfaced here for the admin UI later.
   refund: (id: string, reason: string) =>
     apiClient.post<RentEscrow>(`/escrow/${id}/refund`, { reason }),
+
+  // ─── Deposit escrow (move-in protection) ─────────────────────────────────────
+  listMyDeposits: () => apiClient.get<MyDepositEscrows>("/escrow/deposits"),
+
+  confirmMoveIn: (id: string) =>
+    apiClient.post<DepositEscrow>(`/escrow/deposits/${id}/confirm`),
+
+  // Admin-only at the backend.
+  refundDeposit: (id: string, reason: string) =>
+    apiClient.post<DepositEscrow>(`/escrow/deposits/${id}/refund`, { reason }),
+}
+
+export type DepositEscrowStatus = "holding" | "secured" | "refunded"
+
+export interface DepositEscrow {
+  id: string
+  paymentId: string
+  tenancyId: string
+  tenantUserId: string
+  landlordUserId: string
+  amountKobo: number
+  status: DepositEscrowStatus
+  refundAfter: string
+  confirmedAt?: string | null
+  securedAt?: string | null
+  refundedAt?: string | null
+  refundReason?: "auto_no_confirmation" | "moveout_return" | "admin_refund" | null
+  createdAt: string
+  updatedAt: string
+  tenancy?: RentEscrow["tenancy"]
+}
+
+export interface MyDepositEscrows {
+  asTenant: DepositEscrow[]
+  asLandlord: DepositEscrow[]
 }

@@ -23,6 +23,9 @@ export interface NavItem {
   // hovering it reveals `lockedHint` (e.g. "Coming soon").
   locked?: boolean
   lockedHint?: string
+  // Optional group label. A small heading is shown above the first item of each
+  // new section so the nav reads as a few clusters instead of one long list.
+  section?: string
 }
 
 interface DashboardSidebarProps {
@@ -77,50 +80,67 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
 
       {/* Nav Items */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
+        {navItems.map((item, i) => {
+          // Show a section heading above the first item that carries a new
+          // `section` label, turning the flat list into scannable clusters.
+          const showSection =
+            item.section && item.section !== navItems[i - 1]?.section
+          const sectionHeader = showSection ? (
+            <p
+              key={`sec-${item.section}`}
+              className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 first:pt-1"
+            >
+              {item.section}
+            </p>
+          ) : null
+
           if (item.locked) {
             return (
-              <div
-                key={item.href}
-                className="group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 cursor-not-allowed select-none"
-              >
-                <item.icon className="h-4 w-4 shrink-0" />
-                <span className="flex-1">{item.label}</span>
-                {/* Padlock + hover tooltip */}
-                <span className="relative flex items-center">
-                  <Lock className="h-3.5 w-3.5 text-slate-400" />
-                  <span
-                    role="tooltip"
-                    className="pointer-events-none absolute right-0 bottom-full mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 z-50"
-                  >
-                    {item.lockedHint ?? "Coming soon"}
+              <div key={`wrap-${item.href}`}>
+                {sectionHeader}
+                <div
+                  className="group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 cursor-not-allowed select-none"
+                >
+                  <item.icon className="h-4 w-4 shrink-0" />
+                  <span className="flex-1">{item.label}</span>
+                  {/* Padlock + hover tooltip */}
+                  <span className="relative flex items-center">
+                    <Lock className="h-3.5 w-3.5 text-slate-400" />
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute right-0 bottom-full mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 z-50"
+                    >
+                      {item.lockedHint ?? "Coming soon"}
+                    </span>
                   </span>
-                </span>
+                </div>
               </div>
             )
           }
           const isActive =
             pathname === item.href || (pathname.startsWith(item.href + "/") && item.href !== `/${role}`)
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
-                isActive
-                  ? "bg-[#1a3c5e] text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-              )}
-            >
-              <item.icon className="h-4 w-4 shrink-0" />
-              <span className="flex-1">{item.label}</span>
-              {item.badge ? (
-                <span className="bg-[#f97316] text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
-                  {item.badge}
-                </span>
-              ) : null}
-            </Link>
+            <div key={`wrap-${item.href}`}>
+              {sectionHeader}
+              <Link
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                  isActive
+                    ? "bg-[#1a3c5e] text-white shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                )}
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+                <span className="flex-1">{item.label}</span>
+                {item.badge ? (
+                  <span className="bg-[#f97316] text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                    {item.badge}
+                  </span>
+                ) : null}
+              </Link>
+            </div>
           )
         })}
       </nav>

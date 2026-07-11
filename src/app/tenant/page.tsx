@@ -5,6 +5,7 @@ import { tenanciesApi } from "@/lib/api/tenancies"
 import { paymentsApi } from "@/lib/api/payments"
 import { analyticsApi } from "@/lib/api/analytics"
 import { savingsApi } from "@/lib/api/savings"
+import { invitesApi } from "@/lib/api/invites"
 import { useAuthStore } from "@/lib/store/auth"
 import { StatCard } from "@/components/shared/stat-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatNaira, formatNairaAmount, formatDate } from "@/lib/utils"
+import { formatNaira, formatNairaAmount, formatDate, rentAmountLabel } from "@/lib/utils"
 import {
   Home, Wallet, Wrench, Calendar, ArrowRight, TrendingUp, ShieldAlert, Clock, ShieldX,
   PiggyBank, AlertTriangle
@@ -79,6 +80,12 @@ export default function TenantDashboard() {
     queryFn: () => savingsApi.getGoals(),
   })
 
+  const { data: invitesData } = useQuery({
+    queryKey: ["my-invites"],
+    queryFn: () => invitesApi.getMyInvites(),
+  })
+
+  const pendingInvites = (invitesData?.data ?? []).filter((i) => i.status === "pending")
   const tenancies = tenanciesData?.data ?? []
   const savingsGoals = savingsData?.data ?? []
   const topSavingsGoal =
@@ -97,6 +104,28 @@ export default function TenantDashboard() {
           Here&apos;s an overview of your rental dashboard
         </p>
       </div>
+
+      {/* Pending tenancy invite — surfaced here so tenants act on it without
+          hunting through the nav. */}
+      {pendingInvites.length > 0 && (
+        <Link
+          href="/tenant/invites"
+          className="block rounded-xl border-l-4 border-[#f97316] bg-orange-50 p-4 hover:bg-orange-100 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <Home className="h-5 w-5 text-[#f97316] shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-slate-900 text-sm">
+                You have {pendingInvites.length === 1 ? "a" : pendingInvites.length} pending tenancy {pendingInvites.length === 1 ? "invite" : "invites"}
+              </p>
+              <p className="text-xs text-slate-600 mt-0.5">
+                A landlord invited you to a home — review and accept to start your tenancy.
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-[#f97316] shrink-0" />
+          </div>
+        </Link>
+      )}
 
       {/* KYC Banner */}
       {kycStatus !== "approved" && (
@@ -222,7 +251,7 @@ export default function TenantDashboard() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-slate-50 rounded-xl p-3">
-                      <p className="text-xs text-slate-500">Annual Rent</p>
+                      <p className="text-xs text-slate-500">{rentAmountLabel(activeTenancy?.rentCycle)}</p>
                       <p className="text-lg font-bold text-[#1a3c5e]">
                         {formatNairaAmount(activeTenancy.rentAmount)}
                       </p>

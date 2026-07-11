@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { formatNairaAmount, formatDate, extractApiError } from "@/lib/utils"
+import { formatNairaAmount, formatDate, extractApiError, rentCycleSuffix } from "@/lib/utils"
 import { List, Plus, MapPin, Bed, Eye, Pencil, Trash2, Loader2, CheckCircle, Rocket } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -182,7 +182,7 @@ export default function LandlordListingsPage() {
                         {listing.bedrooms}bd / {listing.bathrooms}ba
                       </div>
                       <span className="text-sm font-bold text-[#1a3c5e]">
-                        {formatNairaAmount(listing.rentPerAnnum)}/yr
+                        {formatNairaAmount(listing.rentPerAnnum)}{rentCycleSuffix(listing.rentCycle)}
                       </span>
                       <span className="text-xs text-slate-400">
                         Created {formatDate(listing.createdAt)}

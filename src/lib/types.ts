@@ -77,6 +77,7 @@ export interface Listing {
   title: string
   description: string
   rentPerAnnum: number
+  rentCycle?: "monthly" | "yearly"
   city: string
   state: string
   lga?: string
@@ -154,6 +155,7 @@ export interface PaginatedResponse<T> {
 export interface Property {
   id: string
   name: string
+  propertyType?: string
   address: string
   city: string
   state: string
@@ -182,6 +184,7 @@ export interface Unit {
   bathrooms: number
   toilets?: number
   rentPerAnnum: number
+  rentCycle?: "monthly" | "yearly"
   images?: string[]
   isActive: boolean
   status?: "vacant" | "occupied" | "maintenance"
@@ -216,10 +219,12 @@ export interface Tenancy {
   startDate: string
   endDate: string
   rentAmount: number
+  rentCycle?: "monthly" | "yearly"
   nextDueDate?: string | null
   lastPaymentDate?: string | null
   status: "active" | "terminated" | "expired"
   depositAmount?: number
+  depositStatus?: "none" | "held" | "returned"
   depositPaidAt?: string
   depositReturnedAt?: string
   depositNote?: string
@@ -282,6 +287,7 @@ export interface Invite {
   invitedPhone: string
   firstName: string
   rentAmount: number
+  rentCycle?: "monthly" | "yearly"
   startDate: string
   endDate: string
   status: "pending" | "accepted" | "cancelled"

@@ -7,7 +7,10 @@
     "dev:clean": "rm -rf .next && next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cf:build": "node scripts/deploy-cloudflare.mjs",
+    "cf:deploy": "node scripts/deploy-cloudflare.mjs --deploy",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -46,6 +49,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -54,12 +58,14 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.110.0"
   },
   "pnpm": {
     "overrides": {
       "postcss@<8.5.10": ">=8.5.10",
       "ws@>=8.0.0 <8.20.1": ">=8.20.1"
-    }
+    },
+    "onlyBuiltDependencies": ["esbuild", "workerd", "sharp"]
   }
 }
