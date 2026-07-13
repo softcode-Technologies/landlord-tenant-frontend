@@ -46,13 +46,7 @@ export default function Image() {
             />
           </div>
           <div style={{ display: "flex", marginLeft: 18, fontSize: 36, fontWeight: 700, color: "white" }}>
-            {BRAND_NAME === "NaijaRental" ? (
-              <>
-                Naija<span style={{ color: "#f97316" }}>Rental</span>
-              </>
-            ) : (
-              BRAND_NAME
-            )}
+            {BRAND_NAME}
           </div>
         </div>
 
