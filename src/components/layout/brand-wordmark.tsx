@@ -1,15 +1,7 @@
 import { BRAND_NAME } from "@/lib/config/brand"
 
-// Renders the brand wordmark. The default "NaijaRental" keeps its two-tone
-// styling; a custom brand name (set via NEXT_PUBLIC_BRAND_NAME) renders plainly
-// since we can't know where to split an arbitrary name.
+// Renders the brand wordmark from NEXT_PUBLIC_BRAND_NAME. Rendered plainly — we
+// can't know where to split an arbitrary name into a two-tone treatment.
 export function BrandWordmark({ className }: { className?: string }) {
-  if (BRAND_NAME === "NaijaRental") {
-    return (
-      <span className={className}>
-        Naija<span className="text-[#f97316]">Rental</span>
-      </span>
-    )
-  }
   return <span className={className}>{BRAND_NAME}</span>
 }
