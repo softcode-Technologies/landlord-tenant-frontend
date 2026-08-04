@@ -33,6 +33,42 @@ function clearProxyCookie() {
   document.cookie = `${PROXY_COOKIE}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
 }
 
+// Touching `localStorage` THROWS (SecurityError) when site data is blocked —
+// in-app browsers (Facebook/Instagram/WhatsApp), "block all cookies", raw
+// Android WebView, some private modes. zustand's createJSONStorage swallows
+// that and returns undefined, and persist then bails out *before* ever calling
+// onRehydrateStorage — so `_hasHydrated` stayed false forever and AuthGuard
+// rendered its spinner for eternity (users reported a blank page).
+// Falling back to an in-memory store keeps the app usable; the session just
+// doesn't survive a reload, which beats an unusable app.
+function createMemoryStorage(): Storage {
+  const mem = new Map<string, string>()
+  return {
+    getItem: (key) => mem.get(key) ?? null,
+    setItem: (key, value) => void mem.set(key, value),
+    removeItem: (key) => void mem.delete(key),
+    clear: () => mem.clear(),
+    key: (index) => Array.from(mem.keys())[index] ?? null,
+    get length() {
+      return mem.size
+    },
+  } as Storage
+}
+
+function getSafeStorage(): Storage {
+  if (typeof window === "undefined") return createMemoryStorage()
+  try {
+    // Probe with a real write — merely reading the property isn't enough, some
+    // browsers expose localStorage but throw on setItem (quota-locked private mode).
+    const probe = "__krib_storage_probe__"
+    window.localStorage.setItem(probe, probe)
+    window.localStorage.removeItem(probe)
+    return window.localStorage
+  } catch {
+    return createMemoryStorage()
+  }
+}
+
 interface AuthState {
   user: User | null
   accessToken: string | null
@@ -103,14 +139,19 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "naijarental-auth",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => getSafeStorage()),
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
       }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true)
+      // On a rehydrate error `state` is undefined, so calling setHasHydrated on
+      // it would silently no-op and hang the guard. Fall back to the store
+      // itself so the flag is ALWAYS set exactly once, success or failure.
+      onRehydrateStorage: () => (state, error) => {
+        if (error) console.warn("[auth] rehydrate failed, continuing unauthenticated", error)
+        if (state) state.setHasHydrated(true)
+        else useAuthStore.getState().setHasHydrated(true)
       },
     }
   )
