@@ -147,12 +147,12 @@ export default function LandlordPropertiesPage() {
                   </div>
                 </div>
 
-                <Link href={`/landlord/properties/${property.id}`} className="block">
-                  <Button variant="outline" className="w-full gap-2 text-sm">
+                <Button variant="outline" className="w-full gap-2 text-sm" asChild>
+                  <Link href={`/landlord/properties/${property.id}`}>
                     Manage
                     <ArrowRight className="h-3.5 w-3.5" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </CardContent>
             </Card>
           ))}

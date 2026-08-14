@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { propertiesApi } from "@/lib/api/properties"
+import { listingsApi } from "@/lib/api/listings"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Loader2, Bed, Bath, DoorOpen, Banknote } from "lucide-react"
-import { rentCycleWord } from "@/lib/utils"
+import { extractApiError, rentCycleWord } from "@/lib/utils"
 import Link from "next/link"
 import { toast } from "sonner"
 import apiClient from "@/lib/api/client"
@@ -48,15 +49,30 @@ export default function NewListingPage() {
     queryFn: () => propertiesApi.getProperties(),
   })
 
+  const { data: listingsData } = useQuery({
+    queryKey: ["my-listings"],
+    queryFn: () => listingsApi.getLandlordListings(),
+  })
+
   const properties = propertiesData?.data ?? []
+  const activeListingByUnitId = new Map(
+    (listingsData?.data ?? [])
+      .filter((listing) => listing.status === "active" && listing.unitId)
+      .map((listing) => [listing.unitId!, listing])
+  )
   const allUnits = properties.flatMap((p) =>
     p.units?.map((u) => ({ ...u, propertyName: p.name })) ?? []
   )
   const selectedUnit = allUnits.find((u) => u.id === form.unitId)
+  const existingListingForUnit = form.unitId ? activeListingByUnitId.get(form.unitId) : undefined
+  const listableUnits = allUnits.filter((unit) => !activeListingByUnitId.has(unit.id))
 
   const validate = (): boolean => {
     const errs: Partial<Record<keyof FormData, string>> = {}
     if (!form.unitId) errs.unitId = "Please select a unit"
+    else if (existingListingForUnit) {
+      errs.unitId = "This unit already has an active listing. Edit or close it from your listings page."
+    }
     if (form.title.length < 5) errs.title = "Title must be at least 5 characters"
     if (form.description.length < 20) errs.description = "Description must be at least 20 characters"
     if (!form.rentPerAnnum || Number(form.rentPerAnnum) < 1) errs.rentPerAnnum = "Rent amount required"
@@ -84,8 +100,8 @@ export default function NewListingPage() {
       queryClient.invalidateQueries({ queryKey: ["listings"] })
       queryClient.invalidateQueries({ queryKey: ["properties"] })
       router.push("/landlord/listings")
-    } catch {
-      toast.error("Failed to create listing. Please try again.")
+    } catch (err) {
+      toast.error(extractApiError(err, "Failed to create listing. Please try again."))
     } finally {
       setIsSubmitting(false)
     }
@@ -132,17 +148,39 @@ export default function NewListingPage() {
                   <SelectItem value="_none" disabled>
                     No units available. Add a property first.
                   </SelectItem>
+                ) : listableUnits.length === 0 ? (
+                  <SelectItem value="_none" disabled>
+                    All units already have active listings.
+                  </SelectItem>
                 ) : (
-                  allUnits.map((unit) => (
-                    <SelectItem key={unit.id} value={unit.id}>
-                      {unit.propertyName} — {unit.unitNumber}
-                    </SelectItem>
-                  ))
+                  allUnits.map((unit) => {
+                    const alreadyListed = activeListingByUnitId.has(unit.id)
+                    return (
+                      <SelectItem key={unit.id} value={unit.id} disabled={alreadyListed}>
+                        {unit.propertyName} — {unit.unitNumber}
+                        {alreadyListed ? " (Already listed)" : ""}
+                      </SelectItem>
+                    )
+                  })
                 )}
               </SelectContent>
             </Select>
             {errors.unitId && (
               <p className="text-xs text-red-500 mt-1">{errors.unitId}</p>
+            )}
+            {existingListingForUnit && (
+              <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                <p className="font-medium">This unit is already listed</p>
+                <p className="mt-1 text-amber-800">
+                  &ldquo;{existingListingForUnit.title}&rdquo; is still active. You can edit it or close it before creating a new one.
+                </p>
+                <Link
+                  href="/landlord/listings"
+                  className="mt-2 inline-block font-semibold text-amber-900 underline"
+                >
+                  Go to my listings
+                </Link>
+              </div>
             )}
             {allUnits.length === 0 && (
               <p className="text-sm text-amber-600 mt-2">
@@ -288,7 +326,11 @@ export default function NewListingPage() {
           <Link href="/landlord/listings" className="flex-1">
             <Button variant="outline" className="w-full">Cancel</Button>
           </Link>
-          <Button type="submit" className="flex-1" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="flex-1"
+            disabled={isSubmitting || Boolean(existingListingForUnit) || listableUnits.length === 0}
+          >
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Publish Listing
           </Button>

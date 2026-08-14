@@ -126,7 +126,7 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer",
                   isActive
                     ? "bg-[#1a3c5e] text-white shadow-sm"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
@@ -149,7 +149,7 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
       <div className="px-3 pb-4">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
         >
           <LogOut className="h-4 w-4" />
           Log out
@@ -173,7 +173,7 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 rounded-lg hover:bg-slate-100"
+          className="p-2 rounded-lg hover:bg-slate-100 cursor-pointer"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
