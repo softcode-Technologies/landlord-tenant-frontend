@@ -174,8 +174,12 @@ function OnboardingContent() {
       {/* Header */}
       <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <BrandLogo className="w-8 h-8 rounded-lg bg-[#1a3c5e]" iconClassName="h-4 w-4 text-white" />
-          <BrandWordmark className="text-xl font-bold text-[#1a3c5e]" />
+          <BrandLogo 
+            variant="full"
+            size="md"
+            className="w-8 h-8 rounded-lg bg-[#1a3c5e]" 
+            iconClassName="h-4 w-4 text-white" 
+          />
         </Link>
         <span className="text-sm text-slate-500">
           Step {step} of {STEP_COUNT}

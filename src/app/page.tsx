@@ -200,9 +200,9 @@ export default function HomePage() {
                   <span className="w-1.5 h-1.5 bg-[#f97316] rounded-full animate-pulse" />
                   <span className="text-[10px] font-bold text-[#fbbf24] uppercase tracking-wide">Now live</span>
                 </span>
-                <span className="text-xs font-medium text-slate-200 tracking-wide">
+                {/* <span className="text-xs font-medium text-slate-200 tracking-wide">
                   Join as a founding member
-                </span>
+                </span> */}
               </div>
 
               <h1 className="text-[2.7rem] sm:text-5xl lg:text-[3.6rem] font-bold leading-[1.05] tracking-tight mb-6">

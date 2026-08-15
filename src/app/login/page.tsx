@@ -191,8 +191,12 @@ function LoginContent() {
       {/* Left: Decorative panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1a3c5e] via-[#1e4a72] to-[#0f2d48] flex-col justify-between p-12">
         <Link href="/" className="flex items-center gap-2">
-          <BrandLogo className="w-9 h-9 rounded-xl bg-white/20" iconClassName="h-5 w-5 text-white" />
-          <BrandWordmark className="text-2xl font-bold text-white" />
+          <BrandLogo 
+            variant="full"
+            size="lg"
+            className="w-9 h-9 rounded-xl bg-white/20" 
+            iconClassName="h-5 w-5 text-white" 
+          />
         </Link>
 
         <div>
@@ -235,8 +239,12 @@ function LoginContent() {
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <Link href="/" className="flex items-center gap-2">
-              <BrandLogo className="w-8 h-8 rounded-lg bg-[#1a3c5e]" iconClassName="h-4 w-4 text-white" />
-              <BrandWordmark className="text-xl font-bold text-[#1a3c5e]" />
+              <BrandLogo 
+                variant="full"
+                size="md"
+                className="w-8 h-8 rounded-lg bg-[#1a3c5e]" 
+                iconClassName="h-4 w-4 text-white" 
+              />
             </Link>
           </div>
 

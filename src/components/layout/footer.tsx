@@ -47,10 +47,11 @@ export function Footer() {
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-5">
               <BrandLogo
+                variant="full"
+                size="lg"
                 className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] border border-white/10"
                 iconClassName="h-5 w-5 text-white"
               />
-              <BrandWordmark className="text-xl font-bold" />
             </div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs mb-5">
               The operating system for Nigerian rentals — connecting landlords, tenants,
