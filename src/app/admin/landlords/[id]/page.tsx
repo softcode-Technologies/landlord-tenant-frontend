@@ -69,14 +69,14 @@ function UnitRow({ unit, onViewPayments }: { unit: LandlordOverviewUnit; onViewP
             </div>
             <div>
               <p className="text-xs text-slate-400">Next Due</p>
-              <p className={`font-medium ${t.overdue ? "text-red-600" : "text-slate-900"}`}>
+              <div className={`font-medium ${t.overdue ? "text-red-600" : "text-slate-900"}`}>
                 {formatDate(t.nextDueDate)}
                 {t.overdue && (
                   <Badge variant="destructive" className="ml-1.5 text-[10px] gap-0.5">
                     <AlertTriangle className="h-2.5 w-2.5" />Overdue
                   </Badge>
                 )}
-              </p>
+              </div>
             </div>
             <div>
               <p className="text-xs text-slate-400">Last Payment</p>
