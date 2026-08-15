@@ -64,10 +64,11 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <BrandLogo
+              variant="full"
+              size="lg"
               className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] shadow-md"
               iconClassName="h-5 w-5 text-white"
             />
-            <BrandWordmark className="text-xl font-bold text-[#1a3c5e] dark:text-white" />
           </Link>
 
           {/* Desktop Nav Links */}

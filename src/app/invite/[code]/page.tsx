@@ -115,8 +115,12 @@ export default function InvitePage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <BrandLogo className="w-9 h-9 rounded-xl bg-[#1a3c5e]" iconClassName="h-5 w-5 text-white" />
-            <BrandWordmark className="text-xl font-bold text-[#1a3c5e]" />
+            <BrandLogo 
+              variant="full"
+              size="md"
+              className="w-9 h-9 rounded-xl bg-[#1a3c5e]" 
+              iconClassName="h-5 w-5 text-white" 
+            />
           </Link>
         </div>
 

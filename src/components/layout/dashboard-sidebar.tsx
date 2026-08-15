@@ -59,8 +59,12 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
       {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-5 border-b border-slate-100">
         <Link href="/" className="flex items-center gap-2">
-          <BrandLogo className="w-8 h-8 rounded-lg bg-[#1a3c5e]" iconClassName="h-5 w-5 text-white" />
-          <BrandWordmark className="text-lg font-bold text-[#1a3c5e]" />
+          <BrandLogo 
+            variant="full"
+            size="md"
+            className="w-8 h-8 rounded-lg bg-[#1a3c5e]" 
+            iconClassName="h-5 w-5 text-white" 
+          />
         </Link>
       </div>
 
@@ -168,8 +172,12 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
       {/* Mobile header bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-100 h-14 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <BrandLogo className="w-7 h-7 rounded-lg bg-[#1a3c5e]" iconClassName="h-4 w-4 text-white" />
-          <BrandWordmark className="text-base font-bold text-[#1a3c5e]" />
+          <BrandLogo 
+            variant="full"
+            size="sm"
+            className="w-7 h-7 rounded-lg bg-[#1a3c5e]" 
+            iconClassName="h-4 w-4 text-white" 
+          />
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
