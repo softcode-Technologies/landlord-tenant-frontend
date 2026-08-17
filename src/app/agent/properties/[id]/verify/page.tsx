@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, use } from "react"
+import { useState, useRef, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
 import Link from "next/link"
@@ -35,6 +35,10 @@ type Fix = { lat: number; lng: number; accuracy: number }
 const MAX_PHOTOS = 8
 /** Matches the server's threshold: worse than this isn't evidence of anything. */
 const POOR_ACCURACY_M = 100
+/** Good enough to stop refining — well inside the server's threshold. */
+const GOOD_ACCURACY_M = 30
+/** How long to let GPS improve on its first, coarse reading. */
+const REFINE_WINDOW_MS = 20000
 
 export default function VerifyPropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: propertyId } = use(params)
@@ -47,32 +51,84 @@ export default function VerifyPropertyPage({ params }: { params: Promise<{ id: s
   const [photos, setPhotos] = useState<File[]>([])
   const [result, setResult] = useState<{ status: string; flags: VerificationFlag[] } | null>(null)
 
+  // A geolocation watch keeps running after unmount unless it is cleared, which
+  // holds the GPS awake and drains the agent's battery in the background.
+  const watchRef = useRef<number | null>(null)
+  useEffect(() => {
+    return () => {
+      if (watchRef.current !== null && typeof navigator !== "undefined" && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchRef.current)
+      }
+    }
+  }, [])
+
+  /**
+   * Watch rather than take a single reading.
+   *
+   * The first fix a phone returns is usually network-derived and coarse — often
+   * hundreds of metres — and GPS then refines it to within ten or so over the
+   * next few seconds. `getCurrentPosition` would hand back that first coarse
+   * reading, which sits the wrong side of the 100m threshold and sends an
+   * otherwise good submission into the manual review queue for no reason.
+   *
+   * So: keep the best reading seen, stop early once it is good enough, and give
+   * up after a bounded window with whatever we managed to get.
+   */
   function captureLocation() {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       setLocationError("This device can't share its location. Try on a phone at the property.")
       return
     }
+
     setLocating(true)
     setLocationError(null)
-    navigator.geolocation.getCurrentPosition(
+    let best: Fix | null = null
+    let settled = false
+
+    const finish = (error?: string) => {
+      if (settled) return
+      settled = true
+      if (watchRef.current !== null) {
+        navigator.geolocation.clearWatch(watchRef.current)
+        watchRef.current = null
+      }
+      clearTimeout(timer)
+      setLocating(false)
+      if (error && !best) setLocationError(error)
+    }
+
+    // Bounded so a device that never gets a good fix still returns its best.
+    const timer = setTimeout(
+      () => finish("Couldn't get a location fix. Step outside, away from walls, and try again."),
+      REFINE_WINDOW_MS,
+    )
+
+    watchRef.current = navigator.geolocation.watchPosition(
       (pos) => {
-        setFix({
+        const candidate: Fix = {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
           accuracy: Math.round(pos.coords.accuracy),
-        })
-        setLocating(false)
+        }
+        // Only ever move to a more accurate reading.
+        if (!best || candidate.accuracy < best.accuracy) {
+          best = candidate
+          setFix(candidate)
+        }
+        if (best.accuracy <= GOOD_ACCURACY_M) finish()
       },
       (err) => {
-        setLocating(false)
-        setLocationError(
-          err.code === err.PERMISSION_DENIED
-            ? "Location permission was blocked. Allow it in your browser settings, then try again."
-            : "Couldn't get a location fix. Step outside and try again.",
-        )
+        // A permission refusal is final — stop waiting on the window.
+        if (err.code === err.PERMISSION_DENIED) {
+          finish("Location permission was blocked. Allow it in your browser settings, then try again.")
+          return
+        }
+        if (!best) {
+          finish("Couldn't get a location fix. Step outside, away from walls, and try again.")
+        }
       },
       // No cached fix: a stale position defeats the point of standing there.
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+      { enableHighAccuracy: true, timeout: REFINE_WINDOW_MS, maximumAge: 0 },
     )
   }
 
@@ -197,14 +253,22 @@ export default function VerifyPropertyPage({ params }: { params: Promise<{ id: s
                     {fix.lat.toFixed(5)}, {fix.lng.toFixed(5)}
                   </span>
                 </div>
-                <Badge
-                  variant="secondary"
-                  className={`text-[10px] ${poorFix ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}
-                >
-                  ±{fix.accuracy}m
-                </Badge>
+                <div className="flex items-center gap-2">
+                  {locating && (
+                    <span className="text-xs text-slate-500 flex items-center gap-1">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      improving…
+                    </span>
+                  )}
+                  <Badge
+                    variant="secondary"
+                    className={`text-[10px] ${poorFix ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}
+                  >
+                    ±{fix.accuracy}m
+                  </Badge>
+                </div>
               </div>
-              {poorFix && (
+              {poorFix && !locating && (
                 <p className="text-xs text-amber-700 mt-2">
                   That&apos;s not accurate enough to rely on. Step outside, away from walls, and
                   capture again — otherwise this will need manual review.
