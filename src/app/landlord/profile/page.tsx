@@ -88,7 +88,7 @@ export default function LandlordProfilePage() {
               >
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={user.avatarUrl} />
-                  <AvatarFallback className="text-2xl font-bold bg-[#1a3c5e]/10 text-[#1a3c5e]">
+                  <AvatarFallback className="text-2xl font-bold bg-[#00162E]/10 text-[#00162E]">
                     {getInitials(fullName)}
                   </AvatarFallback>
                 </Avatar>
@@ -100,7 +100,7 @@ export default function LandlordProfilePage() {
                 <button
                   type="button"
                   onClick={() => setEditOpen(true)}
-                  className="text-xs text-[#1a3c5e] underline underline-offset-2 hover:text-[#f97316] transition-colors"
+                  className="text-xs text-[#00162E] underline underline-offset-2 hover:text-[#005AF1] transition-colors"
                 >
                   Edit photo & details
                 </button>
@@ -138,9 +138,9 @@ export default function LandlordProfilePage() {
           {kycStatus !== "approved" && (
             <button
               onClick={() => router.push("/landlord/kyc")}
-              className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-[#1a3c5e] hover:bg-[#1a3c5e]/5 transition-colors text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-[#00162E] hover:bg-[#00162E]/5 transition-colors text-left"
             >
-              <Shield className="h-5 w-5 text-[#1a3c5e] shrink-0" />
+              <Shield className="h-5 w-5 text-[#00162E] shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-slate-900">Identity Verification</p>
                 <p className="text-xs text-slate-500 truncate">
@@ -151,7 +151,7 @@ export default function LandlordProfilePage() {
                     : "Not verified — tap to get started"}
                 </p>
               </div>
-              <span className="text-xs text-[#1a3c5e] font-medium shrink-0">Manage →</span>
+              <span className="text-xs text-[#00162E] font-medium shrink-0">Manage →</span>
             </button>
           )}
         </div>
@@ -161,7 +161,7 @@ export default function LandlordProfilePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <User className="h-5 w-5 text-[#1a3c5e]" />
+                <User className="h-5 w-5 text-[#00162E]" />
                 <CardTitle>Personal Information</CardTitle>
               </div>
             </CardHeader>
@@ -195,7 +195,7 @@ export default function LandlordProfilePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-[#1a3c5e]" />
+                <Building2 className="h-5 w-5 text-[#00162E]" />
                 <CardTitle>Business Details</CardTitle>
               </div>
             </CardHeader>
@@ -260,7 +260,7 @@ export default function LandlordProfilePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Banknote className="h-5 w-5 text-[#1a3c5e]" />
+                <Banknote className="h-5 w-5 text-[#00162E]" />
                 <CardTitle>Bank Account</CardTitle>
               </div>
               <p className="text-sm text-slate-500">

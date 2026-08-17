@@ -100,8 +100,8 @@ const NOTIF_CONFIG: Record<NotifType, NotifConfig> = {
   },
   broadcast: {
     icon: Megaphone,
-    color: "text-[#1a3c5e]",
-    bg: "bg-[#1a3c5e]/5",
+    color: "text-[#00162E]",
+    bg: "bg-[#00162E]/5",
     label: "Announcement",
     href: () => null,
   },
@@ -172,7 +172,7 @@ export function NotificationsCenter({ role }: Props) {
             onClick={() => setFilter(f)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
               filter === f
-                ? "bg-[#1a3c5e] text-white"
+                ? "bg-[#00162E] text-white"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
@@ -224,7 +224,7 @@ export function NotificationsCenter({ role }: Props) {
                             {config.label}
                           </Badge>
                           {!notification.isRead && (
-                            <span className="h-2 w-2 rounded-full bg-[#1a3c5e] shrink-0" />
+                            <span className="h-2 w-2 rounded-full bg-[#00162E] shrink-0" />
                           )}
                         </div>
                         <p className="text-xs text-slate-500 mt-1 line-clamp-2">
@@ -251,7 +251,7 @@ export function NotificationsCenter({ role }: Props) {
 
             return actionHref ? (
               <Link key={notification.id} href={actionHref} onClick={handleRead}>
-                <Card className={`transition-all hover:shadow-md cursor-pointer ${!notification.isRead ? "border-[#1a3c5e]/20 bg-blue-50/20" : ""}`}>
+                <Card className={`transition-all hover:shadow-md cursor-pointer ${!notification.isRead ? "border-[#00162E]/20 bg-blue-50/20" : ""}`}>
                   {cardContent}
                 </Card>
               </Link>
@@ -259,7 +259,7 @@ export function NotificationsCenter({ role }: Props) {
               <Card
                 key={notification.id}
                 onClick={handleRead}
-                className={`transition-all hover:shadow-sm cursor-pointer ${!notification.isRead ? "border-[#1a3c5e]/20 bg-blue-50/20" : ""}`}
+                className={`transition-all hover:shadow-sm cursor-pointer ${!notification.isRead ? "border-[#00162E]/20 bg-blue-50/20" : ""}`}
               >
                 {cardContent}
               </Card>

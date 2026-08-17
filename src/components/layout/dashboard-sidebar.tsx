@@ -62,7 +62,7 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
           <BrandLogo 
             variant="full"
             size="md"
-            className="w-8 h-8 rounded-lg bg-[#1a3c5e]" 
+            className="w-8 h-8 rounded-lg bg-[#00162E]" 
             iconClassName="h-5 w-5 text-white" 
           />
         </Link>
@@ -132,14 +132,14 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer",
                   isActive
-                    ? "bg-[#1a3c5e] text-white shadow-sm"
+                    ? "bg-[#00162E] text-white shadow-sm"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 )}
               >
                 <item.icon className="h-4 w-4 shrink-0" />
                 <span className="flex-1">{item.label}</span>
                 {item.badge ? (
-                  <span className="bg-[#f97316] text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                  <span className="bg-[#005AF1] text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
                     {item.badge}
                   </span>
                 ) : null}
@@ -175,7 +175,7 @@ export function DashboardSidebar({ navItems, role }: DashboardSidebarProps) {
           <BrandLogo 
             variant="full"
             size="sm"
-            className="w-7 h-7 rounded-lg bg-[#1a3c5e]" 
+            className="w-7 h-7 rounded-lg bg-[#00162E]" 
             iconClassName="h-4 w-4 text-white" 
           />
         </Link>

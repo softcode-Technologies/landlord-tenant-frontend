@@ -304,7 +304,7 @@ function SavingsDetailContent() {
                 <p className="text-xs text-slate-500">Expires {m.display.expMonth}/{m.display.expYear}</p>
               </div>
               {m.status === "active" && m.priority !== 1 && (
-                <button className="text-slate-400 hover:text-[#f97316]" title="Make primary" onClick={() => setPrimaryMutation.mutate(m.id)}>
+                <button className="text-slate-400 hover:text-[#005AF1]" title="Make primary" onClick={() => setPrimaryMutation.mutate(m.id)}>
                   <Star className="h-4 w-4" />
                 </button>
               )}
@@ -321,7 +321,7 @@ function SavingsDetailContent() {
                 <p className="text-xs text-slate-500">{dva.display.accountNumber} · {dva.display.accountName}</p>
               </div>
               <button
-                className="text-slate-400 hover:text-[#1a3c5e]"
+                className="text-slate-400 hover:text-[#00162E]"
                 title="Copy account number"
                 onClick={() => { if (dva.display.accountNumber) { navigator.clipboard.writeText(dva.display.accountNumber); toast.success("Account number copied") } }}
               >

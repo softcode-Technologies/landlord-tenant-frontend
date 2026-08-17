@@ -54,8 +54,8 @@ export default function LandlordAnalyticsPage() {
             label: "Total Revenue",
             value: analytics ? formatNaira(analytics.totalRevenue) : "₦0",
             icon: DollarSign,
-            color: "text-[#1a3c5e]",
-            bg: "bg-[#1a3c5e]/10",
+            color: "text-[#00162E]",
+            bg: "bg-[#00162E]/10",
           },
           {
             label: "Active Tenancies",
@@ -68,7 +68,7 @@ export default function LandlordAnalyticsPage() {
             label: "Properties",
             value: analytics?.totalProperties ?? 0,
             icon: Building,
-            color: "text-[#f97316]",
+            color: "text-[#005AF1]",
             bg: "bg-orange-50",
           },
           {
@@ -106,8 +106,8 @@ export default function LandlordAnalyticsPage() {
               <AreaChart data={revenueData}>
                 <defs>
                   <linearGradient id="revGrad2" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1a3c5e" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#1a3c5e" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#00162E" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#00162E" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -125,7 +125,7 @@ export default function LandlordAnalyticsPage() {
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#1a3c5e"
+                  stroke="#00162E"
                   fill="url(#revGrad2)"
                   strokeWidth={2}
                 />

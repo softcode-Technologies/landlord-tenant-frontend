@@ -25,7 +25,7 @@ export default function AgentDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-[#1a3c5e] to-[#1e4a72] rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-r from-[#00162E] to-[#002A57] rounded-2xl p-6 text-white">
         <h1 className="text-2xl font-bold mb-1">Welcome back, {firstName}!</h1>
         <p className="text-slate-300 text-sm">Your agent dashboard overview</p>
       </div>
@@ -84,8 +84,8 @@ export default function AgentDashboard() {
           title="Managed Properties"
           value={agentProfile?.totalProperties ?? analytics?.managedProperties ?? 0}
           icon={Building2}
-          iconColor="text-[#1a3c5e]"
-          iconBg="bg-[#1a3c5e]/10"
+          iconColor="text-[#00162E]"
+          iconBg="bg-[#00162E]/10"
         />
         <StatCard
           title="Total Commissions"
@@ -98,7 +98,7 @@ export default function AgentDashboard() {
           title="Average Rating"
           value={agentProfile?.rating != null ? Number(agentProfile.rating).toFixed(1) : analytics?.rating != null ? Number(analytics.rating).toFixed(1) : "N/A"}
           icon={Star}
-          iconColor="text-[#f97316]"
+          iconColor="text-[#005AF1]"
           iconBg="bg-orange-50"
           subtitle="out of 5.0"
         />

@@ -47,7 +47,7 @@ export function BrandLogo({
             <div className={cn("flex items-center justify-center overflow-hidden", className)}>
               <Building2 className={iconClassName} />
             </div>
-            <BrandWordmark className="ml-2 text-xl font-bold text-[#1a3c5e]" />
+            <BrandWordmark className="ml-2 text-xl font-bold text-[#00162E]" />
           </>
         )}
       </div>

@@ -88,7 +88,7 @@ function EscrowRow({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
         <div className="bg-white rounded-lg p-2.5 border border-slate-100 min-w-0">
           <p className="text-[10px] text-slate-500 uppercase tracking-wide">{amountLabel}</p>
-          <p className="text-base font-bold text-[#1a3c5e] mt-0.5 truncate">
+          <p className="text-base font-bold text-[#00162E] mt-0.5 truncate">
             {formatNaira(amountToShow)}
           </p>
         </div>

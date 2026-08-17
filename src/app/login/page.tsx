@@ -189,7 +189,7 @@ function LoginContent() {
   return (
     <div className="min-h-screen flex">
       {/* Left: Decorative panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1a3c5e] via-[#1e4a72] to-[#0f2d48] flex-col justify-between p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#00162E] via-[#002A57] to-[#000E1E] flex-col justify-between p-12">
         <Link href="/" className="flex items-center gap-2">
           <BrandLogo 
             variant="full"
@@ -202,7 +202,7 @@ function LoginContent() {
         <div>
           <h2 className="text-4xl font-bold text-white leading-tight mb-4">
             Your home in Nigeria,<br />
-            <span className="text-[#f97316]">found with ease.</span>
+            <span className="text-[#005AF1]">found with ease.</span>
           </h2>
           <p className="text-slate-300 text-lg mb-8">
             Find verified homes and manage your rentals — all in one place.
@@ -219,8 +219,8 @@ function LoginContent() {
                 key={f.text}
                 className="flex items-center gap-3 bg-white/[0.06] backdrop-blur rounded-xl px-4 py-3 border border-white/10"
               >
-                <div className="w-9 h-9 rounded-lg bg-[#f97316]/20 flex items-center justify-center shrink-0">
-                  <f.icon className="h-5 w-5 text-[#fb923c]" />
+                <div className="w-9 h-9 rounded-lg bg-[#005AF1]/20 flex items-center justify-center shrink-0">
+                  <f.icon className="h-5 w-5 text-[#3882FF]" />
                 </div>
                 <span className="text-sm font-medium text-slate-100">{f.text}</span>
               </div>
@@ -242,7 +242,7 @@ function LoginContent() {
               <BrandLogo 
                 variant="full"
                 size="md"
-                className="w-8 h-8 rounded-lg bg-[#1a3c5e]" 
+                className="w-8 h-8 rounded-lg bg-[#00162E]" 
                 iconClassName="h-4 w-4 text-white" 
               />
             </Link>
@@ -252,12 +252,12 @@ function LoginContent() {
           <div className="flex items-center gap-2 mb-8">
             <div
               className={`h-2 flex-1 rounded-full transition-all duration-300 ${
-                step === "phone" ? "bg-[#1a3c5e]" : "bg-[#f97316]"
+                step === "phone" ? "bg-[#00162E]" : "bg-[#005AF1]"
               }`}
             />
             <div
               className={`h-2 flex-1 rounded-full transition-all duration-300 ${
-                step === "otp" ? "bg-[#f97316]" : "bg-slate-200"
+                step === "otp" ? "bg-[#005AF1]" : "bg-slate-200"
               }`}
             />
           </div>
@@ -265,8 +265,8 @@ function LoginContent() {
           {step === "phone" ? (
             <div>
               <div className="mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-[#1a3c5e]/10 flex items-center justify-center mb-4">
-                  <Phone className="h-6 w-6 text-[#1a3c5e]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#00162E]/10 flex items-center justify-center mb-4">
+                  <Phone className="h-6 w-6 text-[#00162E]" />
                 </div>
                 <h1 className="text-2xl font-bold text-slate-900 mb-2">
                   Welcome to {BRAND_NAME}
@@ -318,11 +318,11 @@ function LoginContent() {
 
               <p className="text-center text-sm text-slate-500 mt-6">
                 By continuing, you agree to our{" "}
-                <Link href="#" className="text-[#1a3c5e] hover:underline">
+                <Link href="#" className="text-[#00162E] hover:underline">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="#" className="text-[#1a3c5e] hover:underline">
+                <Link href="#" className="text-[#00162E] hover:underline">
                   Privacy Policy
                 </Link>
               </p>
@@ -341,8 +341,8 @@ function LoginContent() {
               </button>
 
               <div className="mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-[#f97316]/10 flex items-center justify-center mb-4">
-                  <Shield className="h-6 w-6 text-[#f97316]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#005AF1]/10 flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-[#005AF1]" />
                 </div>
                 <h1 className="text-2xl font-bold text-slate-900 mb-2">
                   {otpChannel === "email" ? "Verify your email" : "Verify your number"}
@@ -374,9 +374,9 @@ function LoginContent() {
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className="w-12 h-14 text-center text-xl font-bold text-slate-900 border-2 rounded-xl transition-all duration-150 focus:outline-none focus:border-[#1a3c5e] bg-white shadow-sm"
+                        className="w-12 h-14 text-center text-xl font-bold text-slate-900 border-2 rounded-xl transition-all duration-150 focus:outline-none focus:border-[#00162E] bg-white shadow-sm"
                         style={{
-                          borderColor: digit ? "#1a3c5e" : "#e2e8f0",
+                          borderColor: digit ? "#00162E" : "#e2e8f0",
                         }}
                         autoFocus={index === 0}
                       />
@@ -409,7 +409,7 @@ function LoginContent() {
                     <button
                       onClick={handleResend}
                       disabled={loading}
-                      className="text-[#1a3c5e] font-semibold hover:underline disabled:opacity-50"
+                      className="text-[#00162E] font-semibold hover:underline disabled:opacity-50"
                     >
                       Resend OTP
                     </button>

@@ -112,7 +112,7 @@ export default function AdminTreasuryPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Landmark className="h-6 w-6 text-[#1a3c5e]" />
+            <Landmark className="h-6 w-6 text-[#00162E]" />
             Treasury
           </h1>
           <p className="text-slate-500 mt-1">Your live {providerLabel} money — balance, transactions, settlements &amp; payouts</p>
@@ -123,7 +123,7 @@ export default function AdminTreasuryPage() {
           </Button>
           <Button
             size="sm"
-            className="gap-1 bg-[#1a3c5e] hover:bg-[#0f2d48]"
+            className="gap-1 bg-[#00162E] hover:bg-[#000E1E]"
             onClick={() => setPayoutOpen(true)}
             disabled={!configured || !caps?.manualPayout}
           >
@@ -148,7 +148,7 @@ export default function AdminTreasuryPage() {
 
       {/* Balance hero */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="md:col-span-1 bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] text-white border-0">
+        <Card className="md:col-span-1 bg-gradient-to-br from-[#00162E] to-[#000E1E] text-white border-0">
           <CardContent className="p-5">
             <div className="flex items-center gap-2 text-white/70 text-sm">
               <Wallet className="h-4 w-4" /> Available Balance
@@ -256,7 +256,7 @@ function TransactionsTable({ rows }: { rows: TreasuryTransaction[] }) {
         {rows.map((t) => (
           <TableRow key={t.id}>
             <TableCell className="text-sm text-slate-700">{t.label}</TableCell>
-            <TableCell className={`font-semibold text-sm ${t.direction === "debit" ? "text-red-600" : "text-[#1a3c5e]"}`}>
+            <TableCell className={`font-semibold text-sm ${t.direction === "debit" ? "text-red-600" : "text-[#00162E]"}`}>
               {t.direction === "debit" ? "−" : ""}{formatNaira(t.amountKobo)}
             </TableCell>
             <TableCell className="text-xs text-slate-500 capitalize">{t.channel ?? "—"}</TableCell>
@@ -287,7 +287,7 @@ function SettlementsTable({ rows }: { rows: TreasurySettlement[] }) {
         {rows.map((s) => (
           <TableRow key={s.id}>
             <TableCell className="text-xs text-slate-400 font-mono">#{s.id}</TableCell>
-            <TableCell className="font-semibold text-[#1a3c5e] text-sm">{formatNaira(s.netKobo)}</TableCell>
+            <TableCell className="font-semibold text-[#00162E] text-sm">{formatNaira(s.netKobo)}</TableCell>
             <TableCell className="text-sm text-slate-500">{s.feesKobo != null ? formatNaira(s.feesKobo) : "—"}</TableCell>
             <TableCell className="text-sm text-slate-500">{s.date ? formatDateTime(s.date) : "—"}</TableCell>
             <TableCell><Badge variant={statusBadge(s.status)} className="capitalize text-xs">{s.status}</Badge></TableCell>
@@ -318,7 +318,7 @@ function TransfersTable({ rows }: { rows: TreasuryTransfer[] }) {
               <p className="text-sm font-medium text-slate-900">{t.recipientName}</p>
               {t.recipientDetail && <p className="text-xs text-slate-400">{t.recipientDetail}</p>}
             </TableCell>
-            <TableCell className="font-semibold text-[#1a3c5e] text-sm">{formatNaira(t.amountKobo)}</TableCell>
+            <TableCell className="font-semibold text-[#00162E] text-sm">{formatNaira(t.amountKobo)}</TableCell>
             <TableCell className="text-sm text-slate-500">{t.reason ?? "—"}</TableCell>
             <TableCell className="text-sm text-slate-500">{t.date ? formatDateTime(t.date) : "—"}</TableCell>
             <TableCell><Badge variant={statusBadge(t.status)} className="capitalize text-xs">{t.status}</Badge></TableCell>
@@ -458,7 +458,7 @@ function PayoutDialog({
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => { reset(); onClose() }}>Cancel</Button>
           <Button
-            className="bg-[#1a3c5e] hover:bg-[#0f2d48] gap-1"
+            className="bg-[#00162E] hover:bg-[#000E1E] gap-1"
             disabled={!canSend || transferMutation.isPending}
             onClick={() => transferMutation.mutate()}
           >

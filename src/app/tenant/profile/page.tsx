@@ -87,7 +87,7 @@ export default function TenantProfilePage() {
                 <div className="mb-4">
                   <Link
                     href="/tenant/kyc"
-                    className="text-xs text-[#1a3c5e] underline underline-offset-2 hover:text-[#f97316] transition-colors"
+                    className="text-xs text-[#00162E] underline underline-offset-2 hover:text-[#005AF1] transition-colors"
                   >
                     Manage verification →
                   </Link>
@@ -119,7 +119,7 @@ export default function TenantProfilePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <User className="h-5 w-5 text-[#1a3c5e]" />
+                <User className="h-5 w-5 text-[#00162E]" />
                 <CardTitle>Personal Information</CardTitle>
               </div>
             </CardHeader>

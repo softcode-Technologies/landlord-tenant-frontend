@@ -198,7 +198,7 @@ export default function LandlordWalletPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Balance + Withdraw */}
         <div className="lg:col-span-1 space-y-4">
-          <Card className="bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] text-white border-0">
+          <Card className="bg-gradient-to-br from-[#00162E] to-[#000E1E] text-white border-0">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 rounded-xl bg-white/20">
@@ -466,8 +466,8 @@ export default function LandlordWalletPage() {
                     className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="p-2 rounded-lg bg-[#1a3c5e]/10 shrink-0">
-                        <Building2 className="h-4 w-4 text-[#1a3c5e]" />
+                      <div className="p-2 rounded-lg bg-[#00162E]/10 shrink-0">
+                        <Building2 className="h-4 w-4 text-[#00162E]" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-slate-900 truncate">

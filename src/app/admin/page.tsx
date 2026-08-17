@@ -32,8 +32,8 @@ export default function AdminDashboard() {
       value: (stats?.totalUsers ?? 0).toLocaleString(),
       sub: `+${stats?.newUsersThisMonth ?? 0} this month`,
       icon: Users,
-      color: "text-[#1a3c5e]",
-      bg: "bg-[#1a3c5e]/10",
+      color: "text-[#00162E]",
+      bg: "bg-[#00162E]/10",
     },
     {
       label: "Properties",
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       value: revenue ? formatNaira(revenue.platformCommission) : "₦—",
       sub: "Commission earned",
       icon: TrendingUp,
-      color: "text-[#f97316]",
+      color: "text-[#005AF1]",
       bg: "bg-orange-50",
     },
   ]
@@ -104,9 +104,9 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] rounded-2xl p-6 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#00162E] to-[#000E1E] rounded-2xl p-6 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: "radial-gradient(circle at 80% 50%, #f97316 0%, transparent 60%)"
+          backgroundImage: "radial-gradient(circle at 80% 50%, #005AF1 0%, transparent 60%)"
         }} />
         <h1 className="text-2xl font-bold mb-1 relative">Admin Dashboard</h1>
         <p className="text-slate-300 text-sm relative">Full platform control and management</p>
@@ -175,8 +175,8 @@ export default function AdminDashboard() {
             <Card className={`hover:shadow-md transition-all duration-200 cursor-pointer hover:-translate-y-0.5 ${item.urgent ? "border-amber-200 bg-amber-50/30" : "border-slate-100"}`}>
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`p-2.5 rounded-xl ${item.urgent ? "bg-amber-100" : "bg-[#1a3c5e]/10"}`}>
-                    <item.icon className={`h-5 w-5 ${item.urgent ? "text-amber-600" : "text-[#1a3c5e]"}`} />
+                  <div className={`p-2.5 rounded-xl ${item.urgent ? "bg-amber-100" : "bg-[#00162E]/10"}`}>
+                    <item.icon className={`h-5 w-5 ${item.urgent ? "text-amber-600" : "text-[#00162E]"}`} />
                   </div>
                   <div className="flex items-center gap-2">
                     {item.badge ? (

@@ -53,9 +53,9 @@ const ROLE_CARDS: {
     label: "Landlord",
     description: "I own property and want to rent it out",
     icon: Building2,
-    color: "text-[#1a3c5e]",
-    bg: "bg-[#1a3c5e]/5",
-    border: "border-[#1a3c5e]/20",
+    color: "text-[#00162E]",
+    bg: "bg-[#00162E]/5",
+    border: "border-[#00162E]/20",
   },
   {
     role: "agent",
@@ -177,7 +177,7 @@ function OnboardingContent() {
           <BrandLogo 
             variant="full"
             size="md"
-            className="w-8 h-8 rounded-lg bg-[#1a3c5e]" 
+            className="w-8 h-8 rounded-lg bg-[#00162E]" 
             iconClassName="h-4 w-4 text-white" 
           />
         </Link>
@@ -201,9 +201,9 @@ function OnboardingContent() {
                 key={s}
                 className={`transition-all duration-300 rounded-full ${
                   s === step
-                    ? "w-8 h-3 bg-[#1a3c5e]"
+                    ? "w-8 h-3 bg-[#00162E]"
                     : s < step
-                    ? "w-3 h-3 bg-[#f97316]"
+                    ? "w-3 h-3 bg-[#005AF1]"
                     : "w-3 h-3 bg-slate-200"
                 }`}
               />
@@ -310,7 +310,7 @@ function OnboardingContent() {
                     onClick={() => setSelectedRole(role)}
                     className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 flex items-start gap-4 group ${
                       isSelected
-                        ? `${border} ${bg} shadow-md ring-2 ring-offset-1 ring-[#1a3c5e]/30`
+                        ? `${border} ${bg} shadow-md ring-2 ring-offset-1 ring-[#00162E]/30`
                         : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"
                     }`}
                   >
@@ -327,7 +327,7 @@ function OnboardingContent() {
                           {label}
                         </p>
                         {isSelected && (
-                          <CheckCircle2 className="h-5 w-5 text-[#1a3c5e] flex-shrink-0" />
+                          <CheckCircle2 className="h-5 w-5 text-[#00162E] flex-shrink-0" />
                         )}
                       </div>
                       <p className={`text-sm mt-0.5 ${isSelected ? "text-slate-600" : "text-slate-500"}`}>

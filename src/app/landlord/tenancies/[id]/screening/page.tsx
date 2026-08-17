@@ -135,7 +135,7 @@ export default function TenantScreeningPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <BadgeCheck className="h-5 w-5 text-[#1a3c5e]" /> Identity & Verification
+                  <BadgeCheck className="h-5 w-5 text-[#00162E]" /> Identity & Verification
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -161,7 +161,7 @@ export default function TenantScreeningPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Wallet className="h-5 w-5 text-[#1a3c5e]" /> Payment Reliability
+                  <Wallet className="h-5 w-5 text-[#00162E]" /> Payment Reliability
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -192,7 +192,7 @@ export default function TenantScreeningPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Briefcase className="h-5 w-5 text-[#1a3c5e]" /> Affordability
+                  <Briefcase className="h-5 w-5 text-[#00162E]" /> Affordability
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
@@ -217,7 +217,7 @@ export default function TenantScreeningPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <History className="h-5 w-5 text-[#1a3c5e]" /> Tenancy Footprint
+                  <History className="h-5 w-5 text-[#00162E]" /> Tenancy Footprint
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-3 text-center">

@@ -171,7 +171,7 @@ export default function TenantMaintenancePage() {
                     <div className="flex items-center gap-3 text-xs text-slate-400">
                       <span>{formatDate(req.createdAt)}</span>
                       {req.landlordNote && (
-                        <span className="text-[#1a3c5e]">Landlord note added</span>
+                        <span className="text-[#00162E]">Landlord note added</span>
                       )}
                     </div>
                   </div>

@@ -87,11 +87,11 @@ export default function TenantInvitesPage() {
 
                 return (
                   <Card key={inv.id} className="overflow-hidden">
-                    <CardHeader className="bg-gradient-to-br from-[#1a3c5e]/5 to-[#f97316]/5 border-b border-slate-100">
+                    <CardHeader className="bg-gradient-to-br from-[#00162E]/5 to-[#005AF1]/5 border-b border-slate-100">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <CardTitle className="flex items-center gap-2 text-base">
-                            <Home className="h-4 w-4 text-[#1a3c5e]" />
+                            <Home className="h-4 w-4 text-[#00162E]" />
                             Tenancy invite
                           </CardTitle>
                           <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
@@ -109,7 +109,7 @@ export default function TenantInvitesPage() {
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
                         <div className="bg-slate-50 rounded-lg p-3 min-w-0">
                           <p className="text-[10px] text-slate-500 uppercase tracking-wide">Rent / year</p>
-                          <p className="text-sm font-bold text-[#1a3c5e] mt-0.5 truncate">
+                          <p className="text-sm font-bold text-[#00162E] mt-0.5 truncate">
                             {formatNairaAmount(inv.rentAmount)}
                           </p>
                         </div>
@@ -137,7 +137,7 @@ export default function TenantInvitesPage() {
                         </Link>
                         <Button
                           size="sm"
-                          className="gap-1.5 bg-[#f97316] hover:bg-[#ea6b0e] w-full sm:w-auto"
+                          className="gap-1.5 bg-[#005AF1] hover:bg-[#0047C4] w-full sm:w-auto"
                           onClick={() => acceptMutation.mutate(inv.inviteCode)}
                           disabled={isBusy}
                         >

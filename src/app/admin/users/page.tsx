@@ -89,7 +89,7 @@ export default function AdminUsersPage() {
 
   const roleBadgeClass = (role: string) => {
     switch (role) {
-      case "admin": return "bg-[#1a3c5e] text-white border-transparent"
+      case "admin": return "bg-[#00162E] text-white border-transparent"
       case "landlord": return "bg-blue-50 text-blue-700 border-blue-200"
       case "agent": return "bg-purple-50 text-purple-700 border-purple-200"
       case "tenant": return "bg-green-50 text-green-700 border-green-200"
@@ -179,7 +179,7 @@ export default function AdminUsersPage() {
                         <div className="flex items-center gap-3">
                           <Avatar className="h-9 w-9">
                             <AvatarImage src={user.avatarUrl} />
-                            <AvatarFallback className="text-xs bg-[#1a3c5e]/10 text-[#1a3c5e]">
+                            <AvatarFallback className="text-xs bg-[#00162E]/10 text-[#00162E]">
                               {getInitials(name)}
                             </AvatarFallback>
                           </Avatar>
@@ -210,7 +210,7 @@ export default function AdminUsersPage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-6 w-6 p-0 text-slate-400 hover:text-[#1a3c5e]"
+                            className="h-6 w-6 p-0 text-slate-400 hover:text-[#00162E]"
                             onClick={() => setWalletUser(user)}
                           >
                             <Wallet className="h-3.5 w-3.5" />
@@ -303,9 +303,9 @@ export default function AdminUsersPage() {
           ) : (
             <div className="flex flex-col gap-4 overflow-hidden">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-[#1a3c5e]/5 rounded-xl p-4">
+                <div className="bg-[#00162E]/5 rounded-xl p-4">
                   <p className="text-xs text-slate-500 mb-1">Available Balance</p>
-                  <p className="text-2xl font-bold text-[#1a3c5e]">
+                  <p className="text-2xl font-bold text-[#00162E]">
                     {formatNaira(walletData?.data?.wallet?.balance ?? 0)}
                   </p>
                 </div>
@@ -350,7 +350,7 @@ export default function AdminUsersPage() {
               <div className="flex justify-end pt-2 border-t">
                 <Button
                   onClick={() => { setWalletUser(null); setCreditUser(walletUser) }}
-                  className="gap-2 bg-[#1a3c5e] hover:bg-[#0f2d48]"
+                  className="gap-2 bg-[#00162E] hover:bg-[#000E1E]"
                 >
                   <PlusCircle className="h-4 w-4" />
                   Credit Wallet
@@ -371,7 +371,7 @@ export default function AdminUsersPage() {
             {creditUser && (
               <div className="bg-slate-50 rounded-xl p-3 flex items-center gap-3">
                 <Avatar className="h-9 w-9">
-                  <AvatarFallback className="text-xs bg-[#1a3c5e]/10 text-[#1a3c5e]">
+                  <AvatarFallback className="text-xs bg-[#00162E]/10 text-[#00162E]">
                     {getInitials(`${creditUser.firstName ?? ""} ${creditUser.lastName ?? ""}`.trim() || "U")}
                   </AvatarFallback>
                 </Avatar>
@@ -411,7 +411,7 @@ export default function AdminUsersPage() {
               Cancel
             </Button>
             <Button
-              className="bg-[#1a3c5e] hover:bg-[#0f2d48] gap-2"
+              className="bg-[#00162E] hover:bg-[#000E1E] gap-2"
               disabled={creditMutation.isPending || !creditAmount}
               onClick={handleCredit}
             >

@@ -102,7 +102,7 @@ export default function AdminLandlordsPage() {
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-9 w-9">
-                            <AvatarFallback className="text-xs bg-[#1a3c5e]/10 text-[#1a3c5e]">
+                            <AvatarFallback className="text-xs bg-[#00162E]/10 text-[#00162E]">
                               {getInitials(name)}
                             </AvatarFallback>
                           </Avatar>
@@ -119,7 +119,7 @@ export default function AdminLandlordsPage() {
                       </TableCell>
                       <TableCell className="text-sm font-medium text-slate-700">{lord.propertyCount}</TableCell>
                       <TableCell className="text-sm font-medium text-slate-700">{lord.activeTenancies}</TableCell>
-                      <TableCell className="text-sm font-semibold text-[#1a3c5e]">
+                      <TableCell className="text-sm font-semibold text-[#00162E]">
                         {formatNairaAmount(lord.expectedAnnualRentNaira)}
                       </TableCell>
                       <TableCell>

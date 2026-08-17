@@ -48,7 +48,7 @@ export default function AgentCommissionsPage() {
         <Card>
           <CardContent className="p-5">
             <p className="text-xs text-slate-500 mb-1">Total Earned</p>
-            <p className="text-2xl font-bold text-[#1a3c5e]">
+            <p className="text-2xl font-bold text-[#00162E]">
               {analytics ? formatNaira(analytics.totalCommissions) : "₦0"}
             </p>
           </CardContent>

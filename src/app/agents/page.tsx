@@ -76,7 +76,7 @@ export default function AgentsPage() {
       <Navbar />
 
       {/* Header */}
-      <div className="bg-[#1a3c5e] text-white py-12">
+      <div className="bg-[#00162E] text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-2">Find an Agent</h1>
           <p className="text-slate-300">
@@ -158,7 +158,7 @@ export default function AgentsPage() {
                     <div className="grid grid-cols-2 gap-2 mb-4">
                       <div className="bg-slate-50 rounded-xl p-2.5 text-center">
                         <div className="flex items-center justify-center gap-1">
-                          <Star className="h-3.5 w-3.5 fill-[#f97316] text-[#f97316]" />
+                          <Star className="h-3.5 w-3.5 fill-[#005AF1] text-[#005AF1]" />
                           <span className="text-sm font-bold text-slate-900">
                             {agent.rating != null ? Number(agent.rating).toFixed(1) : "N/A"}
                           </span>
@@ -167,7 +167,7 @@ export default function AgentsPage() {
                       </div>
                       <div className="bg-slate-50 rounded-xl p-2.5 text-center">
                         <div className="flex items-center justify-center gap-1">
-                          <Building className="h-3.5 w-3.5 text-[#1a3c5e]" />
+                          <Building className="h-3.5 w-3.5 text-[#00162E]" />
                           <span className="text-sm font-bold text-slate-900">
                             {agent.totalProperties ?? 0}
                           </span>

@@ -148,7 +148,7 @@ export default function LandlordInvitesPage() {
                     <div className="flex flex-wrap gap-3 text-sm text-slate-500 mb-3">
                       <span>{invite.unit?.unitNumber}</span>
                       <span>{invite.unit?.property?.name}</span>
-                      <span className="font-semibold text-[#1a3c5e]">
+                      <span className="font-semibold text-[#00162E]">
                         {formatNairaAmount(invite.rentAmount)}{rentCycleSuffix(invite.rentCycle)}
                       </span>
                     </div>

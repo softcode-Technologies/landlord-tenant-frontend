@@ -179,7 +179,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* ─── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#00080F] via-[#000E1E] to-[#00162E] text-white">
         <div
           className="absolute inset-0 opacity-[0.05]"
           style={{
@@ -188,7 +188,7 @@ export default function HomePage() {
             backgroundSize: "36px 36px",
           }}
         />
-        <div className="absolute top-1/3 -right-32 w-[640px] h-[640px] bg-[#f97316]/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-1/3 -right-32 w-[640px] h-[640px] bg-[#005AF1]/15 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute -bottom-32 left-1/4 w-[420px] h-[420px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 lg:pt-28 pb-24 lg:pb-32">
@@ -196,8 +196,8 @@ export default function HomePage() {
             {/* Copy */}
             <div className="lg:col-span-6 max-w-xl">
               <div className="inline-flex items-center gap-2 bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-full pl-2 pr-3.5 py-1.5 mb-7">
-                <span className="inline-flex items-center gap-1.5 bg-[#f97316]/15 border border-[#f97316]/25 rounded-full px-2 py-0.5">
-                  <span className="w-1.5 h-1.5 bg-[#f97316] rounded-full animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 bg-[#005AF1]/15 border border-[#005AF1]/25 rounded-full px-2 py-0.5">
+                  <span className="w-1.5 h-1.5 bg-[#005AF1] rounded-full animate-pulse" />
                   <span className="text-[10px] font-bold text-[#fbbf24] uppercase tracking-wide">Now live</span>
                 </span>
                 {/* <span className="text-xs font-medium text-slate-200 tracking-wide">
@@ -207,7 +207,7 @@ export default function HomePage() {
 
               <h1 className="text-[2.7rem] sm:text-5xl lg:text-[3.6rem] font-bold leading-[1.05] tracking-tight mb-6">
                 Run your rentals
-                <span className="block mt-1.5 bg-gradient-to-r from-[#f97316] via-[#fb923c] to-[#fbbf24] bg-clip-text text-transparent">
+                <span className="block mt-1.5 bg-gradient-to-r from-[#005AF1] via-[#3882FF] to-[#fbbf24] bg-clip-text text-transparent">
                   like a business.
                 </span>
               </h1>
@@ -221,7 +221,7 @@ export default function HomePage() {
 
               <div className="flex flex-col sm:flex-row gap-3 mb-10">
                 <Link href="/login">
-                  <Button className="h-12 px-6 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl shadow-lg shadow-orange-500/25 gap-2 text-[15px]">
+                  <Button className="h-12 px-6 bg-[#005AF1] hover:bg-[#0047C4] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 gap-2 text-[15px]">
                     Start managing free <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -253,9 +253,9 @@ export default function HomePage() {
 
             {/* Dashboard mockup */}
             <div className="lg:col-span-6 relative">
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#f97316]/20 via-transparent to-blue-500/10 rounded-[2rem] blur-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#005AF1]/20 via-transparent to-blue-500/10 rounded-[2rem] blur-3xl" />
 
-              <div className="relative bg-gradient-to-br from-[#0f2d48]/90 to-[#0a1e33]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
+              <div className="relative bg-gradient-to-br from-[#000E1E]/90 to-[#00080F]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
                 {/* Top bar */}
                 <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.02]">
                   <div className="flex items-center gap-2">
@@ -278,7 +278,7 @@ export default function HomePage() {
                       <p className="text-xs text-slate-400">Good morning, Chukwuemeka</p>
                       <p className="text-base font-semibold text-white">Portfolio Overview</p>
                     </div>
-                    <div className="px-2.5 py-1 rounded-md bg-[#f97316]/15 border border-[#f97316]/20 text-[10px] font-semibold text-[#f97316]">
+                    <div className="px-2.5 py-1 rounded-md bg-[#005AF1]/15 border border-[#005AF1]/20 text-[10px] font-semibold text-[#005AF1]">
                       3 properties
                     </div>
                   </div>
@@ -319,7 +319,7 @@ export default function HomePage() {
               </div>
 
               {/* Floating chip */}
-              <div className="hidden sm:flex absolute -bottom-5 -left-4 items-center gap-2.5 bg-white text-[#0f2d48] rounded-xl px-3.5 py-2.5 shadow-xl shadow-black/20 border border-slate-100">
+              <div className="hidden sm:flex absolute -bottom-5 -left-4 items-center gap-2.5 bg-white text-[#000E1E] rounded-xl px-3.5 py-2.5 shadow-xl shadow-black/20 border border-slate-100">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
                   <BadgeCheck className="h-4 w-4 text-emerald-600" />
                 </div>
@@ -339,7 +339,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x divide-slate-200 dark:divide-slate-800">
             {TRUST_METRICS.map((m) => (
               <div key={m.label} className="text-center md:px-6">
-                <p className="text-2xl sm:text-3xl font-bold text-[#0f2d48] dark:text-white tracking-tight">
+                <p className="text-2xl sm:text-3xl font-bold text-[#000E1E] dark:text-white tracking-tight">
                   {m.value}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{m.label}</p>
@@ -354,11 +354,11 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             <div className="lg:col-span-5 lg:sticky lg:top-24">
-              <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">For Landlords & Agents</p>
+              <p className="text-xs font-semibold text-[#005AF1] uppercase tracking-[0.18em] mb-3">For Landlords & Agents</p>
               <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-[1.15] tracking-tight mb-5">
                 Stop chasing rent.
                 <br />
-                <span className="text-[#1a3c5e] dark:text-[#fbbf24]">Start running it.</span>
+                <span className="text-[#00162E] dark:text-[#fbbf24]">Start running it.</span>
               </h2>
               <p className="text-slate-600 dark:text-slate-300 text-[15px] leading-relaxed mb-7">
                 Every property, every tenant, every payment — in one place. Built so landlords
@@ -376,7 +376,7 @@ export default function HomePage() {
               </div>
 
               <Link href="/login">
-                <Button className="h-11 px-6 bg-[#1a3c5e] hover:bg-[#0f2d48] text-white font-semibold rounded-xl gap-2">
+                <Button className="h-11 px-6 bg-[#00162E] hover:bg-[#000E1E] text-white font-semibold rounded-xl gap-2">
                   Open landlord dashboard <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -386,10 +386,10 @@ export default function HomePage() {
               {LANDLORD_FEATURES.map((f) => (
                 <div
                   key={f.title}
-                  className="group rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 p-5 hover:border-[#f97316]/40 hover:shadow-lg hover:shadow-slate-200/60 dark:hover:shadow-black/30 transition-all duration-200"
+                  className="group rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 p-5 hover:border-[#005AF1]/40 hover:shadow-lg hover:shadow-slate-200/60 dark:hover:shadow-black/30 transition-all duration-200"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#f97316]/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                    <f.icon className="h-5 w-5 text-[#f97316]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#005AF1]/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                    <f.icon className="h-5 w-5 text-[#005AF1]" />
                   </div>
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1.5">{f.title}</h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
@@ -408,10 +408,10 @@ export default function HomePage() {
               {TENANT_FEATURES.map((f) => (
                 <div
                   key={f.title}
-                  className="group rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 p-5 hover:border-[#1a3c5e]/30 dark:hover:border-[#fbbf24]/30 hover:shadow-lg transition-all duration-200"
+                  className="group rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 p-5 hover:border-[#00162E]/30 dark:hover:border-[#fbbf24]/30 hover:shadow-lg transition-all duration-200"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#1a3c5e]/10 dark:bg-[#fbbf24]/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                    <f.icon className="h-5 w-5 text-[#1a3c5e] dark:text-[#fbbf24]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#00162E]/10 dark:bg-[#fbbf24]/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                    <f.icon className="h-5 w-5 text-[#00162E] dark:text-[#fbbf24]" />
                   </div>
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1.5">{f.title}</h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
@@ -420,11 +420,11 @@ export default function HomePage() {
             </div>
 
             <div className="lg:col-span-5 lg:sticky lg:top-24 lg:order-2 order-1">
-              <p className="text-xs font-semibold text-[#1a3c5e] dark:text-[#fbbf24] uppercase tracking-[0.18em] mb-3">For Tenants</p>
+              <p className="text-xs font-semibold text-[#00162E] dark:text-[#fbbf24] uppercase tracking-[0.18em] mb-3">For Tenants</p>
               <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-[1.15] tracking-tight mb-5">
                 Rent with proof,
                 <br />
-                <span className="text-[#f97316]">not guesswork.</span>
+                <span className="text-[#005AF1]">not guesswork.</span>
               </h2>
               <p className="text-slate-600 dark:text-slate-300 text-[15px] leading-relaxed mb-7">
                 Find verified homes from real landlords. Pay through a system that keeps every
@@ -433,7 +433,7 @@ export default function HomePage() {
               </p>
 
               <Link href="/listings">
-                <Button className="h-11 px-6 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl shadow-lg shadow-orange-500/20 gap-2">
+                <Button className="h-11 px-6 bg-[#005AF1] hover:bg-[#0047C4] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 gap-2">
                   Browse verified homes <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -446,7 +446,7 @@ export default function HomePage() {
       <section className="py-24 bg-slate-50 dark:bg-slate-900/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 max-w-2xl mx-auto">
-            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">How it works</p>
+            <p className="text-xs font-semibold text-[#005AF1] uppercase tracking-[0.18em] mb-3">How it works</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
               One platform. Two starting points. The same outcome.
             </h2>
@@ -457,21 +457,21 @@ export default function HomePage() {
           </div>
 
           <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-gradient-to-r from-[#f97316]/0 via-[#f97316]/40 to-[#f97316]/0" />
+            <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-gradient-to-r from-[#005AF1]/0 via-[#005AF1]/40 to-[#005AF1]/0" />
             {FLOWS.map((f) => (
               <div
                 key={f.step}
                 className="relative rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 p-7 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center text-white shadow-lg">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00162E] to-[#000E1E] flex items-center justify-center text-white shadow-lg">
                     <f.icon className="h-5 w-5" />
                   </div>
                   <span className="text-3xl font-black text-slate-200 dark:text-slate-700 tracking-tighter">
                     {f.step}
                   </span>
                 </div>
-                <p className="text-[10px] font-semibold text-[#f97316] uppercase tracking-wider mb-2">{f.tag}</p>
+                <p className="text-[10px] font-semibold text-[#005AF1] uppercase tracking-wider mb-2">{f.tag}</p>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-2">{f.title}</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
               </div>
@@ -481,15 +481,15 @@ export default function HomePage() {
       </section>
 
       {/* ─── EXISTING TENANT ONBOARDING ⭐ ─────────────────────────────────── */}
-      <section className="py-24 relative overflow-hidden bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#f97316]/12 rounded-full blur-[140px]" />
+      <section className="py-24 relative overflow-hidden bg-gradient-to-br from-[#00080F] via-[#000E1E] to-[#00162E] text-white">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#005AF1]/12 rounded-full blur-[140px]" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px]" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 bg-[#f97316]/15 border border-[#f97316]/25 rounded-full px-3.5 py-1.5 mb-6">
-                <Sparkles className="h-3.5 w-3.5 text-[#f97316]" />
+              <div className="inline-flex items-center gap-2 bg-[#005AF1]/15 border border-[#005AF1]/25 rounded-full px-3.5 py-1.5 mb-6">
+                <Sparkles className="h-3.5 w-3.5 text-[#005AF1]" />
                 <span className="text-xs font-semibold text-[#fbbf24] tracking-wide">
                   Already have tenants?
                 </span>
@@ -512,7 +512,7 @@ export default function HomePage() {
                   { n: "3", t: "We take over the lifecycle", d: "Rent reminders, receipts, renewals, and communication — handled automatically." },
                 ].map((step) => (
                   <div key={step.n} className="flex gap-4">
-                    <div className="shrink-0 w-9 h-9 rounded-lg bg-[#f97316] flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-orange-500/30">
+                    <div className="shrink-0 w-9 h-9 rounded-lg bg-[#005AF1] flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-blue-500/30">
                       {step.n}
                     </div>
                     <div>
@@ -524,7 +524,7 @@ export default function HomePage() {
               </div>
 
               <Link href="/login">
-                <Button className="h-12 px-7 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl shadow-xl shadow-orange-500/30 gap-2">
+                <Button className="h-12 px-7 bg-[#005AF1] hover:bg-[#0047C4] text-white font-semibold rounded-xl shadow-xl shadow-blue-500/30 gap-2">
                   Onboard existing tenants <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -532,11 +532,11 @@ export default function HomePage() {
 
             {/* Invite mock */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/20 to-transparent rounded-3xl blur-2xl" />
-              <div className="relative bg-white text-[#0f2d48] rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#005AF1]/20 to-transparent rounded-3xl blur-2xl" />
+              <div className="relative bg-white text-[#000E1E] rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-[#1a3c5e] flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-[#00162E] flex items-center justify-center">
                       <UserPlus className="h-4 w-4 text-white" />
                     </div>
                     <p className="text-sm font-semibold">Invite tenant</p>
@@ -550,7 +550,7 @@ export default function HomePage() {
                   <div>
                     <p className="text-[11px] text-slate-500 mb-1.5">Property</p>
                     <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 border border-slate-200">
-                      <Building2 className="h-4 w-4 text-[#1a3c5e]" />
+                      <Building2 className="h-4 w-4 text-[#00162E]" />
                       <p className="text-sm font-medium">Sunrise Apartments · Unit 3B</p>
                     </div>
                   </div>
@@ -573,14 +573,14 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-[#f97316]/10 border border-[#f97316]/20">
-                    <Send className="h-4 w-4 text-[#f97316] shrink-0" />
-                    <p className="text-xs text-[#0f2d48]">
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-[#005AF1]/10 border border-[#005AF1]/20">
+                    <Send className="h-4 w-4 text-[#005AF1] shrink-0" />
+                    <p className="text-xs text-[#000E1E]">
                       Tenant will receive an SMS invite and confirm with one tap.
                     </p>
                   </div>
 
-                  <div className="h-10 rounded-xl bg-[#0f2d48] flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="h-10 rounded-xl bg-[#000E1E] flex items-center justify-center text-white text-sm font-semibold">
                     Send invite
                   </div>
                 </div>
@@ -594,7 +594,7 @@ export default function HomePage() {
       <section className="py-24 bg-white dark:bg-[#0a0f1e]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 max-w-2xl mx-auto">
-            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Everything in the box</p>
+            <p className="text-xs font-semibold text-[#005AF1] uppercase tracking-[0.18em] mb-3">Everything in the box</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
               The full rental stack, out of the box.
             </h2>
@@ -608,10 +608,10 @@ export default function HomePage() {
             {FEATURE_CARDS.map((f) => (
               <div
                 key={f.title}
-                className="group rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-slate-50/60 dark:bg-slate-800/40 p-6 hover:border-[#f97316]/40 hover:bg-white dark:hover:bg-slate-800/80 hover:shadow-lg transition-all duration-200"
+                className="group rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-slate-50/60 dark:bg-slate-800/40 p-6 hover:border-[#005AF1]/40 hover:bg-white dark:hover:bg-slate-800/80 hover:shadow-lg transition-all duration-200"
               >
-                <div className="w-11 h-11 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center mb-4 group-hover:border-[#f97316]/30 transition-colors">
-                  <f.icon className="h-5 w-5 text-[#1a3c5e] dark:text-[#fbbf24] group-hover:text-[#f97316] transition-colors" />
+                <div className="w-11 h-11 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center mb-4 group-hover:border-[#005AF1]/30 transition-colors">
+                  <f.icon className="h-5 w-5 text-[#00162E] dark:text-[#fbbf24] group-hover:text-[#005AF1] transition-colors" />
                 </div>
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">{f.title}</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{f.desc}</p>
@@ -625,7 +625,7 @@ export default function HomePage() {
       <section className="py-24 bg-slate-50 dark:bg-slate-900/40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 max-w-2xl mx-auto">
-            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Why {BRAND_NAME}</p>
+            <p className="text-xs font-semibold text-[#005AF1] uppercase tracking-[0.18em] mb-3">Why {BRAND_NAME}</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
               We&apos;re not another listings site.
             </h2>
@@ -642,7 +642,7 @@ export default function HomePage() {
                 className="rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 p-7 hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-start gap-4">
-                  <div className="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center text-white shadow-md">
+                  <div className="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#00162E] to-[#000E1E] flex items-center justify-center text-white shadow-md">
                     <p.icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -660,7 +660,7 @@ export default function HomePage() {
       <section className="py-24 bg-white dark:bg-[#0a0f1e]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 max-w-2xl mx-auto">
-            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Pricing</p>
+            <p className="text-xs font-semibold text-[#005AF1] uppercase tracking-[0.18em] mb-3">Pricing</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
               Honest pricing. No surprises.
             </h2>
@@ -676,16 +676,16 @@ export default function HomePage() {
                 key={plan.name}
                 className={`relative rounded-2xl p-7 border transition-all duration-200 ${
                   plan.highlight
-                    ? "bg-gradient-to-br from-[#0f2d48] to-[#0a1e33] border-[#f97316]/30 text-white shadow-xl shadow-slate-300/40 dark:shadow-black/40"
+                    ? "bg-gradient-to-br from-[#000E1E] to-[#00080F] border-[#005AF1]/30 text-white shadow-xl shadow-slate-300/40 dark:shadow-black/40"
                     : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
                 }`}
               >
                 {plan.highlight && (
-                  <span className="absolute top-5 right-5 text-[10px] font-bold uppercase tracking-wider bg-[#f97316] text-white px-2.5 py-1 rounded-full">
+                  <span className="absolute top-5 right-5 text-[10px] font-bold uppercase tracking-wider bg-[#005AF1] text-white px-2.5 py-1 rounded-full">
                     Most popular
                   </span>
                 )}
-                <p className={`text-xs font-semibold uppercase tracking-[0.18em] mb-3 ${plan.highlight ? "text-[#fbbf24]" : "text-[#f97316]"}`}>
+                <p className={`text-xs font-semibold uppercase tracking-[0.18em] mb-3 ${plan.highlight ? "text-[#fbbf24]" : "text-[#005AF1]"}`}>
                   {plan.audience}
                 </p>
                 <div className="flex items-end gap-1.5 mb-1">
@@ -706,7 +706,7 @@ export default function HomePage() {
                 <ul className="space-y-2.5 mb-7">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
-                      <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${plan.highlight ? "bg-[#f97316]/20" : "bg-emerald-500/15"}`}>
+                      <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${plan.highlight ? "bg-[#005AF1]/20" : "bg-emerald-500/15"}`}>
                         <Check className={`h-3 w-3 ${plan.highlight ? "text-[#fbbf24]" : "text-emerald-600 dark:text-emerald-400"}`} />
                       </span>
                       <span className={`text-[13px] leading-snug ${plan.highlight ? "text-slate-200" : "text-slate-600 dark:text-slate-300"}`}>{f}</span>
@@ -718,8 +718,8 @@ export default function HomePage() {
                   <Button
                     className={`w-full h-11 rounded-xl font-semibold gap-2 ${
                       plan.highlight
-                        ? "bg-[#f97316] hover:bg-[#ea6b0e] text-white shadow-lg shadow-orange-500/25"
-                        : "bg-[#1a3c5e] hover:bg-[#0f2d48] text-white"
+                        ? "bg-[#005AF1] hover:bg-[#0047C4] text-white shadow-lg shadow-blue-500/25"
+                        : "bg-[#00162E] hover:bg-[#000E1E] text-white"
                     }`}
                   >
                     {plan.cta.label} <ArrowRight className="h-4 w-4" />
@@ -739,12 +739,12 @@ export default function HomePage() {
       {SHOW_APP_DOWNLOAD && (
       <section className="py-20 bg-slate-50 dark:bg-slate-900/40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white px-8 sm:px-12 py-12 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-[#f97316]/12 rounded-full blur-[130px] pointer-events-none" />
+          <div className="rounded-3xl bg-gradient-to-br from-[#00080F] via-[#000E1E] to-[#00162E] text-white px-8 sm:px-12 py-12 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-[#005AF1]/12 rounded-full blur-[130px] pointer-events-none" />
             <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/10 rounded-full px-3.5 py-1.5 mb-6">
-                  <Smartphone className="h-3.5 w-3.5 text-[#f97316]" />
+                  <Smartphone className="h-3.5 w-3.5 text-[#005AF1]" />
                   <span className="text-xs font-medium text-slate-200">iOS &amp; Android</span>
                 </div>
                 <h2 className="text-3xl sm:text-[2.4rem] font-bold leading-[1.1] tracking-tight mb-4">
@@ -790,7 +790,7 @@ export default function HomePage() {
                     { icon: Bell, label: "Rent due in 7 days", accent: "bg-amber-500/15 text-amber-400" },
                     { icon: CheckCircle2, label: "₦450,000 received", accent: "bg-emerald-500/15 text-emerald-400" },
                     { icon: Wrench, label: "Maintenance update", accent: "bg-blue-500/15 text-blue-400" },
-                    { icon: MessageSquare, label: "New message", accent: "bg-[#f97316]/15 text-[#f97316]" },
+                    { icon: MessageSquare, label: "New message", accent: "bg-[#005AF1]/15 text-[#005AF1]" },
                   ].map((n) => (
                     <div key={n.label} className="flex items-center gap-2.5 bg-white/[0.05] border border-white/10 rounded-xl px-3.5 py-3">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${n.accent}`}>
@@ -811,7 +811,7 @@ export default function HomePage() {
       <section className="py-24 bg-white dark:bg-[#0a0f1e]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">FAQ</p>
+            <p className="text-xs font-semibold text-[#005AF1] uppercase tracking-[0.18em] mb-3">FAQ</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
               Questions, answered.
             </h2>
@@ -838,7 +838,7 @@ export default function HomePage() {
 
       {/* ─── FINAL CTA ─────────────────────────────────────────────────────── */}
       <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#00080F] via-[#000E1E] to-[#00162E]" />
         <div
           className="absolute inset-0 opacity-[0.06]"
           style={{
@@ -846,7 +846,7 @@ export default function HomePage() {
             backgroundSize: "32px 32px",
           }}
         />
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#f97316]/15 rounded-full blur-[140px]" />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#005AF1]/15 rounded-full blur-[140px]" />
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
@@ -863,7 +863,7 @@ export default function HomePage() {
 
             <div className="flex flex-col gap-3 lg:items-end">
               <Link href="/login" className="w-full lg:w-auto">
-                <Button className="w-full h-12 px-7 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl shadow-xl shadow-orange-500/30 gap-2">
+                <Button className="w-full h-12 px-7 bg-[#005AF1] hover:bg-[#0047C4] text-white font-semibold rounded-xl shadow-xl shadow-blue-500/30 gap-2">
                   I&apos;m a landlord — start free <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>

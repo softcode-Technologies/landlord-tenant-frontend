@@ -29,8 +29,8 @@ export default function AgentAnalyticsPage() {
           title="Managed Properties"
           value={analytics?.managedProperties ?? 0}
           icon={Building2}
-          iconColor="text-[#1a3c5e]"
-          iconBg="bg-[#1a3c5e]/10"
+          iconColor="text-[#00162E]"
+          iconBg="bg-[#00162E]/10"
         />
         <StatCard
           title="Total Earned"
@@ -88,7 +88,7 @@ export default function AgentAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center justify-center py-6 text-center">
-              <div className="flex items-center gap-1 text-[#f97316]">
+              <div className="flex items-center gap-1 text-[#005AF1]">
                 <Star className="h-7 w-7 fill-current" />
                 <span className="text-4xl font-bold text-slate-900">
                   {analytics?.rating != null && Number(analytics.rating) > 0 ? Number(analytics.rating).toFixed(1) : "—"}

@@ -98,7 +98,7 @@ export default function AgentProfilePage() {
             <button
               type="button"
               onClick={() => setEditOpen(true)}
-              className="text-xs text-[#1a3c5e] underline underline-offset-2 hover:text-[#f97316] transition-colors mb-3"
+              className="text-xs text-[#00162E] underline underline-offset-2 hover:text-[#005AF1] transition-colors mb-3"
             >
               Edit photo & details
             </button>
@@ -110,7 +110,7 @@ export default function AgentProfilePage() {
             )}
             {agentProfile?.rating && (
               <div className="flex items-center justify-center gap-1 mt-3">
-                <Star className="h-4 w-4 fill-[#f97316] text-[#f97316]" />
+                <Star className="h-4 w-4 fill-[#005AF1] text-[#005AF1]" />
                 <span className="font-semibold text-slate-900">
                   {Number(agentProfile.rating).toFixed(1)}
                 </span>

@@ -118,7 +118,7 @@ export default function InvitePage() {
             <BrandLogo 
               variant="full"
               size="md"
-              className="w-9 h-9 rounded-xl bg-[#1a3c5e]" 
+              className="w-9 h-9 rounded-xl bg-[#00162E]" 
               iconClassName="h-5 w-5 text-white" 
             />
           </Link>
@@ -126,7 +126,7 @@ export default function InvitePage() {
 
         <Card className="overflow-hidden">
           {/* Top gradient */}
-          <div className="h-2 bg-gradient-to-r from-[#1a3c5e] to-[#f97316]" />
+          <div className="h-2 bg-gradient-to-r from-[#00162E] to-[#005AF1]" />
 
           <CardHeader className="text-center pb-2">
             <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-3">
@@ -160,7 +160,7 @@ export default function InvitePage() {
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-500">Annual Rent</span>
-                <span className="text-lg font-bold text-[#1a3c5e]">
+                <span className="text-lg font-bold text-[#00162E]">
                   {formatNairaAmount(invite.rentAmount)}
                 </span>
               </div>

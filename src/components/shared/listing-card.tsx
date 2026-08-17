@@ -61,17 +61,17 @@ export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e]">
-              <Building2 className="h-10 w-10 text-[#f97316]/80" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#00080F] via-[#000E1E] to-[#00162E]">
+              <Building2 className="h-10 w-10 text-[#005AF1]/80" />
               <span className="text-xs font-medium text-slate-300">No photo available</span>
             </div>
           )}
           <div className="absolute top-3 left-3 flex items-center gap-1.5">
             {listing.isFeatured && (
-              <Badge className="bg-[#f97316] text-white">Featured</Badge>
+              <Badge className="bg-[#005AF1] text-white">Featured</Badge>
             )}
             {listing.isListerVerified && (
-              <Badge className="bg-[#1a3c5e] text-white gap-1 px-2">
+              <Badge className="bg-[#00162E] text-white gap-1 px-2">
                 <BadgeCheck className="h-3 w-3" />
                 Verified
               </Badge>
@@ -97,12 +97,12 @@ export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
         {/* Content */}
         <div className="p-4">
           <div className="flex items-start justify-between gap-2 mb-2">
-            <h3 className="font-semibold text-slate-900 text-sm leading-tight line-clamp-1 group-hover:text-[#1a3c5e] transition-colors">
+            <h3 className="font-semibold text-slate-900 text-sm leading-tight line-clamp-1 group-hover:text-[#00162E] transition-colors">
               {listing.title}
             </h3>
             {listing.averageRating ? (
               <div className="flex items-center gap-1 shrink-0">
-                <Star className="h-3.5 w-3.5 fill-[#f97316] text-[#f97316]" />
+                <Star className="h-3.5 w-3.5 fill-[#005AF1] text-[#005AF1]" />
                 <span className="text-xs font-medium text-slate-600">
                   {listing.averageRating.toFixed(1)}
                 </span>
@@ -144,7 +144,7 @@ export function ListingCard({ listing, onSaveToggle }: ListingCardProps) {
 
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-lg font-bold text-[#1a3c5e]">
+              <span className="text-lg font-bold text-[#00162E]">
                 {formatNairaAmount(listing.rentPerAnnum)}
               </span>
               <span className="text-xs text-slate-400">/{rentCycleWord(listing.rentCycle)}</span>

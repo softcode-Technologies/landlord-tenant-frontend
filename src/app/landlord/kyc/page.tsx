@@ -64,7 +64,7 @@ export default function LandlordKycPage() {
       <div>
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#1a3c5e] transition-colors mb-4"
+          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#00162E] transition-colors mb-4"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -131,7 +131,7 @@ export default function LandlordKycPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-[#1a3c5e]" />
+              <AlertCircle className="h-5 w-5 text-[#00162E]" />
               <CardTitle>Submit Verification</CardTitle>
             </div>
           </CardHeader>
@@ -145,8 +145,8 @@ export default function LandlordKycPage() {
                     onClick={() => setKycMethod(m)}
                     className={`flex-1 py-2 rounded-lg text-xs font-semibold border transition-colors ${
                       kycMethod === m
-                        ? "bg-[#1a3c5e] text-white border-[#1a3c5e]"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-[#1a3c5e]"
+                        ? "bg-[#00162E] text-white border-[#00162E]"
+                        : "bg-white text-slate-600 border-slate-200 hover:border-[#00162E]"
                     }`}
                   >
                     {m === "nin" ? "NIN" : m === "bvn" ? "BVN" : "Document"}
@@ -198,7 +198,7 @@ export default function LandlordKycPage() {
                 <Label htmlFor="doc-input">Government ID document</Label>
                 <label
                   htmlFor="doc-input"
-                  className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 py-6 text-center hover:border-[#1a3c5e]"
+                  className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 py-6 text-center hover:border-[#00162E]"
                 >
                   {kycFile ? (
                     <>

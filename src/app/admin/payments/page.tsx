@@ -145,8 +145,8 @@ export default function AdminPaymentsPage() {
               onClick={() => { setTypeFilter(t); setPage(1) }}
               className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
                 typeFilter === t
-                  ? "bg-[#1a3c5e] text-white border-[#1a3c5e]"
-                  : "bg-white text-slate-600 border-slate-200 hover:border-[#1a3c5e]"
+                  ? "bg-[#00162E] text-white border-[#00162E]"
+                  : "bg-white text-slate-600 border-slate-200 hover:border-[#00162E]"
               }`}
             >
               {t === "all" ? "All Types" : TYPE_LABELS[t]}
@@ -201,7 +201,7 @@ export default function AdminPaymentsPage() {
                           {TYPE_LABELS[payment.type] ?? payment.type}
                         </span>
                       </TableCell>
-                      <TableCell className="font-bold text-[#1a3c5e] text-sm">
+                      <TableCell className="font-bold text-[#00162E] text-sm">
                         {formatNaira(payment.amount)}
                       </TableCell>
                       <TableCell className="text-xs text-slate-400 font-mono">

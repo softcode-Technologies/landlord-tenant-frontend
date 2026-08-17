@@ -15,19 +15,21 @@
     --card-foreground: 15 23 42;
     --popover: 255 255 255;
     --popover-foreground: 15 23 42;
-    --primary: 26 60 94;
+    --primary: 0 22 46;            /* #00162E — logo navy */
     --primary-foreground: 248 250 252;
     --secondary: 241 245 249;
     --secondary-foreground: 15 23 42;
     --muted: 241 245 249;
     --muted-foreground: 100 116 139;
-    --accent: 249 115 22;
+    --accent: 0 90 241;            /* #005AF1 — logo blue */
     --accent-foreground: 255 255 255;
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
     --border: 226 232 240;
     --input: 226 232 240;
-    --ring: 26 60 94;
+    /* Focus ring uses the vivid blue: the navy is too close to body text to
+       read as a focus indicator. */
+    --ring: 0 90 241;
     --radius: 0.75rem;
     --success: 22 163 74;
     --success-foreground: 255 255 255;
@@ -40,19 +42,19 @@
     --card-foreground: 241 245 249;
     --popover: 17 24 39;
     --popover-foreground: 241 245 249;
-    --primary: 249 115 22;
+    --primary: 0 90 241;           /* #005AF1 — the navy is unreadable on a dark ground */
     --primary-foreground: 255 255 255;
     --secondary: 30 41 59;
     --secondary-foreground: 241 245 249;
     --muted: 30 41 59;
     --muted-foreground: 148 163 184;
-    --accent: 249 115 22;
+    --accent: 0 90 241;            /* #005AF1 */
     --accent-foreground: 255 255 255;
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
     --border: 30 41 59;
     --input: 30 41 59;
-    --ring: 249 115 22;
+    --ring: 0 90 241;
     --success: 22 163 74;
     --success-foreground: 255 255 255;
   }
