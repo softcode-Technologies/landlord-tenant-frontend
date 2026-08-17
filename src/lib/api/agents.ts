@@ -20,6 +20,9 @@ export interface AgentManagedLandlord {
   firstName: string | null
   lastName: string | null
   phone: string
+  email: string | null
+  /** Only `active` landlords can have new properties added directly. */
+  status: "pending" | "active" | "revoked" | "rejected"
   propertyCount: number
 }
 
@@ -69,4 +72,33 @@ export const agentsApi = {
   // an existing landlord/agent relationship (enforced server-side).
   createPropertyAsAgent: (data: CreatePropertyAsAgentData) =>
     apiClient.post<Property>("/properties/agent", data),
+}
+
+export interface AwaitingLandlord {
+  landlordProfileId: string
+  name: string
+  phone: string
+  claimStatus: "unclaimed" | "invited"
+  propertyCount: number
+  heldCommissionKobo: number
+  invitedAt: string | null
+  daysWaiting: number
+}
+
+/** The agent's conversion picture: what's held, and on whom. */
+export interface AgentPipeline {
+  heldCommissionKobo: number
+  awaitingCount: number
+  awaiting: AwaitingLandlord[]
+  trustTier: "unverified" | "id_verified" | "established" | "partner"
+  unclaimedLimit: number | null
+  unclaimedRemaining: number | null
+  onboardedLandlordCount: number
+  claimedLandlordCount: number
+  claimRatePercent: number
+  suspended: boolean
+}
+
+export const agentPipelineApi = {
+  get: () => apiClient.get<AgentPipeline>("/agent/pipeline"),
 }
