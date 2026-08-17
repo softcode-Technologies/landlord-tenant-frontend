@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -7,14 +8,14 @@ import { z } from "zod"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { agentsApi } from "@/lib/api/agents"
+import { claimsApi } from "@/lib/api/claims"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Building2, ArrowLeft, Info, Loader2, UserPlus } from "lucide-react"
+import { ArrowLeft, Info, Loader2, UserPlus, Users, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
 import { extractApiError } from "@/lib/utils"
 import { NIGERIAN_STATES, getLGAs } from "@/lib/data/nigeria-geo"
@@ -29,8 +30,14 @@ const PROPERTY_TYPES = [
   { value: "land", label: "Land" },
 ]
 
-const schema = z.object({
-  landlordProfileId: z.string().min(1, "Pick a landlord"),
+const RELATIONSHIPS = [
+  { value: "owner", label: "Owner" },
+  { value: "caretaker", label: "Caretaker" },
+  { value: "family_representative", label: "Family representative" },
+  { value: "company", label: "Company" },
+]
+
+const propertyFields = {
   name: z.string().min(3, "Name required"),
   address: z.string().min(5, "Address required"),
   city: z.string().min(2, "City required"),
@@ -39,40 +46,44 @@ const schema = z.object({
   area: z.string().optional(),
   propertyType: z.string().min(1, "Property type required"),
   description: z.string().optional(),
+}
+
+/** Existing landlord on the platform — the original flow. */
+const existingSchema = z.object({ landlordProfileId: z.string().min(1, "Pick a landlord"), ...propertyFields })
+
+/** New landlord — the agent supplies their details and we invite them. */
+const newLandlordSchema = z.object({
+  landlordFirstName: z.string().min(2, "First name required"),
+  landlordLastName: z.string().optional(),
+  landlordPhone: z.string().min(7, "Phone number required"),
+  landlordEmail: z.string().email("Enter a valid email").optional().or(z.literal("")),
+  relationship: z.string().min(1, "Select their relationship to the property"),
+  companyName: z.string().optional(),
+  // Kept as a string so the schema's input and output types stay identical —
+  // z.coerce makes them diverge, which breaks the resolver's typing. Converted
+  // on submit instead.
+  commissionPercent: z
+    .string()
+    .optional()
+    .refine((v) => !v || (/^\d+$/.test(v) && Number(v) >= 0 && Number(v) <= 50), {
+      message: "Enter a whole number between 0 and 50",
+    }),
+  ...propertyFields,
 })
 
-type FormData = z.infer<typeof schema>
+type ExistingForm = z.infer<typeof existingSchema>
+type NewForm = z.infer<typeof newLandlordSchema>
 
 export default function AgentNewPropertyPage() {
   const router = useRouter()
+  const [tab, setTab] = useState<"new" | "existing">("new")
 
   const { data: landlordsData, isLoading: landlordsLoading } = useQuery({
     queryKey: ["agent-landlords"],
     queryFn: () => agentsApi.getMyLandlords(),
   })
   const landlords = landlordsData?.data ?? []
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) })
-
-  const watchState = watch("state")
-  const lgas = getLGAs(watchState ?? "")
-
-  const createMutation = useMutation({
-    mutationFn: (form: FormData) => agentsApi.createPropertyAsAgent(form),
-    onSuccess: () => {
-      toast.success("Property added. The landlord has been notified.")
-      router.push("/agent/properties")
-    },
-    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to add property")),
-  })
-
-  const noLandlords = !landlordsLoading && landlords.length === 0
+  const hasLandlords = !landlordsLoading && landlords.length > 0
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -88,217 +99,352 @@ export default function AgentNewPropertyPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Add a property</h1>
         <p className="text-slate-500 mt-1">
-          Create a property on behalf of a landlord who has already assigned you to one of their properties.
+          Add a property you manage. We&apos;ll invite the landlord to confirm it.
         </p>
       </div>
 
-      {noLandlords && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center text-center py-8">
-              <div className="p-3 rounded-xl bg-amber-100 mb-4">
-                <UserPlus className="h-6 w-6 text-amber-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2">No landlord relationship yet</h3>
-              <p className="text-sm text-slate-500 max-w-md mb-5">
-                You can only add properties for landlords you already manage for.
-                A landlord must first assign you to one of their existing properties using your registered phone number.
-              </p>
-              <Link href="/agent">
-                <Button variant="outline" size="sm">
-                  Back to dashboard
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex gap-2 border-b border-slate-200">
+        <TabButton active={tab === "new"} onClick={() => setTab("new")} icon={UserPlus}>
+          New landlord
+        </TabButton>
+        <TabButton active={tab === "existing"} onClick={() => setTab("existing")} icon={Users}>
+          Landlord already on here
+          {hasLandlords && <span className="ml-1.5 text-xs text-slate-400">({landlords.length})</span>}
+        </TabButton>
+      </div>
+
+      {tab === "new" ? (
+        <NewLandlordForm onDone={() => router.push("/agent/properties")} />
+      ) : (
+        <ExistingLandlordForm
+          landlords={landlords}
+          loading={landlordsLoading}
+          onDone={() => router.push("/agent/properties")}
+          onSwitch={() => setTab("new")}
+        />
       )}
+    </div>
+  )
+}
 
-      {!noLandlords && (
-        <form onSubmit={handleSubmit((d) => createMutation.mutate(d))} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Landlord</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Add this property under</Label>
-                {landlordsLoading ? (
-                  <Skeleton className="h-10 w-full mt-1.5" />
-                ) : (
-                  <Select onValueChange={(v) => setValue("landlordProfileId", v, { shouldValidate: true })}>
-                    <SelectTrigger className="mt-1.5">
-                      <SelectValue placeholder="Choose a landlord you manage for" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {landlords.map((l) => {
-                        const name =
-                          `${l.firstName ?? ""} ${l.lastName ?? ""}`.trim() || l.phone
-                        return (
-                          <SelectItem key={l.landlordProfileId} value={l.landlordProfileId}>
-                            {name} · {l.propertyCount} propert{l.propertyCount === 1 ? "y" : "ies"}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
-                )}
-                {errors.landlordProfileId && (
-                  <p className="text-xs text-red-600 mt-1">{errors.landlordProfileId.message}</p>
-                )}
-              </div>
+function TabButton({
+  active,
+  onClick,
+  icon: Icon,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  icon: typeof Users
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-2 px-1 pb-2.5 -mb-px border-b-2 text-sm font-medium transition-colors ${
+        active
+          ? "border-slate-900 text-slate-900"
+          : "border-transparent text-slate-500 hover:text-slate-700"
+      }`}
+    >
+      <Icon className="h-4 w-4" />
+      {children}
+    </button>
+  )
+}
 
-              <div className="rounded-lg bg-blue-50 border border-blue-100 p-3 flex gap-2.5 text-xs text-blue-900">
-                <Info className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <p>
-                  The landlord will be notified that you added a property under their name. They can remove
-                  you or archive the property at any time from their dashboard.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+// ─── New landlord ─────────────────────────────────────────────────────────────
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Property details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Property name</Label>
-                <Input
-                  {...register("name")}
-                  placeholder="e.g. Sunrise Apartments, Lekki"
-                  className="mt-1.5"
-                />
-                {errors.name && <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>}
-              </div>
+function NewLandlordForm({ onDone }: { onDone: () => void }) {
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<NewForm>({
+    resolver: zodResolver(newLandlordSchema),
+  })
+  const watchState = watch("state")
+  const lgas = getLGAs(watchState ?? "")
 
-              <div>
-                <Label>Property type</Label>
-                <Select onValueChange={(v) => setValue("propertyType", v, { shouldValidate: true })}>
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue placeholder="Select property type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PROPERTY_TYPES.map((t) => (
-                      <SelectItem key={t.value} value={t.value}>
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-3.5 w-3.5 text-slate-500" />
-                          {t.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.propertyType && (
-                  <p className="text-xs text-red-600 mt-1">{errors.propertyType.message}</p>
-                )}
-              </div>
+  const mutation = useMutation({
+    mutationFn: (f: NewForm) =>
+      claimsApi.onboard({
+        landlord: {
+          firstName: f.landlordFirstName,
+          lastName: f.landlordLastName || undefined,
+          phone: f.landlordPhone,
+          email: f.landlordEmail || undefined,
+          relationship: f.relationship as "owner",
+          companyName: f.companyName || undefined,
+        },
+        property: {
+          name: f.name,
+          description: f.description || undefined,
+          address: f.address,
+          city: f.city,
+          state: f.state,
+          lga: f.lga || undefined,
+          area: f.area || undefined,
+          propertyType: f.propertyType,
+          isPublic: false,
+        },
+        commissionPercent: f.commissionPercent ? Number(f.commissionPercent) : undefined,
+      }),
+    onSuccess: (res) => {
+      const channels = res.data?.channelsSent ?? []
+      toast.success(
+        channels.length > 0
+          ? `Property added. We've asked the landlord to confirm by ${channels.join(" and ")}.`
+          : "Property added. We couldn't reach the landlord — please check their contact details.",
+      )
+      onDone()
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Could not add the property")),
+  })
 
-              <div>
-                <Label>Address</Label>
-                <Input
-                  {...register("address")}
-                  placeholder="House number and street"
-                  className="mt-1.5"
-                />
-                {errors.address && (
-                  <p className="text-xs text-red-600 mt-1">{errors.address.message}</p>
-                )}
-              </div>
+  return (
+    <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
+      <div className="flex gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 p-3.5">
+        <ShieldCheck className="h-4 w-4 text-emerald-700 mt-0.5 shrink-0" />
+        <p className="text-sm text-emerald-900 leading-snug">
+          We&apos;ll create the landlord&apos;s account and send them a confirmation link. You can manage the
+          property straight away — your commission is released once they confirm.
+        </p>
+      </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label>State</Label>
-                  <Select
-                    onValueChange={(v) => {
-                      setValue("state", v, { shouldValidate: true })
-                      setValue("lga", "")
-                    }}
-                  >
-                    <SelectTrigger className="mt-1.5">
-                      <SelectValue placeholder="Select state" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {NIGERIAN_STATES.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.state && (
-                    <p className="text-xs text-red-600 mt-1">{errors.state.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label>City</Label>
-                  <Input
-                    {...register("city")}
-                    placeholder="e.g. Lagos"
-                    className="mt-1.5"
-                  />
-                  {errors.city && (
-                    <p className="text-xs text-red-600 mt-1">{errors.city.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {lgas.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label>LGA (optional)</Label>
-                    <Select
-                      onValueChange={(v) => setValue("lga", v)}
-                    >
-                      <SelectTrigger className="mt-1.5">
-                        <SelectValue placeholder="Select LGA" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {lgas.map((l) => (
-                          <SelectItem key={l} value={l}>
-                            {l}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Area (optional)</Label>
-                    <Input
-                      {...register("area")}
-                      placeholder="Neighbourhood / estate"
-                      className="mt-1.5"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <Label>Description (optional)</Label>
-                <Textarea
-                  {...register("description")}
-                  placeholder="Anything you want the landlord to know about this listing"
-                  className="mt-1.5"
-                  rows={4}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-            <Link href="/agent/properties" className="sm:w-auto">
-              <Button variant="ghost" type="button" className="w-full sm:w-auto">
-                Cancel
-              </Button>
-            </Link>
-            <Button type="submit" disabled={createMutation.isPending} className="gap-2 w-full sm:w-auto">
-              {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Add property
-            </Button>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">The landlord</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="First name" error={errors.landlordFirstName?.message}>
+              <Input {...register("landlordFirstName")} placeholder="Bola" />
+            </Field>
+            <Field label="Last name" optional>
+              <Input {...register("landlordLastName")} placeholder="Adekunle" />
+            </Field>
           </div>
-        </form>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field
+              label="Phone number"
+              error={errors.landlordPhone?.message}
+              hint="This is how they'll confirm — make sure it's theirs, not yours."
+            >
+              <Input {...register("landlordPhone")} placeholder="08012345678" inputMode="tel" />
+            </Field>
+            <Field label="Email" optional error={errors.landlordEmail?.message}>
+              <Input {...register("landlordEmail")} placeholder="bola@example.com" inputMode="email" />
+            </Field>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="Their relationship to the property" error={errors.relationship?.message}>
+              <Select onValueChange={(v) => setValue("relationship", v, { shouldValidate: true })}>
+                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>
+                  {RELATIONSHIPS.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Your commission (%)" optional hint="Your letting fee on this property.">
+              <Input {...register("commissionPercent")} placeholder="10" inputMode="numeric" />
+            </Field>
+          </div>
+        </CardContent>
+      </Card>
+
+      <PropertyFieldsCard register={register} errors={errors} setValue={setValue} lgas={lgas} />
+
+      <div className="flex justify-end gap-2">
+        <Link href="/agent/properties">
+          <Button type="button" variant="outline">Cancel</Button>
+        </Link>
+        <Button type="submit" disabled={mutation.isPending}>
+          {mutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          Add property & invite landlord
+        </Button>
+      </div>
+    </form>
+  )
+}
+
+// ─── Existing landlord ────────────────────────────────────────────────────────
+
+function ExistingLandlordForm({
+  landlords,
+  loading,
+  onDone,
+  onSwitch,
+}: {
+  landlords: { landlordProfileId: string; firstName: string | null; lastName: string | null; phone: string; propertyCount: number }[]
+  loading: boolean
+  onDone: () => void
+  onSwitch: () => void
+}) {
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ExistingForm>({
+    resolver: zodResolver(existingSchema),
+  })
+  const watchState = watch("state")
+  const lgas = getLGAs(watchState ?? "")
+
+  const mutation = useMutation({
+    mutationFn: (f: ExistingForm) => agentsApi.createPropertyAsAgent(f),
+    onSuccess: () => {
+      toast.success("Property added. The landlord has been notified.")
+      onDone()
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Failed to add property")),
+  })
+
+  if (!loading && landlords.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col items-center text-center py-8">
+            <div className="p-3 rounded-xl bg-slate-100 mb-4">
+              <UserPlus className="h-6 w-6 text-slate-600" />
+            </div>
+            <h3 className="font-semibold text-slate-900 mb-2">No confirmed landlords yet</h3>
+            <p className="text-sm text-slate-500 max-w-md mb-5">
+              This list fills up as landlords confirm you. To add a property for someone new, enter their
+              details and we&apos;ll invite them.
+            </p>
+            <Button onClick={onSwitch} size="sm">Add a new landlord</Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
+      <Card>
+        <CardHeader><CardTitle className="text-base">Landlord</CardTitle></CardHeader>
+        <CardContent>
+          <Field label="Which landlord?" error={errors.landlordProfileId?.message}>
+            <Select onValueChange={(v) => setValue("landlordProfileId", v, { shouldValidate: true })}>
+              <SelectTrigger><SelectValue placeholder={loading ? "Loading…" : "Select a landlord"} /></SelectTrigger>
+              <SelectContent>
+                {landlords.map((l) => (
+                  <SelectItem key={l.landlordProfileId} value={l.landlordProfileId}>
+                    {[l.firstName, l.lastName].filter(Boolean).join(" ") || l.phone}
+                    {l.propertyCount > 0 && ` · ${l.propertyCount} propert${l.propertyCount === 1 ? "y" : "ies"}`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+        </CardContent>
+      </Card>
+
+      <PropertyFieldsCard register={register} errors={errors} setValue={setValue} lgas={lgas} />
+
+      <div className="flex justify-end gap-2">
+        <Link href="/agent/properties">
+          <Button type="button" variant="outline">Cancel</Button>
+        </Link>
+        <Button type="submit" disabled={mutation.isPending}>
+          {mutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          Add property
+        </Button>
+      </div>
+    </form>
+  )
+}
+
+// ─── Shared property fields ───────────────────────────────────────────────────
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function PropertyFieldsCard({
+  register,
+  errors,
+  setValue,
+  lgas,
+}: {
+  register: any
+  errors: any
+  setValue: any
+  lgas: string[]
+}) {
+  return (
+    <Card>
+      <CardHeader><CardTitle className="text-base">The property</CardTitle></CardHeader>
+      <CardContent className="space-y-4">
+        <Field label="Property name" error={errors.name?.message}>
+          <Input {...register("name")} placeholder="Awolowo Heights" />
+        </Field>
+        <Field label="Street address" error={errors.address?.message} hint="Only shown to tenants after an inspection is unlocked.">
+          <Input {...register("address")} placeholder="14 Awolowo Road" />
+        </Field>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field label="State" error={errors.state?.message}>
+            <Select onValueChange={(v) => { setValue("state", v, { shouldValidate: true }); setValue("lga", "") }}>
+              <SelectTrigger><SelectValue placeholder="Select state" /></SelectTrigger>
+              <SelectContent>
+                {NIGERIAN_STATES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="City" error={errors.city?.message}>
+            <Input {...register("city")} placeholder="Ikeja" />
+          </Field>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field label="LGA" optional>
+            <Select onValueChange={(v) => setValue("lga", v)}>
+              <SelectTrigger><SelectValue placeholder={lgas.length ? "Select LGA" : "Pick a state first"} /></SelectTrigger>
+              <SelectContent>
+                {lgas.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Area / neighbourhood" optional>
+            <Input {...register("area")} placeholder="Lekki Phase 1" />
+          </Field>
+        </div>
+        <Field label="Property type" error={errors.propertyType?.message}>
+          <Select onValueChange={(v) => setValue("propertyType", v, { shouldValidate: true })}>
+            <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+            <SelectContent>
+              {PROPERTY_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Description" optional>
+          <Textarea {...register("description")} rows={3} placeholder="Anything a tenant should know" />
+        </Field>
+      </CardContent>
+    </Card>
+  )
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+function Field({
+  label,
+  children,
+  error,
+  hint,
+  optional,
+}: {
+  label: string
+  children: React.ReactNode
+  error?: string
+  hint?: string
+  optional?: boolean
+}) {
+  return (
+    <div>
+      <Label className="text-sm">
+        {label}
+        {optional && <span className="text-slate-400 font-normal ml-1">(optional)</span>}
+      </Label>
+      <div className="mt-1.5">{children}</div>
+      {hint && !error && (
+        <p className="text-xs text-slate-400 mt-1 flex items-start gap-1">
+          <Info className="h-3 w-3 mt-0.5 shrink-0" />
+          {hint}
+        </p>
       )}
+      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
     </div>
   )
 }

@@ -18,7 +18,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog"
 import { formatNairaAmount, extractApiError } from "@/lib/utils"
-import { ArrowLeft, Building2, MapPin, Bed, Bath, Plus, Pencil, UserPlus, Loader2, DoorOpen } from "lucide-react"
+import { ArrowLeft, Building2, MapPin, Bed, Bath, Plus, Pencil, UserPlus, Loader2, DoorOpen, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
 import type { Unit } from "@/lib/types"
 
@@ -131,6 +131,29 @@ export default function AgentPropertyDetailPage() {
       <Link href="/agent/properties">
         <Button variant="ghost" size="sm" className="gap-1"><ArrowLeft className="h-4 w-4" />Properties</Button>
       </Link>
+
+      {/* Address verification is what lets an agent-onboarded property be listed
+          publicly, so it is surfaced here rather than buried in a settings page. */}
+      {property.sourceChannel === "agent_onboarded" && !property.addressConfirmedAt && (
+        <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div className="flex gap-2.5 min-w-0">
+            <ShieldCheck className="h-4 w-4 text-amber-700 mt-0.5 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-amber-900">Address not confirmed yet</p>
+              <p className="text-sm text-amber-800 mt-0.5">
+                {property.verificationStatus === "pending"
+                  ? "Your submission is with our team for review."
+                  : "This property can't be listed publicly until someone confirms the address on site."}
+              </p>
+            </div>
+          </div>
+          {property.verificationStatus !== "pending" && (
+            <Link href={`/agent/properties/${id}/verify`}>
+              <Button size="sm">Confirm address</Button>
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* Property summary */}
       <Card>

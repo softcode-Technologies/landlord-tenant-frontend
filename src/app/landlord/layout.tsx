@@ -24,6 +24,8 @@ import {
   ShieldCheck,
   Wallet,
   DollarSign,
+  UserCog,
+  Activity,
 } from "lucide-react"
 
 function LandlordNav({ children }: { children: React.ReactNode }) {
@@ -61,6 +63,8 @@ function LandlordNav({ children }: { children: React.ReactNode }) {
     { label: "Tenancies", href: "/landlord/tenancies", icon: Users, section: "Tenants" },
     { label: "Invites", href: "/landlord/invites", icon: UserPlus, section: "Tenants" },
     { label: "Maintenance", href: "/landlord/maintenance", icon: Wrench, section: "Tenants" },
+    { label: "My agents", href: "/landlord/agents", icon: UserCog, section: "Tenants" },
+    { label: "Activity", href: "/landlord/activity", icon: Activity, section: "Tenants" },
 
     { label: "Wallet", href: "/landlord/wallet", icon: Wallet, section: "Money" },
     ...(usesAgents
