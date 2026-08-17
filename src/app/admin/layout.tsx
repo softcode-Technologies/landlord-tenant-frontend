@@ -13,6 +13,7 @@ import {
   Gift,
   BarChart3,
   UserCircle,
+  ShieldCheck,
 } from "lucide-react"
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Landlords", href: "/admin/landlords", icon: Building2 },
   { label: "KYC Queue", href: "/admin/kyc", icon: Shield },
+  { label: "Verifications", href: "/admin/verifications", icon: ShieldCheck },
   { label: "Tenancies", href: "/admin/tenancies", icon: Home },
   { label: "Payments", href: "/admin/payments", icon: CreditCard },
   { label: "Treasury", href: "/admin/treasury", icon: Landmark },

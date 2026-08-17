@@ -172,6 +172,16 @@ export interface Property {
     lastName?: string | null
     phone?: string | null
   }
+  /** Which acquisition channel produced this property. */
+  sourceChannel?: "landlord_direct" | "agent_onboarded"
+  /** Workflow state of the address review. */
+  verificationStatus?: "unverified" | "pending" | "rejected" | "verified"
+  /** Badge: someone stood at the property with GPS on and a reviewer accepted it. */
+  addressConfirmedAt?: string | null
+  /** Badge: a human reviewed the ownership documents. */
+  documentsSightedAt?: string | null
+  /** Denormalized marketplace gate — recomputed server-side, never set by hand. */
+  listingEligible?: boolean
   createdAt: string
   updatedAt: string
 }
