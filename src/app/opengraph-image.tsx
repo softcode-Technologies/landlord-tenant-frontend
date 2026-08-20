@@ -16,9 +16,9 @@ export default function Image() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          backgroundColor: "#0a1e33",
+          backgroundColor: "#00080F",
           backgroundImage:
-            "linear-gradient(135deg, #0a1e33 0%, #0f2d48 55%, #1a3c5e 100%)",
+            "linear-gradient(135deg, #00080F 0%, #000E1E 55%, #00162E 100%)",
           fontFamily: "sans-serif",
         }}
       >
@@ -28,7 +28,7 @@ export default function Image() {
               width: 64,
               height: 64,
               borderRadius: 18,
-              backgroundColor: "#1a3c5e",
+              backgroundColor: "#00162E",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -40,7 +40,7 @@ export default function Image() {
                 width: 28,
                 height: 28,
                 borderRadius: 6,
-                backgroundColor: "#f97316",
+                backgroundColor: "#005AF1",
                 display: "flex",
               }}
             />
@@ -62,7 +62,7 @@ export default function Image() {
           }}
         >
           <span>Run your rentals</span>
-          <span style={{ color: "#fb923c" }}>like a business.</span>
+          <span style={{ color: "#3882FF" }}>like a business.</span>
         </div>
 
         <div style={{ display: "flex", marginTop: 32, fontSize: 30, color: "rgba(226,232,240,0.85)", maxWidth: 900 }}>

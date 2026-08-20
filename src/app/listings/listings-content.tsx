@@ -94,7 +94,7 @@ function ListingsContent() {
       <Navbar />
 
       {/* Header */}
-      <div className="bg-[#1a3c5e] text-white py-12">
+      <div className="bg-[#00162E] text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-2">Browse Listings</h1>
           <p className="text-slate-300 mb-6">
@@ -120,7 +120,7 @@ function ListingsContent() {
                 className="h-12 pl-10 bg-white text-slate-900 border-0 placeholder:text-slate-400"
               />
             </div>
-            <Button type="submit" className="h-12 px-6 bg-[#f97316] hover:bg-[#ea6b0e] gap-2 shrink-0">
+            <Button type="submit" className="h-12 px-6 bg-[#005AF1] hover:bg-[#0047C4] gap-2 shrink-0">
               <Search className="h-4 w-4" />
               <span className="hidden sm:inline">Search</span>
             </Button>
@@ -137,7 +137,7 @@ function ListingsContent() {
                 <h3 className="font-semibold text-slate-900">Filters</h3>
                 <button
                   onClick={clearFilters}
-                  className="text-xs text-[#f97316] hover:underline"
+                  className="text-xs text-[#005AF1] hover:underline"
                 >
                   Clear all
                 </button>

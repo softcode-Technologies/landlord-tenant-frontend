@@ -161,7 +161,7 @@ export default function AgentPropertyDetailPage() {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                <Building2 className="h-6 w-6 text-[#1a3c5e]" />
+                <Building2 className="h-6 w-6 text-[#00162E]" />
                 {property.name}
               </h1>
               <p className="text-sm text-slate-500 mt-1 flex items-center gap-1">

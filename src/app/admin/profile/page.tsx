@@ -78,7 +78,7 @@ export default function AdminProfilePage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <User className="h-5 w-5 text-[#1a3c5e]" />
+                <User className="h-5 w-5 text-[#00162E]" />
                 <CardTitle>Personal Information</CardTitle>
               </div>
             </CardHeader>

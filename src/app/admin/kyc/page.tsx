@@ -128,7 +128,7 @@ export default function AdminKycPage() {
                   <div className="flex items-start gap-4">
                     <Avatar className="h-11 w-11 shrink-0">
                       <AvatarImage src={record.avatarUrl ?? undefined} />
-                      <AvatarFallback className="text-sm bg-[#1a3c5e]/10 text-[#1a3c5e]">
+                      <AvatarFallback className="text-sm bg-[#00162E]/10 text-[#00162E]">
                         {getInitials(name)}
                       </AvatarFallback>
                     </Avatar>
@@ -193,7 +193,7 @@ export default function AdminKycPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 text-xs text-[#1a3c5e]"
+                        className="h-8 text-xs text-[#00162E]"
                         onClick={() => setDetailTarget(record)}
                       >
                         Details
@@ -296,7 +296,7 @@ export default function AdminKycPage() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-14 w-14">
                   <AvatarImage src={detailTarget.avatarUrl ?? undefined} />
-                  <AvatarFallback className="text-lg bg-[#1a3c5e]/10 text-[#1a3c5e]">
+                  <AvatarFallback className="text-lg bg-[#00162E]/10 text-[#00162E]">
                     {getInitials(`${detailTarget.firstName ?? ""} ${detailTarget.lastName ?? ""}`)}
                   </AvatarFallback>
                 </Avatar>

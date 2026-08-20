@@ -81,7 +81,7 @@ export default function TenantInspectionsPage() {
                         </div>
                       )}
                       <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                        <Calendar className="h-3.5 w-3.5 text-[#1a3c5e]" />
+                        <Calendar className="h-3.5 w-3.5 text-[#00162E]" />
                         <span>{formatDateTime(schedule.scheduledAt)}</span>
                       </div>
                       {schedule.note && (

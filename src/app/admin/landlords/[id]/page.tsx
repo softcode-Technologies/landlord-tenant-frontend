@@ -65,7 +65,7 @@ function UnitRow({ unit, onViewPayments }: { unit: LandlordOverviewUnit; onViewP
             </div>
             <div>
               <p className="text-xs text-slate-400">Annual Rent</p>
-              <p className="font-semibold text-[#1a3c5e]">{formatNairaAmount(t.rentAmount)}</p>
+              <p className="font-semibold text-[#00162E]">{formatNairaAmount(t.rentAmount)}</p>
             </div>
             <div>
               <p className="text-xs text-slate-400">Next Due</p>
@@ -109,7 +109,7 @@ function PropertyCard({ property, onViewPayments }: { property: LandlordOverview
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="font-semibold text-slate-900 flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-[#1a3c5e]" />
+              <Building2 className="h-4 w-4 text-[#00162E]" />
               {property.name}
             </p>
             <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
@@ -122,7 +122,7 @@ function PropertyCard({ property, onViewPayments }: { property: LandlordOverview
               {occupied}/{property.units.length} occupied
             </Badge>
             {property.assignedAgent && (
-              <Badge variant="outline" className="text-xs gap-1 text-[#1a3c5e] border-[#1a3c5e]/30">
+              <Badge variant="outline" className="text-xs gap-1 text-[#00162E] border-[#00162E]/30">
                 <UserCheck className="h-3 w-3" />
                 {property.assignedAgent.name}
               </Badge>
@@ -195,7 +195,7 @@ function TenancyPaymentsDialog({ tenancyId, onClose }: { tenancyId: string | nul
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 text-sm">
                 <div>
                   <p className="text-xs text-slate-400">Annual Rent</p>
-                  <p className="font-semibold text-[#1a3c5e]">{formatNairaAmount(history.tenancy.rentAmount)}</p>
+                  <p className="font-semibold text-[#00162E]">{formatNairaAmount(history.tenancy.rentAmount)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-slate-400">Next Due</p>
@@ -374,7 +374,7 @@ export default function AdminLandlordOverviewPage({ params }: { params: Promise<
           label="Expected Annual Rent"
           value={formatNairaAmount(summary.expectedAnnualRentNaira)}
           sub={`${summary.activeTenancies} active tenancies`}
-          accent="text-[#1a3c5e]"
+          accent="text-[#00162E]"
         />
         <SummaryCard
           label="Total Collected"

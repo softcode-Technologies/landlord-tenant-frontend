@@ -55,7 +55,7 @@ export default function AgentPropertiesPage() {
           {properties.map((p) => (
             <Link key={p.id} href={`/agent/properties/${p.id}`}>
               <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
-                <div className="h-32 bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] flex items-center justify-center">
+                <div className="h-32 bg-gradient-to-br from-[#00162E] to-[#000E1E] flex items-center justify-center">
                   {p.images && p.images[0] ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />

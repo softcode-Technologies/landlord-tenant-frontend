@@ -181,7 +181,7 @@ export default function LandlordListingsPage() {
                         <Bed className="h-3.5 w-3.5" />
                         {listing.bedrooms}bd / {listing.bathrooms}ba
                       </div>
-                      <span className="text-sm font-bold text-[#1a3c5e]">
+                      <span className="text-sm font-bold text-[#00162E]">
                         {formatNairaAmount(listing.rentPerAnnum)}{rentCycleSuffix(listing.rentCycle)}
                       </span>
                       <span className="text-xs text-slate-400">
@@ -226,7 +226,7 @@ export default function LandlordListingsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-8 gap-1 text-orange-600 hover:text-orange-700 border-orange-200"
+                        className="h-8 gap-1 text-[#005AF1] hover:text-[#0047C4] border-blue-200"
                         onClick={() => {
                           setBoostingListing(listing)
                           setSelectedTierDays(boostTiers.tiers[0]?.days ?? null)
@@ -350,7 +350,7 @@ export default function LandlordListingsPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Rocket className="h-5 w-5 text-orange-500" />
+              <Rocket className="h-5 w-5 text-[#005AF1]" />
               Boost listing
             </DialogTitle>
           </DialogHeader>
@@ -358,7 +358,7 @@ export default function LandlordListingsPage() {
             <p className="text-sm text-slate-600">
               Featured listings appear at the top of search results, so more tenants see them.
               {boostingListing?.isFeatured && boostingListing.featuredUntil && (
-                <span className="block mt-1 text-xs text-orange-700">
+                <span className="block mt-1 text-xs text-[#0047C4]">
                   Currently featured until {formatDate(boostingListing.featuredUntil)} — buying
                   another tier adds days on top.
                 </span>
@@ -372,13 +372,13 @@ export default function LandlordListingsPage() {
                   onClick={() => setSelectedTierDays(t.days)}
                   className={`w-full text-left rounded-md border p-3 transition ${
                     selectedTierDays === t.days
-                      ? "border-orange-500 bg-orange-50"
+                      ? "border-[#005AF1] bg-blue-50"
                       : "border-slate-200 hover:border-slate-300"
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-slate-900">{t.days} days</span>
-                    <span className="font-bold text-[#1a3c5e]">
+                    <span className="font-bold text-[#00162E]">
                       {formatNairaAmount(t.priceKobo)}
                     </span>
                   </div>
@@ -404,7 +404,7 @@ export default function LandlordListingsPage() {
                 }
               }}
               disabled={!selectedTierDays || boostMutation.isPending}
-              className="bg-orange-500 hover:bg-orange-600"
+              className="bg-[#005AF1] hover:bg-[#0047C4]"
             >
               {boostMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

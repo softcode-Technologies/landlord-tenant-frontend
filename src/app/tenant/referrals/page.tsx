@@ -15,8 +15,8 @@ function StatCard({ icon: Icon, label, value, sub }: { icon: typeof Gift; label:
     <Card>
       <CardContent className="p-5">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-[#1a3c5e]/10 flex items-center justify-center shrink-0">
-            <Icon className="h-5 w-5 text-[#1a3c5e]" />
+          <div className="h-10 w-10 rounded-xl bg-[#00162E]/10 flex items-center justify-center shrink-0">
+            <Icon className="h-5 w-5 text-[#00162E]" />
           </div>
           <div>
             <p className="text-xs text-slate-500">{label}</p>
@@ -108,10 +108,10 @@ function ReferralsContent() {
       </div>
 
       {/* Referral code card */}
-      <Card className="bg-gradient-to-br from-[#1a3c5e] to-[#2d5a8e] text-white">
+      <Card className="bg-gradient-to-br from-[#00162E] to-[#003D7A] text-white">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-2">
-            <Gift className="h-5 w-5 text-[#f97316]" />
+            <Gift className="h-5 w-5 text-[#005AF1]" />
             <p className="font-semibold text-white/90">Your Referral Code</p>
           </div>
 
@@ -137,7 +137,7 @@ function ReferralsContent() {
                 </button>
                 <button
                   onClick={shareCode}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#f97316] hover:bg-[#ea6c0a] transition-colors rounded-xl py-2.5 text-sm font-medium text-white"
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#005AF1] hover:bg-[#0047C4] transition-colors rounded-xl py-2.5 text-sm font-medium text-white"
                 >
                   <Share2 className="h-4 w-4" />
                   Share
@@ -178,7 +178,7 @@ function ReferralsContent() {
               "No limit — invite as many friends as you want!",
             ].map((step, i) => (
               <li key={i} className="flex items-start gap-3 text-sm text-slate-600">
-                <span className="shrink-0 h-6 w-6 rounded-full bg-[#1a3c5e]/10 text-[#1a3c5e] text-xs font-bold flex items-center justify-center">
+                <span className="shrink-0 h-6 w-6 rounded-full bg-[#00162E]/10 text-[#00162E] text-xs font-bold flex items-center justify-center">
                   {i + 1}
                 </span>
                 {step}

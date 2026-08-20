@@ -255,7 +255,7 @@ export default function TenantTenancyDetailPage() {
               <div className="border-t pt-4 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-500">{rentAmountLabel(tenancy.rentCycle)}</span>
-                  <span className="text-xl font-bold text-[#1a3c5e]">
+                  <span className="text-xl font-bold text-[#00162E]">
                     {formatNairaAmount(tenancy.rentAmount)}
                   </span>
                 </div>
@@ -276,7 +276,7 @@ export default function TenantTenancyDetailPage() {
               <CardTitle className="flex items-center gap-2">
                 Security Deposit
                 {depositEscrow && (depositEscrow.status === "holding" || depositEscrow.status === "secured") && (
-                  <Badge variant="outline" className="gap-1 text-[#1a3c5e] border-[#1a3c5e]/30">
+                  <Badge variant="outline" className="gap-1 text-[#00162E] border-[#00162E]/30">
                     <ShieldCheck className="h-3 w-3" /> In escrow
                   </Badge>
                 )}
@@ -350,7 +350,7 @@ export default function TenantTenancyDetailPage() {
                       {formatNaira(tenancy.depositAmount)}
                     </span>
                   </div>
-                  <div className="rounded-xl border border-[#1a3c5e]/20 bg-[#1a3c5e]/5 p-3 flex items-start gap-2 text-sm text-[#1a3c5e]">
+                  <div className="rounded-xl border border-[#00162E]/20 bg-[#00162E]/5 p-3 flex items-start gap-2 text-sm text-[#00162E]">
                     <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0" />
                     <span>
                       Pay your deposit into escrow. We hold it until you confirm move-in — so you
@@ -426,7 +426,7 @@ export default function TenantTenancyDetailPage() {
                     href={agreement.documentUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#1a3c5e] hover:bg-slate-50"
+                    className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#00162E] hover:bg-slate-50"
                   >
                     <FileText className="h-4 w-4 shrink-0" />
                     <span className="truncate flex-1">{agreement.documentName ?? "View Agreement Document"}</span>
@@ -523,7 +523,7 @@ export default function TenantTenancyDetailPage() {
                         >
                           <Star
                             className={`h-7 w-7 transition-colors ${
-                              n <= stars ? "fill-[#f97316] text-[#f97316]" : "text-slate-300"
+                              n <= stars ? "fill-[#005AF1] text-[#005AF1]" : "text-slate-300"
                             }`}
                           />
                         </button>
@@ -625,7 +625,7 @@ export default function TenantTenancyDetailPage() {
                 href={agreement.documentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#1a3c5e] hover:bg-slate-50"
+                className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#00162E] hover:bg-slate-50"
               >
                 <FileText className="h-4 w-4 shrink-0" />
                 <span className="truncate flex-1">{agreement.documentName ?? "Open the agreement document"}</span>

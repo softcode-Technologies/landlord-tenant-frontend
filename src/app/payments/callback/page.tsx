@@ -36,7 +36,7 @@ function CallbackContent() {
         <XCircle className="h-12 w-12 text-red-500" />
         <p className="text-lg font-semibold text-slate-800">Payment could not be verified</p>
         <button
-          className="text-sm text-[#1a3c5e] underline"
+          className="text-sm text-[#00162E] underline"
           onClick={() => router.replace("/")}
         >
           Go home
@@ -47,7 +47,7 @@ function CallbackContent() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <Loader2 className="h-10 w-10 animate-spin text-[#1a3c5e]" />
+      <Loader2 className="h-10 w-10 animate-spin text-[#00162E]" />
       <p className="text-slate-600 text-sm">Verifying your payment…</p>
     </div>
   )

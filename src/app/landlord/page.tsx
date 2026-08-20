@@ -74,7 +74,7 @@ export default function LandlordDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome */}
-      <div className="bg-gradient-to-r from-[#1a3c5e] to-[#1e4a72] rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-r from-[#00162E] to-[#002A57] rounded-2xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-1">Welcome back, {firstName}!</h1>
@@ -84,7 +84,7 @@ export default function LandlordDashboard() {
           </div>
           {!firstRun && (
             <Link href="/landlord/listings/new">
-              <Button className="bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2">
+              <Button className="bg-[#005AF1] hover:bg-[#005AF1]/90 text-white gap-2">
                 <Plus className="h-4 w-4" />
                 New Listing
               </Button>
@@ -102,17 +102,17 @@ export default function LandlordDashboard() {
           <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
               href="/landlord/tenancies"
-              className="rounded-xl border border-[#1a3c5e]/20 bg-[#1a3c5e]/[0.04] p-4 hover:bg-[#1a3c5e]/[0.07] transition-colors"
+              className="rounded-xl border border-[#00162E]/20 bg-[#00162E]/[0.04] p-4 hover:bg-[#00162E]/[0.07] transition-colors"
             >
               <div className="flex items-center gap-2 mb-1">
-                <Users className="h-5 w-5 text-[#1a3c5e]" />
+                <Users className="h-5 w-5 text-[#00162E]" />
                 <span className="font-semibold text-slate-900">Add a tenant you already have</span>
               </div>
               <p className="text-sm text-slate-500">
                 Start tracking rent, receipts and renewals in minutes. Your tenant doesn&apos;t need
                 to sign up first.
               </p>
-              <span className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#1a3c5e]">
+              <span className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#00162E]">
                 Add tenant <ArrowRight className="h-3.5 w-3.5" />
               </span>
             </Link>
@@ -193,8 +193,8 @@ export default function LandlordDashboard() {
           title="Total Properties"
           value={properties.length}
           icon={Building2}
-          iconColor="text-[#1a3c5e]"
-          iconBg="bg-[#1a3c5e]/10"
+          iconColor="text-[#00162E]"
+          iconBg="bg-[#00162E]/10"
         />
         <StatCard
           title="Active Tenancies"
@@ -207,7 +207,7 @@ export default function LandlordDashboard() {
           title="Monthly Revenue"
           value={analytics ? formatNaira(analytics.totalRevenue / 12) : "₦0"}
           icon={DollarSign}
-          iconColor="text-[#f97316]"
+          iconColor="text-[#005AF1]"
           iconBg="bg-orange-50"
           change="From active tenancies"
           changeType="neutral"
@@ -242,8 +242,8 @@ export default function LandlordDashboard() {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1a3c5e" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#1a3c5e" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#00162E" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#00162E" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -255,7 +255,7 @@ export default function LandlordDashboard() {
                     <Area
                       type="monotone"
                       dataKey="revenue"
-                      stroke="#1a3c5e"
+                      stroke="#00162E"
                       fill="url(#revGrad)"
                       strokeWidth={2}
                     />
@@ -288,8 +288,8 @@ export default function LandlordDashboard() {
               ].map((action) => (
                 <Link key={action.href} href={action.href}>
                   <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors">
-                    <div className="p-1.5 rounded-lg bg-[#1a3c5e]/10">
-                      <action.icon className="h-4 w-4 text-[#1a3c5e]" />
+                    <div className="p-1.5 rounded-lg bg-[#00162E]/10">
+                      <action.icon className="h-4 w-4 text-[#00162E]" />
                     </div>
                     <span className="text-sm font-medium text-slate-700">{action.label}</span>
                     <ArrowRight className="h-3.5 w-3.5 text-slate-400 ml-auto" />

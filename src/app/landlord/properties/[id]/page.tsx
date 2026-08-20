@@ -284,7 +284,7 @@ export default function PropertyDetailPage() {
         ].map((stat) => (
           <Card key={stat.label}>
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-[#1a3c5e]">{stat.value}</p>
+              <p className="text-2xl font-bold text-[#00162E]">{stat.value}</p>
               <p className="text-xs text-slate-500 mt-1">{stat.label}</p>
             </CardContent>
           </Card>
@@ -383,7 +383,7 @@ export default function PropertyDetailPage() {
                         </div>
                       </div>
 
-                      <p className="text-base font-bold text-[#1a3c5e]">
+                      <p className="text-base font-bold text-[#00162E]">
                         {formatNairaAmount(unit.rentPerAnnum)}{rentCycleSuffix(unit.rentCycle)}
                       </p>
 
@@ -480,7 +480,7 @@ export default function PropertyDetailPage() {
                   id="unit-cycle"
                   value={unitCycle}
                   onChange={(e) => setUnitCycle(e.target.value as "monthly" | "yearly")}
-                  className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a3c5e]/30"
+                  className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00162E]/30"
                 >
                   <option value="monthly">Monthly</option>
                   <option value="yearly">Yearly</option>

@@ -45,7 +45,7 @@ export function LocationListings({ state, lga, listings, total }: Props) {
       <Navbar />
 
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white">
+      <div className="bg-gradient-to-br from-[#00080F] via-[#000E1E] to-[#00162E] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-300 mb-5 flex-wrap">
@@ -74,7 +74,7 @@ export function LocationListings({ state, lga, listings, total }: Props) {
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href={browseHref}>
-              <Button className="h-11 px-6 bg-[#f97316] hover:bg-[#ea6b0e] text-white font-semibold rounded-xl gap-2">
+              <Button className="h-11 px-6 bg-[#005AF1] hover:bg-[#0047C4] text-white font-semibold rounded-xl gap-2">
                 <Search className="h-4 w-4" />
                 Browse &amp; filter homes in {lga ?? stateLabel}
               </Button>
@@ -93,7 +93,7 @@ export function LocationListings({ state, lga, listings, total }: Props) {
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         <div className="flex items-center gap-2 mb-6">
-          <MapPin className="h-4 w-4 text-[#f97316]" />
+          <MapPin className="h-4 w-4 text-[#005AF1]" />
           <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
             {total > 0
               ? `${total.toLocaleString()} verified ${total === 1 ? "rental" : "rentals"} in ${locationLabel}`
@@ -124,7 +124,7 @@ export function LocationListings({ state, lga, listings, total }: Props) {
                 <Button variant="outline" className="rounded-xl">Browse all rentals</Button>
               </Link>
               <Link href="/login">
-                <Button className="rounded-xl bg-[#f97316] hover:bg-[#ea6b0e] text-white">
+                <Button className="rounded-xl bg-[#005AF1] hover:bg-[#0047C4] text-white">
                   List your property free
                 </Button>
               </Link>
@@ -144,7 +144,7 @@ export function LocationListings({ state, lga, listings, total }: Props) {
                   <Link
                     key={l}
                     href={lgaHref(state, l)}
-                    className="text-xs px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#f97316]/40 hover:text-[#f97316] transition-colors"
+                    className="text-xs px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#005AF1]/40 hover:text-[#005AF1] transition-colors"
                   >
                     Rent in {l}
                   </Link>
@@ -162,7 +162,7 @@ export function LocationListings({ state, lga, listings, total }: Props) {
                 <Link
                   key={`${l.state}-${l.lga}`}
                   href={lgaHref(l.state, l.lga)}
-                  className="text-xs px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#f97316]/40 hover:text-[#f97316] transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#005AF1]/40 hover:text-[#005AF1] transition-colors"
                 >
                   {l.lga}, {stateDisplayName(l.state)}
                 </Link>
@@ -179,7 +179,7 @@ export function LocationListings({ state, lga, listings, total }: Props) {
                 <Link
                   key={s}
                   href={stateHref(s)}
-                  className="text-xs px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#f97316]/40 hover:text-[#f97316] transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-[#005AF1]/40 hover:text-[#005AF1] transition-colors"
                 >
                   {stateDisplayName(s)}
                 </Link>

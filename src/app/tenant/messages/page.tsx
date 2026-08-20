@@ -228,7 +228,7 @@ export default function TenantMessagesPage() {
                         )}
                       </div>
                       {(conv.unreadCount ?? 0) > 0 && (
-                        <span className="bg-[#f97316] text-white text-xs rounded-full px-1.5 py-0.5 shrink-0">
+                        <span className="bg-[#005AF1] text-white text-xs rounded-full px-1.5 py-0.5 shrink-0">
                           {conv.unreadCount}
                         </span>
                       )}
@@ -276,7 +276,7 @@ export default function TenantMessagesPage() {
                         <div
                           className={`max-w-xs lg:max-w-md px-4 py-2.5 rounded-2xl text-sm ${
                             isMe
-                              ? "bg-[#1a3c5e] text-white rounded-br-sm"
+                              ? "bg-[#00162E] text-white rounded-br-sm"
                               : "bg-slate-100 text-slate-900 rounded-bl-sm"
                           }`}
                         >

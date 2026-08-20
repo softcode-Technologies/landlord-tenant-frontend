@@ -23,7 +23,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 const inputClass =
-  "flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a3c5e]/30 disabled:opacity-50"
+  "flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00162E]/30 disabled:opacity-50"
 
 export default function LandlordTenanciesPage() {
   const router = useRouter()
@@ -170,7 +170,7 @@ export default function LandlordTenanciesPage() {
                     </div>
 
                     <div className="text-right shrink-0">
-                      <p className="font-bold text-[#1a3c5e]">
+                      <p className="font-bold text-[#00162E]">
                         {formatNairaAmount(tenancy.rentAmount)}{rentCycleSuffix(tenancy.rentCycle)}
                       </p>
                       <p className="text-xs text-slate-400">
@@ -225,7 +225,7 @@ export default function LandlordTenanciesPage() {
                     : "They already have an account. We've also notified them in-app."}
                 </DialogDescription>
               </DialogHeader>
-              <div className="rounded-xl border border-[#1a3c5e]/15 bg-[#1a3c5e]/[0.04] p-3 text-sm text-slate-700">
+              <div className="rounded-xl border border-[#00162E]/15 bg-[#00162E]/[0.04] p-3 text-sm text-slate-700">
                 {result.claimMessage}
               </div>
               <DialogFooter className="gap-2">
@@ -326,7 +326,7 @@ export default function LandlordTenanciesPage() {
                   <button
                     type="button"
                     onClick={() => setShowMore(true)}
-                    className="text-sm font-medium text-[#1a3c5e] hover:underline"
+                    className="text-sm font-medium text-[#00162E] hover:underline"
                   >
                     + Add more details (last name, email, deposit, end date)
                   </button>
@@ -358,7 +358,7 @@ export default function LandlordTenanciesPage() {
                   </div>
                 )}
 
-                <div className="rounded-xl border border-[#1a3c5e]/15 bg-[#1a3c5e]/[0.04] p-3 flex items-start gap-2 text-xs text-[#1a3c5e]">
+                <div className="rounded-xl border border-[#00162E]/15 bg-[#00162E]/[0.04] p-3 flex items-start gap-2 text-xs text-[#00162E]">
                   <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0" />
                   <span>
                     Your tenant doesn&apos;t need to sign up first. They&apos;ll get a message to log in

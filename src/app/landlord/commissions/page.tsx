@@ -72,7 +72,7 @@ export default function LandlordCommissionsPage() {
         <Card>
           <CardContent className="p-5">
             <p className="text-xs text-slate-500 mb-1">Total recorded</p>
-            <p className="text-2xl font-bold text-[#1a3c5e]">{formatNaira(totals.all)}</p>
+            <p className="text-2xl font-bold text-[#00162E]">{formatNaira(totals.all)}</p>
           </CardContent>
         </Card>
         <Card>

@@ -119,7 +119,7 @@ export default function AdminTenanciesPage() {
                     <TableCell className="text-sm text-slate-600">
                       {tenancy.property?.name ?? tenancy.unit?.unitNumber ?? "N/A"}
                     </TableCell>
-                    <TableCell className="font-semibold text-[#1a3c5e] text-sm">
+                    <TableCell className="font-semibold text-[#00162E] text-sm">
                       {formatNaira(tenancy.rentAmount)}
                     </TableCell>
                     <TableCell className="text-sm text-slate-500">

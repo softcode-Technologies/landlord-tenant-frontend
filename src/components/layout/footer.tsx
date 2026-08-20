@@ -49,7 +49,7 @@ export function Footer() {
               <BrandLogo
                 variant="full"
                 size="lg"
-                className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] border border-white/10"
+                className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00162E] to-[#000E1E] border border-white/10"
                 iconClassName="h-5 w-5 text-white"
               />
             </div>
@@ -83,7 +83,7 @@ export function Footer() {
                   key={s.label}
                   href={s.href}
                   aria-label={s.label}
-                  className="w-9 h-9 rounded-lg bg-white/5 hover:bg-[#f97316] border border-white/10 hover:border-[#f97316] flex items-center justify-center transition-all duration-200 text-xs font-bold text-slate-400 hover:text-white"
+                  className="w-9 h-9 rounded-lg bg-white/5 hover:bg-[#005AF1] border border-white/10 hover:border-[#005AF1] flex items-center justify-center transition-all duration-200 text-xs font-bold text-slate-400 hover:text-white"
                 >
                   {s.char}
                 </a>

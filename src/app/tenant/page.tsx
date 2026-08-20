@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation"
 function CreditGauge({ score }: { score: number }) {
   const pct = (score / 850) * 100
   const color =
-    score >= 700 ? "#16a34a" : score >= 600 ? "#f97316" : "#ef4444"
+    score >= 700 ? "#16a34a" : score >= 600 ? "#005AF1" : "#ef4444"
   const label =
     score >= 750 ? "Excellent" :
     score >= 700 ? "Good" :
@@ -98,7 +98,7 @@ export default function TenantDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome */}
-      <div className="bg-gradient-to-r from-[#1a3c5e] to-[#1e4a72] rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-r from-[#00162E] to-[#002A57] rounded-2xl p-6 text-white">
         <h1 className="text-2xl font-bold mb-1">Welcome back, {firstName}! 👋</h1>
         <p className="text-slate-300 text-sm">
           Here&apos;s an overview of your rental dashboard
@@ -110,10 +110,10 @@ export default function TenantDashboard() {
       {pendingInvites.length > 0 && (
         <Link
           href="/tenant/invites"
-          className="block rounded-xl border-l-4 border-[#f97316] bg-orange-50 p-4 hover:bg-orange-100 transition-colors"
+          className="block rounded-xl border-l-4 border-[#005AF1] bg-blue-50 p-4 hover:bg-blue-100 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <Home className="h-5 w-5 text-[#f97316] shrink-0" />
+            <Home className="h-5 w-5 text-[#005AF1] shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-slate-900 text-sm">
                 You have {pendingInvites.length === 1 ? "a" : pendingInvites.length} pending tenancy {pendingInvites.length === 1 ? "invite" : "invites"}
@@ -122,7 +122,7 @@ export default function TenantDashboard() {
                 A landlord invited you to a home — review and accept to start your tenancy.
               </p>
             </div>
-            <ArrowRight className="h-4 w-4 text-[#f97316] shrink-0" />
+            <ArrowRight className="h-4 w-4 text-[#005AF1] shrink-0" />
           </div>
         </Link>
       )}
@@ -186,8 +186,8 @@ export default function TenantDashboard() {
           title="Active Tenancies"
           value={tenancies.filter((t) => t.status === "active").length}
           icon={Home}
-          iconColor="text-[#1a3c5e]"
-          iconBg="bg-[#1a3c5e]/10"
+          iconColor="text-[#00162E]"
+          iconBg="bg-[#00162E]/10"
         />
         <StatCard
           title="Wallet Balance"
@@ -200,7 +200,7 @@ export default function TenantDashboard() {
           title="Credit Score"
           value={creditScore || "N/A"}
           icon={TrendingUp}
-          iconColor="text-[#f97316]"
+          iconColor="text-[#005AF1]"
           iconBg="bg-orange-50"
           subtitle="out of 850"
         />
@@ -252,7 +252,7 @@ export default function TenantDashboard() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-slate-50 rounded-xl p-3">
                       <p className="text-xs text-slate-500">{rentAmountLabel(activeTenancy?.rentCycle)}</p>
-                      <p className="text-lg font-bold text-[#1a3c5e]">
+                      <p className="text-lg font-bold text-[#00162E]">
                         {formatNairaAmount(activeTenancy.rentAmount)}
                       </p>
                     </div>
@@ -322,7 +322,7 @@ export default function TenantDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <PiggyBank className="h-4 w-4 text-[#f97316]" /> Rent Savings
+                <PiggyBank className="h-4 w-4 text-[#005AF1]" /> Rent Savings
               </CardTitle>
               {topSavingsGoal && (
                 <Link href={`/tenant/savings/${topSavingsGoal.id}`}>
@@ -428,8 +428,8 @@ export default function TenantDashboard() {
               ].map((action) => (
                 <Link key={action.href} href={action.href}>
                   <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-left">
-                    <div className="p-1.5 rounded-lg bg-[#1a3c5e]/10">
-                      <action.icon className="h-4 w-4 text-[#1a3c5e]" />
+                    <div className="p-1.5 rounded-lg bg-[#00162E]/10">
+                      <action.icon className="h-4 w-4 text-[#00162E]" />
                     </div>
                     <span className="text-sm font-medium text-slate-700">{action.label}</span>
                     <ArrowRight className="h-3.5 w-3.5 text-slate-400 ml-auto" />

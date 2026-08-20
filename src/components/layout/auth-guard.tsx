@@ -41,7 +41,7 @@ export function AuthGuard({ children, redirectTo = "/login" }: AuthGuardProps) {
   if (!settled) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#1a3c5e]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#00162E]" />
       </div>
     )
   }

@@ -68,7 +68,7 @@ export default function TenantTenanciesPage() {
       {!invitesLoading && pendingInvites.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-base font-semibold text-slate-700 flex items-center gap-2">
-            <Mail className="h-4 w-4 text-[#f97316]" />
+            <Mail className="h-4 w-4 text-[#005AF1]" />
             Pending Invites
           </h2>
           {pendingInvites.map((invite) => (
@@ -99,7 +99,7 @@ export default function TenantTenanciesPage() {
                       )}
                       <div>
                         <p className="text-xs text-slate-400">{rentAmountLabel(invite.rentCycle)}</p>
-                        <p className="text-base font-bold text-[#1a3c5e]">
+                        <p className="text-base font-bold text-[#00162E]">
                           {formatNairaAmount(invite.rentAmount)}
                         </p>
                       </div>
@@ -122,7 +122,7 @@ export default function TenantTenanciesPage() {
 
                   <Button
                     size="sm"
-                    className="gap-1.5 shrink-0 bg-[#1a3c5e] hover:bg-[#1a3c5e]/90"
+                    className="gap-1.5 shrink-0 bg-[#00162E] hover:bg-[#00162E]/90"
                     onClick={() => acceptMutation.mutate(invite.inviteCode)}
                     disabled={acceptMutation.isPending}
                   >
@@ -188,7 +188,7 @@ export default function TenantTenanciesPage() {
                     <div className="flex flex-wrap gap-4">
                       <div>
                         <p className="text-xs text-slate-400">{rentAmountLabel(tenancy.rentCycle)}</p>
-                        <p className="text-base font-bold text-[#1a3c5e]">
+                        <p className="text-base font-bold text-[#00162E]">
                           {formatNairaAmount(tenancy.rentAmount)}
                         </p>
                       </div>

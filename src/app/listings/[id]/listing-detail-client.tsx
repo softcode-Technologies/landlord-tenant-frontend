@@ -388,7 +388,7 @@ export function ListingDetailClient({ initialListing }: Props) {
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
             {listing.isFeatured && (
-              <Badge className="absolute top-4 left-4 bg-[#f97316] text-white border-0 shadow-lg">
+              <Badge className="absolute top-4 left-4 bg-[#005AF1] text-white border-0 shadow-lg">
                 Featured
               </Badge>
             )}
@@ -423,7 +423,7 @@ export function ListingDetailClient({ initialListing }: Props) {
                   onClick={() => setActiveImage(index)}
                   className={`relative w-20 h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
                     safeIndex === index
-                      ? "border-[#f97316] ring-2 ring-[#f97316]/20"
+                      ? "border-[#005AF1] ring-2 ring-[#005AF1]/20"
                       : "border-transparent opacity-70 hover:opacity-100"
                   }`}
                 >
@@ -506,11 +506,11 @@ export function ListingDetailClient({ initialListing }: Props) {
             {/* Property Details */}
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-xl">
-                <Bed className="h-4 w-4 text-[#1a3c5e] dark:text-blue-400" />
+                <Bed className="h-4 w-4 text-[#00162E] dark:text-blue-400" />
                 <span className="text-sm font-medium">{listing.bedrooms} Bedrooms</span>
               </div>
               <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-xl">
-                <Bath className="h-4 w-4 text-[#1a3c5e] dark:text-blue-400" />
+                <Bath className="h-4 w-4 text-[#00162E] dark:text-blue-400" />
                 <span className="text-sm font-medium">{listing.bathrooms} Bathrooms</span>
               </div>
               {listing.isFurnished && (
@@ -549,7 +549,7 @@ export function ListingDetailClient({ initialListing }: Props) {
                   <CardTitle>Reviews</CardTitle>
                   {listing.averageRating && (
                     <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-[#f97316] text-[#f97316]" />
+                      <Star className="h-4 w-4 fill-[#005AF1] text-[#005AF1]" />
                       <span className="font-semibold">{listing.averageRating.toFixed(1)}</span>
                       <span className="text-slate-400 text-sm">({listing.reviewCount})</span>
                     </div>
@@ -582,7 +582,7 @@ export function ListingDetailClient({ initialListing }: Props) {
                                   key={i}
                                   className={`h-3 w-3 ${
                                     i < review.rating
-                                      ? "fill-[#f97316] text-[#f97316]"
+                                      ? "fill-[#005AF1] text-[#005AF1]"
                                       : "text-slate-200"
                                   }`}
                                 />
@@ -617,7 +617,7 @@ export function ListingDetailClient({ initialListing }: Props) {
             <Card className="sticky top-4">
               <CardContent className="p-6">
                 <div className="mb-4">
-                  <span className="text-3xl font-bold text-[#1a3c5e] dark:text-blue-400">
+                  <span className="text-3xl font-bold text-[#00162E] dark:text-blue-400">
                     {formatNairaAmount(listing.rentPerAnnum)}
                   </span>
                   <span className="text-slate-400 text-sm">{rentCycleSuffix(listing.rentCycle)}</span>
@@ -637,7 +637,7 @@ export function ListingDetailClient({ initialListing }: Props) {
                         </div>
                         <a
                           href={`tel:${contact.lister?.phone}`}
-                          className="flex items-center gap-2 text-sm text-[#1a3c5e] font-medium hover:underline"
+                          className="flex items-center gap-2 text-sm text-[#00162E] font-medium hover:underline"
                         >
                           <Phone className="h-3.5 w-3.5" />
                           {contact.lister?.phone}
@@ -672,7 +672,7 @@ export function ListingDetailClient({ initialListing }: Props) {
                     ) : (
                       <Button
                         onClick={handleBookInspection}
-                        className="w-full h-12 bg-[#f97316] hover:bg-[#f97316]/90 text-white"
+                        className="w-full h-12 bg-[#005AF1] hover:bg-[#005AF1]/90 text-white"
                       >
                         <Calendar className="h-4 w-4" />
                         Book Inspection
@@ -683,7 +683,7 @@ export function ListingDetailClient({ initialListing }: Props) {
                   <>
                     <Button
                       onClick={handleUnlock}
-                      className="w-full mb-3 h-12 bg-[#f97316] hover:bg-[#f97316]/90 text-white"
+                      className="w-full mb-3 h-12 bg-[#005AF1] hover:bg-[#005AF1]/90 text-white"
                       disabled={unlockMutation.isPending}
                     >
                       {unlockMutation.isPending ? (
@@ -739,7 +739,7 @@ export function ListingDetailClient({ initialListing }: Props) {
       {/* Mobile sticky action bar — sidebar CTA is far down on phones */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white dark:bg-[#0a0f1e] border-t border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
         <div className="min-w-0">
-          <p className="text-lg font-bold text-[#1a3c5e] dark:text-blue-400 leading-tight">
+          <p className="text-lg font-bold text-[#00162E] dark:text-blue-400 leading-tight">
             {formatNairaAmount(listing.rentPerAnnum)}
             <span className="text-xs font-normal text-slate-400">{rentCycleSuffix(listing.rentCycle)}</span>
           </p>
@@ -763,7 +763,7 @@ export function ListingDetailClient({ initialListing }: Props) {
           ) : (
             <Button
               onClick={handleBookInspection}
-              className="flex-1 h-11 bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2"
+              className="flex-1 h-11 bg-[#005AF1] hover:bg-[#005AF1]/90 text-white gap-2"
             >
               <Calendar className="h-4 w-4" />
               Book Inspection
@@ -773,7 +773,7 @@ export function ListingDetailClient({ initialListing }: Props) {
           <Button
             onClick={handleUnlock}
             disabled={unlockMutation.isPending}
-            className="flex-1 h-11 bg-[#f97316] hover:bg-[#f97316]/90 text-white gap-2"
+            className="flex-1 h-11 bg-[#005AF1] hover:bg-[#005AF1]/90 text-white gap-2"
           >
             {unlockMutation.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

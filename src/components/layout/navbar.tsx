@@ -66,7 +66,7 @@ export function Navbar() {
             <BrandLogo
               variant="full"
               size="lg"
-              className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3c5e] to-[#0f2d48] shadow-md"
+              className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00162E] to-[#000E1E] shadow-md"
               iconClassName="h-5 w-5 text-white"
             />
           </Link>
@@ -79,7 +79,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-slate-800 dark:text-slate-300 hover:text-[#1a3c5e] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-800 dark:text-slate-300 hover:text-[#00162E] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors"
               >
                 {link.label}
               </Link>
@@ -91,17 +91,17 @@ export function Navbar() {
             {isAuthenticated && user ? (
               <>
                 <Link href={dashboardPath}>
-                  <Button variant="ghost" size="sm" className="gap-2 text-slate-800 dark:text-slate-300 hover:text-[#1a3c5e] dark:hover:text-white dark:hover:bg-white/10">
+                  <Button variant="ghost" size="sm" className="gap-2 text-slate-800 dark:text-slate-300 hover:text-[#00162E] dark:hover:text-white dark:hover:bg-white/10">
                     <LayoutDashboard className="h-4 w-4" />
                     Dashboard
                   </Button>
                 </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-2 p-1 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors ring-2 ring-transparent hover:ring-[#f97316]/30">
+                    <button className="flex items-center gap-2 p-1 rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors ring-2 ring-transparent hover:ring-[#005AF1]/30">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={user.avatarUrl} />
-                        <AvatarFallback className="text-xs bg-[#1a3c5e] text-white">{getInitials(fullName)}</AvatarFallback>
+                        <AvatarFallback className="text-xs bg-[#00162E] text-white">{getInitials(fullName)}</AvatarFallback>
                       </Avatar>
                     </button>
                   </DropdownMenuTrigger>
@@ -141,7 +141,7 @@ export function Navbar() {
                                 <Icon className="h-4 w-4 mr-2" />
                                 {r.label}
                                 {isActive && (
-                                  <span className="ml-auto text-[10px] text-[#f97316]">Current</span>
+                                  <span className="ml-auto text-[10px] text-[#005AF1]">Current</span>
                                 )}
                               </Link>
                             </DropdownMenuItem>
@@ -159,12 +159,12 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" size="sm" className="text-slate-800 dark:text-slate-300 hover:text-[#1a3c5e] dark:hover:text-white dark:hover:bg-white/10">
+                  <Button variant="ghost" size="sm" className="text-slate-800 dark:text-slate-300 hover:text-[#00162E] dark:hover:text-white dark:hover:bg-white/10">
                     Log in
                   </Button>
                 </Link>
                 <Link href="/login">
-                  <Button size="sm" className="bg-[#f97316] hover:bg-[#ea6b0e] text-white rounded-xl shadow-md shadow-orange-500/20">
+                  <Button size="sm" className="bg-[#005AF1] hover:bg-[#0047C4] text-white rounded-xl shadow-md shadow-blue-500/20">
                     Get Started
                   </Button>
                 </Link>
@@ -192,7 +192,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-3 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-300 hover:text-[#1a3c5e] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg"
+                className="block px-3 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-300 hover:text-[#00162E] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
@@ -229,7 +229,7 @@ export function Navbar() {
                           <Icon className="h-4 w-4" />
                           {r.label}
                           {isActive && (
-                            <span className="ml-auto text-[10px] text-[#f97316]">Current</span>
+                            <span className="ml-auto text-[10px] text-[#005AF1]">Current</span>
                           )}
                         </Link>
                       )
@@ -246,7 +246,7 @@ export function Navbar() {
             ) : (
               <div className="px-3 pt-2">
                 <Link href="/login" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full bg-[#f97316] hover:bg-[#ea6b0e] text-white">
+                  <Button className="w-full bg-[#005AF1] hover:bg-[#0047C4] text-white">
                     Log in / Sign up
                   </Button>
                 </Link>

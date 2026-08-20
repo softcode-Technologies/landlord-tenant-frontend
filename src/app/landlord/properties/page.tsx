@@ -120,8 +120,8 @@ export default function LandlordPropertiesPage() {
             <Card key={property.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between gap-2 mb-3">
-                  <div className="p-2 rounded-xl bg-[#1a3c5e]/10">
-                    <Building2 className="h-5 w-5 text-[#1a3c5e]" />
+                  <div className="p-2 rounded-xl bg-[#00162E]/10">
+                    <Building2 className="h-5 w-5 text-[#00162E]" />
                   </div>
                   <Badge variant="secondary" className="text-xs">
                     {property.units?.length ?? 0} units

@@ -19,7 +19,7 @@ import { PiggyBank, ArrowRight, Loader2, Sparkles, ShieldCheck } from "lucide-re
 import { toast } from "sonner"
 
 export function SavingsRing({ percent, size = 132 }: { percent: number; size?: number }) {
-  const color = percent >= 100 ? "#16a34a" : "#f97316"
+  const color = percent >= 100 ? "#16a34a" : "#005AF1"
   return (
     <div
       className="relative mx-auto"
@@ -156,7 +156,7 @@ function CreateGoalDialog() {
             {suggested > 0 && (
               <button
                 type="button"
-                className="mt-1 text-xs text-[#f97316] font-medium"
+                className="mt-1 text-xs text-[#005AF1] font-medium"
                 onClick={() => setMonthly(String(Math.round(suggested / 100)))}
               >
                 Use suggested {formatNaira(suggested)}
@@ -210,7 +210,7 @@ function SavingsContent() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-[#1a3c5e] to-[#1e4a72] rounded-2xl p-6 text-white flex items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-[#00162E] to-[#002A57] rounded-2xl p-6 text-white flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
             <PiggyBank className="h-6 w-6" /> Rent Savings
@@ -225,8 +225,8 @@ function SavingsContent() {
       {goals.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mb-4">
-              <Sparkles className="h-7 w-7 text-[#f97316]" />
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
+              <Sparkles className="h-7 w-7 text-[#005AF1]" />
             </div>
             <h3 className="text-lg font-bold text-slate-900">Turn one big rent into twelve small ones</h3>
             <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
@@ -265,7 +265,7 @@ function SavingsContent() {
                           Next: {formatNaira(goal.monthlyAmount)} on {formatDate(goal.nextChargeDate)}
                         </p>
                       ) : null}
-                      <span className="inline-flex items-center gap-1 text-xs font-medium text-[#1a3c5e]">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-[#00162E]">
                         Manage <ArrowRight className="h-3 w-3" />
                       </span>
                     </div>

@@ -86,7 +86,7 @@ export default function AdminReferralsPage() {
           icon={Gift}
           label="Total Paid Out"
           value={formatNaira(summary?.totalPaidKobo ?? 0)}
-          accent="bg-[#1a3c5e]/10 text-[#1a3c5e]"
+          accent="bg-[#00162E]/10 text-[#00162E]"
         />
       </div>
 
@@ -132,7 +132,7 @@ export default function AdminReferralsPage() {
                       <p className="font-medium text-sm text-slate-900">{r.referred?.name ?? "Unknown"}</p>
                       <p className="text-xs text-slate-400">{r.referred?.phone ?? r.referred?.email ?? ""}</p>
                     </TableCell>
-                    <TableCell className="text-sm font-semibold text-[#1a3c5e]">
+                    <TableCell className="text-sm font-semibold text-[#00162E]">
                       {r.status === "rewarded" ? formatNaira(r.rewardKobo) : "—"}
                     </TableCell>
                     <TableCell className="text-sm text-slate-500">

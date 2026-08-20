@@ -37,14 +37,14 @@ export default function AdminAnalyticsPage() {
   const kpis = a?.kpis
 
   const moneyCards = [
-    { label: "Collected Today", value: money?.collectedToday ?? 0, icon: CalendarDays, grad: "from-[#1a3c5e] to-[#0f2d48]" },
-    { label: "This Week", value: money?.collected7Days ?? 0, icon: CalendarRange, grad: "from-[#1f4e79] to-[#16385a]" },
+    { label: "Collected Today", value: money?.collectedToday ?? 0, icon: CalendarDays, grad: "from-[#00162E] to-[#000E1E]" },
+    { label: "This Week", value: money?.collected7Days ?? 0, icon: CalendarRange, grad: "from-[#002E5C] to-[#16385a]" },
     { label: "This Month", value: money?.collectedThisMonth ?? 0, icon: TrendingUp, grad: "from-[#2563eb] to-[#1e40af]" },
     { label: "All-Time Collected", value: money?.collectedAllTime ?? 0, icon: Coins, grad: "from-emerald-600 to-emerald-800" },
   ]
 
   const kpiCards = [
-    { label: "Total Users", value: kpis?.totalUsers ?? 0, icon: Users, color: "text-[#1a3c5e]", bg: "bg-[#1a3c5e]/10" },
+    { label: "Total Users", value: kpis?.totalUsers ?? 0, icon: Users, color: "text-[#00162E]", bg: "bg-[#00162E]/10" },
     { label: "New Users (Month)", value: kpis?.newUsersThisMonth ?? 0, icon: UserPlus, color: "text-violet-600", bg: "bg-violet-50" },
     { label: "Properties Listed", value: kpis?.totalProperties ?? 0, icon: Building, color: "text-emerald-600", bg: "bg-emerald-50" },
     { label: "Active Tenancies", value: kpis?.activeTenancies ?? 0, icon: Home, color: "text-blue-600", bg: "bg-blue-50" },
@@ -131,15 +131,15 @@ export default function AdminAnalyticsPage() {
               <AreaChart data={dailyChart} margin={{ left: 4, right: 8, top: 8 }}>
                 <defs>
                   <linearGradient id="dayGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1a3c5e" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#1a3c5e" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#00162E" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#00162E" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={4} />
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={nairaTick} width={52} />
                 <Tooltip formatter={(v) => [`₦${Number(v).toLocaleString()}`, "Collected"]} />
-                <Area type="monotone" dataKey="collected" stroke="#1a3c5e" fill="url(#dayGrad)" strokeWidth={2} />
+                <Area type="monotone" dataKey="collected" stroke="#00162E" fill="url(#dayGrad)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
@@ -170,7 +170,7 @@ export default function AdminAnalyticsPage() {
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={nairaTick} width={52} />
                   <Tooltip formatter={(v, n) => [`₦${Number(v).toLocaleString()}`, n === "collected" ? "Collected" : "Our earnings"]} />
                   <Legend formatter={(v) => (v === "collected" ? "Collected" : "Our earnings")} wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="collected" fill="#1a3c5e" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="collected" fill="#00162E" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="earnings" fill="#16a34a" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

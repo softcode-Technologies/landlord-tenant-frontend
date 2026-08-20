@@ -16,9 +16,9 @@ export default function PrivacyPage() {
       <Navbar />
 
       <main className="flex-1">
-        <section className="bg-gradient-to-br from-[#0a1e33] via-[#0f2d48] to-[#1a3c5e] text-white">
+        <section className="bg-gradient-to-br from-[#00080F] via-[#000E1E] to-[#00162E] text-white">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <p className="text-xs font-semibold text-[#f97316] uppercase tracking-[0.18em] mb-3">Legal</p>
+            <p className="text-xs font-semibold text-[#005AF1] uppercase tracking-[0.18em] mb-3">Legal</p>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Privacy Policy</h1>
             <p className="text-slate-300/90 mt-3 text-sm">Last updated: {LAST_UPDATED}</p>
           </div>
@@ -99,7 +99,7 @@ export default function PrivacyPage() {
 
           <Section title="11. Contact us">
             Questions about this policy or your data? Email{" "}
-            <a href={`mailto:${brandEmail("privacy")}`} className="text-[#f97316] font-medium hover:underline">
+            <a href={`mailto:${brandEmail("privacy")}`} className="text-[#005AF1] font-medium hover:underline">
               {brandEmail("privacy")}
             </a>.
           </Section>

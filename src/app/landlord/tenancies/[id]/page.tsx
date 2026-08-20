@@ -291,7 +291,7 @@ export default function LandlordTenancyDetailPage() {
                 <CardTitle className="flex items-center gap-2">
                   Security Deposit
                   {depositEscrow && (depositEscrow.status === "holding" || depositEscrow.status === "secured") && (
-                    <Badge variant="outline" className="gap-1 text-[#1a3c5e] border-[#1a3c5e]/30">
+                    <Badge variant="outline" className="gap-1 text-[#00162E] border-[#00162E]/30">
                       <ShieldCheck className="h-3 w-3" /> In escrow
                     </Badge>
                   )}
@@ -444,7 +444,7 @@ export default function LandlordTenancyDetailPage() {
                       href={agreement.documentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#1a3c5e] hover:bg-slate-50"
+                      className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm text-[#00162E] hover:bg-slate-50"
                     >
                       <FileText className="h-4 w-4 shrink-0" />
                       <span className="truncate flex-1">{agreement.documentName ?? "View Document"}</span>
@@ -647,7 +647,7 @@ export default function LandlordTenancyDetailPage() {
                 type="checkbox"
                 checked={isCorrection}
                 onChange={(e) => setIsCorrection(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-[#1a3c5e]"
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-[#00162E]"
               />
               <span>
                 This is a correction (fixing a data-entry mistake), not a rent change.
@@ -777,7 +777,7 @@ export default function LandlordTenancyDetailPage() {
             <div className="space-y-3 py-2">
               <label
                 htmlFor="agreement-file"
-                className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 p-6 text-center cursor-pointer hover:border-[#1a3c5e]/40 hover:bg-slate-50 transition-colors"
+                className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 p-6 text-center cursor-pointer hover:border-[#00162E]/40 hover:bg-slate-50 transition-colors"
               >
                 <FileText className="h-8 w-8 text-slate-300" />
                 {agreementFile ? (
@@ -798,7 +798,7 @@ export default function LandlordTenancyDetailPage() {
               </label>
               <button
                 type="button"
-                className="text-xs text-slate-400 hover:text-[#1a3c5e] underline"
+                className="text-xs text-slate-400 hover:text-[#00162E] underline"
                 onClick={() => { setUseUrlMode(true); setAgreementFile(null) }}
               >
                 Or paste a link instead
@@ -819,7 +819,7 @@ export default function LandlordTenancyDetailPage() {
               </div>
               <button
                 type="button"
-                className="text-xs text-slate-400 hover:text-[#1a3c5e] underline"
+                className="text-xs text-slate-400 hover:text-[#00162E] underline"
                 onClick={() => { setUseUrlMode(false); setDocUrl("") }}
               >
                 Or upload a file instead
@@ -870,7 +870,7 @@ export default function LandlordTenancyDetailPage() {
                 href={agreement.documentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-[#1a3c5e] hover:underline"
+                className="flex items-center gap-2 text-sm text-[#00162E] hover:underline"
               >
                 <ExternalLink className="h-3.5 w-3.5" /> Review the document first
               </a>

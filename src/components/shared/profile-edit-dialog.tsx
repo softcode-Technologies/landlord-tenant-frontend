@@ -115,7 +115,7 @@ export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="text-xs text-[#1a3c5e] underline underline-offset-2 hover:text-[#f97316] transition-colors"
+              className="text-xs text-[#00162E] underline underline-offset-2 hover:text-[#005AF1] transition-colors"
             >
               Change photo
             </button>
