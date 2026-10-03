@@ -21,6 +21,12 @@ export const BRAND_URL =
 export const BRAND_LEGAL_NAME =
   process.env.NEXT_PUBLIC_BRAND_LEGAL_NAME || `${BRAND_NAME} Technologies Ltd`
 
+// Registered business address — shown in the footer and on the legal pages
+// (required by Termii for sender-ID approval). Override via env if it moves.
+export const BRAND_ADDRESS =
+  process.env.NEXT_PUBLIC_BRAND_ADDRESS ||
+  "Oreyo, opposite Redroof Hotel & Bar, Ikorodu, Lagos, Nigeria"
+
 export const brandEmail = (mailbox: string): string => `${mailbox}@${BRAND_DOMAIN}`
 
 // Mobile apps aren't live yet. Set NEXT_PUBLIC_SHOW_APP_DOWNLOAD=true to reveal

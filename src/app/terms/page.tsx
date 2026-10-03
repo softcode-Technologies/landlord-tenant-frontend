@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
-import { BRAND_NAME, BRAND_LEGAL_NAME, brandEmail } from "@/lib/config/brand"
+import { BRAND_NAME, BRAND_LEGAL_NAME, BRAND_ADDRESS, brandEmail } from "@/lib/config/brand"
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -100,7 +100,8 @@ export default function TermsPage() {
             Questions about these terms? Email{" "}
             <a href={`mailto:${brandEmail("legal")}`} className="text-[#005AF1] font-medium hover:underline">
               {brandEmail("legal")}
-            </a>.
+            </a>
+            , or write to us at {BRAND_LEGAL_NAME}, {BRAND_ADDRESS}.
           </Section>
         </article>
       </main>

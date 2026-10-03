@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
-import { BRAND_NAME, BRAND_LEGAL_NAME, brandEmail } from "@/lib/config/brand"
+import { BRAND_NAME, BRAND_LEGAL_NAME, BRAND_ADDRESS, brandEmail } from "@/lib/config/brand"
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -101,7 +101,8 @@ export default function PrivacyPage() {
             Questions about this policy or your data? Email{" "}
             <a href={`mailto:${brandEmail("privacy")}`} className="text-[#005AF1] font-medium hover:underline">
               {brandEmail("privacy")}
-            </a>.
+            </a>
+            , or write to us at {BRAND_LEGAL_NAME}, {BRAND_ADDRESS}.
           </Section>
         </article>
       </main>

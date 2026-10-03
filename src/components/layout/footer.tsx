@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { BrandWordmark } from "./brand-wordmark"
 import { BrandLogo } from "./brand-logo"
-import { BRAND_NAME, BRAND_LEGAL_NAME, brandEmail } from "@/lib/config/brand"
+import { BRAND_NAME, BRAND_LEGAL_NAME, BRAND_ADDRESS, brandEmail } from "@/lib/config/brand"
 
 // Support WhatsApp line — all customer chats route here.
 const WHATSAPP_NUMBER = "2348165275980"
@@ -75,6 +75,12 @@ export function Footer() {
                 </span>
               </span>
             </a>
+
+            {/* Business address */}
+            <address className="not-italic flex items-start gap-2 text-sm text-slate-400 max-w-xs mb-6">
+              <span aria-hidden="true">📍</span>
+              <span>{BRAND_ADDRESS}</span>
+            </address>
 
             {/* Socials */}
             <div className="flex items-center gap-3">
