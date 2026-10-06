@@ -184,6 +184,30 @@ export interface ReferralsResponse {
   }
 }
 
+export type SignupLeadStage = "unverified" | "not_onboarded"
+
+export interface SignupLead {
+  phone: string
+  stage: SignupLeadStage
+  userId: string | null
+  name: string | null
+  // null for verified users from before funnel tracking started
+  otpRequestCount: number | null
+  firstSeenAt: string
+  lastSeenAt: string
+  lastContactedAt: string | null
+}
+
+export interface SignupLeadsResponse {
+  leads: SignupLead[]
+  pagination: { total: number; page: number; limit: number; totalPages: number }
+  summary: {
+    unverifiedCount: number
+    notOnboardedCount: number
+    newNumbersLast7Days: number
+  }
+}
+
 export interface AnalyticsOverview {
   kpis: {
     totalUsers: number
@@ -491,4 +515,11 @@ export const adminApi = {
 
   rewardReferral: (id: string) =>
     apiClient.post<{ id: string; status: string; rewardKobo: number }>(`/admin/referrals/${id}/reward`),
+
+  // ── Incomplete sign-ups ───────────────────────────────────────────────────────
+  getSignupLeads: (params: { stage: SignupLeadStage; page?: number; limit?: number; search?: string }) =>
+    apiClient.get<SignupLeadsResponse>("/admin/signup-leads", { params }),
+
+  markSignupLeadContacted: (phone: string) =>
+    apiClient.patch<{ phone: string; lastContactedAt: string }>("/admin/signup-leads/contacted", { phone }),
 }

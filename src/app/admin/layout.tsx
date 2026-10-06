@@ -14,11 +14,13 @@ import {
   BarChart3,
   UserCircle,
   ShieldCheck,
+  UserX,
 } from "lucide-react"
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Users", href: "/admin/users", icon: Users },
+  { label: "Incomplete Sign-ups", href: "/admin/signups", icon: UserX },
   { label: "Landlords", href: "/admin/landlords", icon: Building2 },
   { label: "KYC Queue", href: "/admin/kyc", icon: Shield },
   { label: "Verifications", href: "/admin/verifications", icon: ShieldCheck },
