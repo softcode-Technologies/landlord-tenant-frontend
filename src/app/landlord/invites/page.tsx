@@ -4,17 +4,16 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { invitesApi } from "@/lib/api/invites"
 import { propertiesApi } from "@/lib/api/properties"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatNairaAmount, formatDate, getStatusVariant, extractApiError, rentAmountLabel, rentCycleWord, rentCycleSuffix } from "@/lib/utils"
-import { UserPlus, Plus, Copy, Loader2, Trash2 } from "lucide-react"
+import { extractApiError, rentAmountLabel, rentCycleWord } from "@/lib/utils"
+import { UserPlus, Plus, Loader2 } from "lucide-react"
+import { InviteCard } from "@/components/invites/invite-card"
 import { toast } from "sonner"
 import { RentFeeBreakdown } from "@/components/shared/rent-fee-breakdown"
 
@@ -80,25 +79,11 @@ export default function LandlordInvitesPage() {
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to send invite")),
   })
 
-  const cancelMutation = useMutation({
-    mutationFn: (id: string) => invitesApi.cancelInvite(id),
-    onSuccess: () => {
-      toast.success("Invite cancelled")
-      queryClient.invalidateQueries({ queryKey: ["landlord-invites"] })
-    },
-  })
-
   const invites = invitesData?.data ?? []
   const properties = propertiesData?.data ?? []
   const allUnits = properties.flatMap((p) =>
     p.units?.map((u) => ({ ...u, propertyName: p.name })) ?? []
   )
-
-  const copyInviteLink = (code: string) => {
-    const link = `${window.location.origin}/invite/${code}`
-    navigator.clipboard.writeText(link)
-    toast.success("Invite link copied!")
-  }
 
   return (
     <div className="space-y-6">
@@ -130,62 +115,7 @@ export default function LandlordInvitesPage() {
       ) : (
         <div className="space-y-4">
           {invites.map((invite) => (
-            <Card key={invite.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-slate-900">
-                        {invite.firstName}
-                      </h3>
-                      <span className="text-slate-400 text-sm">&middot;</span>
-                      <span className="text-sm text-slate-500">{invite.invitedPhone}</span>
-                      <Badge variant={getStatusVariant(invite.status)} className="capitalize text-xs">
-                        {invite.status}
-                      </Badge>
-                    </div>
-
-                    <div className="flex flex-wrap gap-3 text-sm text-slate-500 mb-3">
-                      <span>{invite.unit?.unitNumber}</span>
-                      <span>{invite.unit?.property?.name}</span>
-                      <span className="font-semibold text-[#00162E]">
-                        {formatNairaAmount(invite.rentAmount)}{rentCycleSuffix(invite.rentCycle)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-4 text-xs text-slate-400">
-                      <span>Start: {formatDate(invite.startDate)}</span>
-                      <span>End: {formatDate(invite.endDate)}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    {invite.status === "pending" && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="gap-1"
-                          onClick={() => copyInviteLink(invite.inviteCode)}
-                        >
-                          <Copy className="h-3.5 w-3.5" />
-                          Copy Link
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-500 hover:text-red-600 gap-1"
-                          onClick={() => cancelMutation.mutate(invite.id)}
-                          disabled={cancelMutation.isPending}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <InviteCard key={invite.id} invite={invite} showSender />
           ))}
         </div>
       )}

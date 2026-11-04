@@ -23,4 +23,7 @@ export const invitesApi = {
   acceptInvite: (code: string) => apiClient.post(`/invites/${code}/accept`),
 
   cancelInvite: (id: string) => apiClient.delete(`/invites/${id}/cancel`),
+
+  /** Re-send the SMS/email; a lapsed invite gets a fresh 7-day window. */
+  resendInvite: (id: string) => apiClient.post<Invite>(`/invites/${id}/resend`),
 }

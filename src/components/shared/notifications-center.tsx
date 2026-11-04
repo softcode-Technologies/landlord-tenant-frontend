@@ -56,6 +56,20 @@ const NOTIF_CONFIG: Record<NotifType, NotifConfig> = {
     label: "Invite",
     href: () => "/tenant/tenancies",
   },
+  tenancy_invite_sent: {
+    icon: Mail,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    label: "Invite",
+    href: (_, role) => (role === "landlord" ? "/landlord/invites" : null),
+  },
+  tenancy_invite_accepted: {
+    icon: CheckCircle2,
+    color: "text-green-600",
+    bg: "bg-green-50",
+    label: "Tenancy",
+    href: (_, role) => (role === "landlord" ? "/landlord/tenancies" : null),
+  },
   inspection_unlocked: {
     icon: Unlock,
     color: "text-purple-600",
