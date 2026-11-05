@@ -7,6 +7,7 @@ export interface AppConfig {
     /** Management mandates (agent full management). Off until the backend flag is on. */
     agentFullManagementEnabled?: boolean
     agentRentCollectionEnabled?: boolean
+    autoPayoutEnabled?: boolean
     kycMode: "manual" | "automatic"
     whatsappOptInDefault: boolean
   }
