@@ -300,10 +300,18 @@ export interface Invite {
   rentCycle?: "monthly" | "yearly"
   startDate: string
   endDate: string
-  status: "pending" | "accepted" | "cancelled"
+  status: "pending" | "accepted" | "cancelled" | "expired"
   unit?: Unit
   createdAt: string
+  updatedAt?: string
   expiresAt?: string
+  /** Set when an agent (not the landlord) sent the invite. */
+  invitedByAgentProfileId?: string | null
+  invitedByAgent?: {
+    id: string
+    agencyName?: string | null
+    user?: { id: string; firstName?: string | null; lastName?: string | null }
+  } | null
 }
 
 // Maintenance
@@ -374,6 +382,8 @@ export type NotificationType =
   | "payment_confirmed"
   | "tenancy_expiring"
   | "invite_received"
+  | "tenancy_invite_sent"
+  | "tenancy_invite_accepted"
   | "inspection_unlocked"
   | "inspection_scheduled"
   | "inspection_confirmed"

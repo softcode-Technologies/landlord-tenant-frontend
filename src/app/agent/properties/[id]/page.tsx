@@ -17,10 +17,11 @@ import { EmptyState } from "@/components/shared/empty-state"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog"
-import { formatNairaAmount, extractApiError } from "@/lib/utils"
-import { ArrowLeft, Building2, MapPin, Bed, Bath, Plus, Pencil, UserPlus, Loader2, DoorOpen, ShieldCheck } from "lucide-react"
+import { formatNairaAmount, extractApiError, formatRelativeTime, rentAmountLabel, rentCycleSuffix } from "@/lib/utils"
+import { ArrowLeft, Building2, MapPin, Bed, Bath, Plus, Pencil, UserPlus, Loader2, DoorOpen, ShieldCheck, RotateCw, Trash2, Clock } from "lucide-react"
 import { toast } from "sonner"
-import type { Unit } from "@/lib/types"
+import type { Invite, Unit } from "@/lib/types"
+import { isInviteLapsed, useInviteActions } from "@/components/invites/invite-card"
 
 export default function AgentPropertyDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -41,6 +42,18 @@ export default function AgentPropertyDetailPage() {
   })
   const property = data?.data
   const units = property?.units ?? []
+
+  // Pending invites on this property's units, so each unit shows what's
+  // outstanding instead of offering a second invite.
+  const { data: invitesData } = useQuery({
+    queryKey: ["agent-invites"],
+    queryFn: () => invitesApi.getInvites(),
+  })
+  const pendingByUnit = new Map<string, Invite>()
+  for (const inv of invitesData?.data ?? []) {
+    if (inv.status === "pending" && !pendingByUnit.has(inv.unitId)) pendingByUnit.set(inv.unitId, inv)
+  }
+  const { resend, cancel } = useInviteActions()
 
   const editMutation = useMutation({
     mutationFn: () => propertiesApi.updateProperty(id, {
@@ -79,12 +92,15 @@ export default function AgentPropertyDetailPage() {
       invitedPhone: invite.phone.trim(),
       firstName: invite.firstName.trim(),
       rentAmount: Number(invite.rentAmount),
+      rentCycle: inviteUnit?.rentCycle ?? "yearly",
       startDate: invite.startDate,
       endDate: invite.endDate,
     }),
     onSuccess: () => {
-      toast.success("Invite sent to tenant")
+      toast.success("Invite sent. You can track it under Tenant invites.")
       queryClient.invalidateQueries({ queryKey: ["property", id] })
+      queryClient.invalidateQueries({ queryKey: ["agent-invites"] })
+      queryClient.invalidateQueries({ queryKey: ["landlord-invites"] })
       setInviteUnit(null)
     },
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to send invite")),
@@ -197,18 +213,54 @@ export default function AgentPropertyDetailPage() {
                     <p className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
                       <span className="flex items-center gap-1"><Bed className="h-3 w-3" />{u.bedrooms ?? 0}</span>
                       <span className="flex items-center gap-1"><Bath className="h-3 w-3" />{u.bathrooms ?? 0}</span>
-                      {u.rentPerAnnum != null && <span>· {formatNairaAmount(u.rentPerAnnum)}/yr</span>}
+                      {u.rentPerAnnum != null && <span>· {formatNairaAmount(u.rentPerAnnum)}{rentCycleSuffix(u.rentCycle)}</span>}
                     </p>
+                    {(() => {
+                      const pending = pendingByUnit.get(u.id)
+                      if (!pending || u.status === "occupied") return null
+                      const lapsed = isInviteLapsed(pending)
+                      return (
+                        <p className={`text-xs mt-1.5 flex items-center gap-1 ${lapsed ? "text-amber-600" : "text-slate-500"}`}>
+                          <Clock className="h-3 w-3" />
+                          {lapsed ? "Invite expired" : "Invite pending"} · {pending.firstName} {pending.invitedPhone} · sent{" "}
+                          {formatRelativeTime(pending.createdAt).replace("Just now", "just now")}
+                        </p>
+                      )
+                    })()}
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={u.status === "occupied" ? "success" : "outline"} className="text-xs capitalize">
                       {u.status ?? "vacant"}
                     </Badge>
-                    {u.status !== "occupied" && (
-                      <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => openInvite(u)}>
-                        <UserPlus className="h-3 w-3" /> Invite tenant
-                      </Button>
-                    )}
+                    {u.status !== "occupied" && (() => {
+                      const pending = pendingByUnit.get(u.id)
+                      if (!pending) {
+                        return (
+                          <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => openInvite(u)}>
+                            <UserPlus className="h-3 w-3" /> Invite tenant
+                          </Button>
+                        )
+                      }
+                      const resending = resend.isPending && resend.variables === pending.id
+                      const cancelling = cancel.isPending && cancel.variables === pending.id
+                      return (
+                        <>
+                          <Button size="sm" variant="outline" className="h-7 text-xs gap-1" disabled={resending} onClick={() => resend.mutate(pending.id)}>
+                            {resending ? <Loader2 className="h-3 w-3 animate-spin" /> : <RotateCw className="h-3 w-3" />} Resend
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs gap-1 text-red-500 hover:text-red-600"
+                            disabled={cancelling}
+                            onClick={() => cancel.mutate(pending.id)}
+                            aria-label="Cancel invite"
+                          >
+                            {cancelling ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                          </Button>
+                        </>
+                      )
+                    })()}
                   </div>
                 </div>
               ))}
@@ -266,13 +318,13 @@ export default function AgentPropertyDetailPage() {
           <DialogHeader>
             <DialogTitle>Invite Tenant</DialogTitle>
             <DialogDescription>
-              Invite a tenant to Unit {inviteUnit?.unitNumber}. They&apos;ll get an SMS with a code to accept.
+              Invite a tenant to Unit {inviteUnit?.unitNumber}. They&apos;ll get an SMS with a link to accept. You and the landlord are notified when they do.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div><Label>Tenant phone</Label><Input value={invite.phone} onChange={(e) => setInvite((i) => ({ ...i, phone: e.target.value }))} placeholder="08012345678" className="mt-1.5" /></div>
             <div><Label>Tenant first name</Label><Input value={invite.firstName} onChange={(e) => setInvite((i) => ({ ...i, firstName: e.target.value }))} className="mt-1.5" /></div>
-            <div><Label>Annual Rent (₦)</Label><Input type="number" value={invite.rentAmount} onChange={(e) => setInvite((i) => ({ ...i, rentAmount: e.target.value }))} className="mt-1.5" /></div>
+            <div><Label>{rentAmountLabel(inviteUnit?.rentCycle ?? "yearly")} (₦)</Label><Input type="number" value={invite.rentAmount} onChange={(e) => setInvite((i) => ({ ...i, rentAmount: e.target.value }))} className="mt-1.5" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Start date</Label><Input type="date" value={invite.startDate} onChange={(e) => setInvite((i) => ({ ...i, startDate: e.target.value }))} className="mt-1.5" /></div>
               <div><Label>End date</Label><Input type="date" value={invite.endDate} onChange={(e) => setInvite((i) => ({ ...i, endDate: e.target.value }))} className="mt-1.5" /></div>

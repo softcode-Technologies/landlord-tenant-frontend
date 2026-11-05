@@ -9,8 +9,10 @@ import { useAuthStore } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
 import { commissionsApi } from "@/lib/api/commission"
 import { propertiesApi } from "@/lib/api/properties"
+import { useAgentFullManagementEnabled } from "@/lib/hooks/use-app-config"
 import {
   LayoutDashboard,
+  KeyRound,
   Building2,
   List,
   UserPlus,
@@ -49,6 +51,7 @@ function LandlordNav({ children }: { children: React.ReactNode }) {
     queryKey: ["properties"],
     queryFn: () => propertiesApi.getProperties(),
   })
+  const mandatesEnabled = useAgentFullManagementEnabled()
   const usesAgents =
     (commissionsData?.data?.length ?? 0) > 0 ||
     (propertiesData?.data ?? []).some((p) => p.assignedAgent)
@@ -64,6 +67,9 @@ function LandlordNav({ children }: { children: React.ReactNode }) {
     { label: "Invites", href: "/landlord/invites", icon: UserPlus, section: "Tenants" },
     { label: "Maintenance", href: "/landlord/maintenance", icon: Wrench, section: "Tenants" },
     { label: "My agents", href: "/landlord/agents", icon: UserCog, section: "Tenants" },
+    ...(mandatesEnabled
+      ? [{ label: "Agent authority", href: "/landlord/mandates", icon: KeyRound, section: "Tenants" }]
+      : []),
     { label: "Activity", href: "/landlord/activity", icon: Activity, section: "Tenants" },
 
     { label: "Wallet", href: "/landlord/wallet", icon: Wallet, section: "Money" },

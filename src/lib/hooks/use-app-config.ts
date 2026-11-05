@@ -20,3 +20,10 @@ export function usePlatformCommissionPercent(): number {
   const { data } = useAppConfig()
   return data?.data?.pricing?.platformCommissionPercent ?? 10
 }
+
+// Whether management mandates are switched on. False while loading or on error,
+// so mandate screens never flash on for a backend that has them off.
+export function useAgentFullManagementEnabled(): boolean {
+  const { data } = useAppConfig()
+  return data?.data?.features?.agentFullManagementEnabled === true
+}
