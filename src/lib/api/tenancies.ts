@@ -10,6 +10,8 @@ export interface ManagedTenancyAccess {
   endTenancies: boolean
   manageDeposits: boolean
   manageAgreements: boolean
+  /** Record rent paid outside Krib (cash, transfer, POS). Full management only. */
+  recordPayments: boolean
   /** Set when the access comes from a landlord's mandate. */
   mandateLevel: "managing" | "full" | null
 }

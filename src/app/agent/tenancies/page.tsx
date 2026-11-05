@@ -4,6 +4,9 @@ import { useState } from "react"
 import Link from "next/link"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { tenanciesApi, type ManagedTenancy } from "@/lib/api/tenancies"
+import { rentRecordsApi, METHOD_LABEL, type OfflineRentMethod } from "@/lib/api/rent-records"
+import { OfflineRentHistory } from "@/components/rent/offline-rent-history"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAgentFullManagementEnabled, useAppConfig } from "@/lib/hooks/use-app-config"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,6 +22,7 @@ import { Home, Loader2, Search } from "lucide-react"
 import { toast } from "sonner"
 
 type Action = "renew" | "rent" | "end"
+type Dialogs = Action | "pay" | "history"
 
 /**
  * Tenancies the agent runs — through a property assignment or a landlord's
@@ -28,7 +32,7 @@ export default function AgentTenanciesPage() {
   const enabled = useAgentFullManagementEnabled()
   const { isLoading: configLoading } = useAppConfig()
   const [search, setSearch] = useState("")
-  const [action, setAction] = useState<{ kind: Action; tenancy: ManagedTenancy } | null>(null)
+  const [action, setAction] = useState<{ kind: Dialogs; tenancy: ManagedTenancy } | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ["agent-tenancies"],
@@ -86,7 +90,23 @@ export default function AgentTenanciesPage() {
         </div>
       )}
 
-      {action && <ActionDialog action={action.kind} tenancy={action.tenancy} onClose={() => setAction(null)} />}
+      {action?.kind === "pay" && <RecordPaymentDialog tenancy={action.tenancy} onClose={() => setAction(null)} />}
+      {action?.kind === "history" && (
+        <Dialog open onOpenChange={(o) => !o && setAction(null)}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Cash and transfer payments</DialogTitle>
+              <DialogDescription>Rent paid outside Krib on this tenancy.</DialogDescription>
+            </DialogHeader>
+            <div className="max-h-[60vh] overflow-y-auto">
+              <OfflineRentHistory tenancyId={action.tenancy.id} viewer="agent" />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      {action && action.kind !== "pay" && action.kind !== "history" && (
+        <ActionDialog action={action.kind} tenancy={action.tenancy} onClose={() => setAction(null)} />
+      )}
     </div>
   )
 }
@@ -95,7 +115,7 @@ function personName(u?: { firstName?: string | null; lastName?: string | null } 
   return [u?.firstName, u?.lastName].filter(Boolean).join(" ") || "—"
 }
 
-function TenancyRow({ tenancy: t, onAction }: { tenancy: ManagedTenancy; onAction: (a: Action) => void }) {
+function TenancyRow({ tenancy: t, onAction }: { tenancy: ManagedTenancy; onAction: (a: Dialogs) => void }) {
   const active = t.status === "active"
   const canRenew = t.access.renewTenancies && (t.status === "active" || t.status === "expired")
   return (
@@ -122,6 +142,12 @@ function TenancyRow({ tenancy: t, onAction }: { tenancy: ManagedTenancy; onActio
             <Button asChild size="sm" variant="outline">
               <Link href="/agent/maintenance">Repairs</Link>
             </Button>
+          )}
+          {t.access.recordPayments && (t.status === "active" || t.status === "expired") && (
+            <Button size="sm" onClick={() => onAction("pay")}>Record payment</Button>
+          )}
+          {t.access.manageTenancies && (
+            <Button size="sm" variant="outline" onClick={() => onAction("history")}>Payments</Button>
           )}
           {canRenew && <Button size="sm" variant="outline" onClick={() => onAction("renew")}>Renew</Button>}
           {t.access.changeRent && active && (
@@ -223,6 +249,115 @@ function ActionDialog({ action, tenancy: t, onClose }: { action: Action; tenancy
           >
             {run.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {action === "renew" ? "Renew" : action === "rent" ? "Save rent" : "End tenancy"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function RecordPaymentDialog({ tenancy: t, onClose }: { tenancy: ManagedTenancy; onClose: () => void }) {
+  const queryClient = useQueryClient()
+  const [today] = useState(() => new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Lagos" }))
+  const [amount, setAmount] = useState(String(t.rentAmount))
+  const [method, setMethod] = useState<OfflineRentMethod>("cash")
+  const [receivedBy, setReceivedBy] = useState<"agent" | "landlord">("agent")
+  const [paidOn, setPaidOn] = useState(today)
+  const [reference, setReference] = useState("")
+  const [note, setNote] = useState("")
+
+  const amountNum = Number(amount)
+  const amountOk = Number.isInteger(amountNum) && amountNum > 0 && amountNum <= 20_000_000
+  const isPart = amountOk && amountNum < t.rentAmount
+
+  const save = useMutation({
+    mutationFn: () =>
+      rentRecordsApi.record({
+        tenancyId: t.id,
+        amount: amountNum,
+        method,
+        receivedBy,
+        paidOn,
+        ...(reference.trim() ? { reference: reference.trim() } : {}),
+        ...(note.trim() ? { note: note.trim() } : {}),
+      }),
+    onSuccess: (res) => {
+      toast.success(
+        res.data?.advancedLease
+          ? `Recorded. Paid up to ${formatDate(res.data.newEndDate)}.`
+          : "Part payment recorded",
+      )
+      queryClient.invalidateQueries({ queryKey: ["agent-tenancies"] })
+      queryClient.invalidateQueries({ queryKey: ["offline-rent", t.id] })
+      onClose()
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Could not record the payment")),
+  })
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Record a payment</DialogTitle>
+          <DialogDescription>
+            Rent {personName(t.tenant)} paid outside Krib. The tenant gets a receipt, and the landlord gets an SMS.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label>Amount (₦)</Label>
+            <Input type="number" min={1} value={amount} onChange={(e) => setAmount(e.target.value)} className="mt-1.5" />
+            {isPart && (
+              <p className="text-xs text-amber-600 mt-1">
+                Less than the full rent ({formatNairaAmount(t.rentAmount)}). It is recorded as a part payment, and the lease dates don&apos;t move.
+              </p>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>How it was paid</Label>
+              <Select value={method} onValueChange={(v) => setMethod(v as OfflineRentMethod)}>
+                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(METHOD_LABEL) as OfflineRentMethod[]).map((m) => (
+                    <SelectItem key={m} value={m}>{METHOD_LABEL[m]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Paid on</Label>
+              <Input type="date" max={today} value={paidOn} onChange={(e) => setPaidOn(e.target.value)} className="mt-1.5" />
+            </div>
+          </div>
+          <div>
+            <Label>Who has the money now?</Label>
+            <div className="grid grid-cols-2 gap-2 mt-1.5">
+              {(["agent", "landlord"] as const).map((who) => (
+                <button
+                  key={who}
+                  type="button"
+                  onClick={() => setReceivedBy(who)}
+                  className={`rounded-xl border p-2.5 text-sm transition-colors ${receivedBy === who ? "border-[#005AF1] bg-blue-50 text-slate-900" : "border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                >
+                  {who === "agent" ? "I have it" : "Paid to the landlord"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <Label>Reference <span className="text-slate-400 font-normal">(optional)</span></Label>
+            <Input value={reference} onChange={(e) => setReference(e.target.value)} maxLength={100} placeholder="Bank or POS reference" className="mt-1.5" />
+          </div>
+          <div>
+            <Label>Note <span className="text-slate-400 font-normal">(optional)</span></Label>
+            <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} maxLength={1000} className="mt-1.5" />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button disabled={!amountOk || !paidOn || paidOn > today || save.isPending} onClick={() => save.mutate()} className="gap-2">
+            {save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Record payment
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   UserX,
   KeyRound,
+  Scale,
 } from "lucide-react"
 
 const navItems = [
@@ -37,7 +38,12 @@ const navItems = [
 function AdminSidebar() {
   const mandatesEnabled = useAgentFullManagementEnabled()
   const items = mandatesEnabled
-    ? [...navItems.slice(0, 6), { label: "Mandate reviews", href: "/admin/mandates", icon: KeyRound }, ...navItems.slice(6)]
+    ? [
+        ...navItems.slice(0, 6),
+        { label: "Mandate reviews", href: "/admin/mandates", icon: KeyRound },
+        { label: "Rent disputes", href: "/admin/rent-disputes", icon: Scale },
+        ...navItems.slice(6),
+      ]
     : navItems
   return <DashboardSidebar navItems={items} role="admin" />
 }

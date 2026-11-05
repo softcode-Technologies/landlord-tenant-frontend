@@ -20,6 +20,7 @@ import { formatNaira, formatNairaAmount, formatDate, getStatusVariant, getInitia
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Calendar, DollarSign, Shield, Trash2, RefreshCw, Loader2, Pencil } from "lucide-react"
 import { RentHistoryCard } from "@/components/shared/rent-history-card"
+import { OfflineRentHistory } from "@/components/rent/offline-rent-history"
 import { RentFeeBreakdown } from "@/components/shared/rent-fee-breakdown"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -58,6 +59,7 @@ export default function LandlordTenancyDetailPage() {
     staleTime: 5 * 60 * 1000,
   })
   const depositEscrowEnabled = configData?.data?.features?.depositEscrowEnabled ?? false
+  const agentManagementEnabled = configData?.data?.features?.agentFullManagementEnabled === true
 
   const { data: depositEscrowsData } = useQuery({
     queryKey: ["my-deposit-escrows"],
@@ -413,6 +415,18 @@ export default function LandlordTenancyDetailPage() {
 
           {/* Rent History */}
           <RentHistoryCard tenancyId={id} />
+
+          {/* Cash / transfer payments recorded outside Krib (agent management) */}
+          {agentManagementEnabled && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Cash and transfer payments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <OfflineRentHistory tenancyId={id} viewer="landlord" />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Agreement */}
           <Card>
