@@ -6,7 +6,7 @@ import { AuthGuard } from "@/components/layout/auth-guard"
 import { useAuthStore } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
 import { useAgentFullManagementEnabled } from "@/lib/hooks/use-app-config"
-import { LayoutDashboard, DollarSign, BarChart3, MessageCircle, User, ShieldCheck, Building2, Wallet, Calendar, Users, UserPlus, KeyRound } from "lucide-react"
+import { LayoutDashboard, DollarSign, BarChart3, MessageCircle, User, ShieldCheck, Building2, Wallet, Calendar, Users, UserPlus, KeyRound, Home, Wrench } from "lucide-react"
 
 const navItems = [
   { label: "Dashboard", href: "/agent", icon: LayoutDashboard },
@@ -26,7 +26,13 @@ function AgentNav({ children }: { children: React.ReactNode }) {
   const { setUser } = useAuthStore()
   const mandatesEnabled = useAgentFullManagementEnabled()
   const items = mandatesEnabled
-    ? [...navItems.slice(0, 3), { label: "Landlord authority", href: "/agent/mandates", icon: KeyRound }, ...navItems.slice(3)]
+    ? [
+        ...navItems.slice(0, 3),
+        { label: "Landlord authority", href: "/agent/mandates", icon: KeyRound },
+        { label: "Tenancies", href: "/agent/tenancies", icon: Home },
+        { label: "Maintenance", href: "/agent/maintenance", icon: Wrench },
+        ...navItems.slice(3),
+      ]
     : navItems
 
   useEffect(() => {

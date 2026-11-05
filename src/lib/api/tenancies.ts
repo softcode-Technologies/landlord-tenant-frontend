@@ -1,6 +1,21 @@
 import apiClient from "./client"
 import type { Tenancy, CreditScore, RentChange, ScreeningReport } from "@/lib/types"
 
+/** What the signed-in agent may do on a tenancy they manage. */
+export interface ManagedTenancyAccess {
+  manageTenancies: boolean
+  manageMaintenance: boolean
+  renewTenancies: boolean
+  changeRent: boolean
+  endTenancies: boolean
+  manageDeposits: boolean
+  manageAgreements: boolean
+  /** Set when the access comes from a landlord's mandate. */
+  mandateLevel: "managing" | "full" | null
+}
+
+export type ManagedTenancy = Tenancy & { access: ManagedTenancyAccess }
+
 export interface AddExistingTenantData {
   unitId: string
   phone: string
@@ -24,6 +39,9 @@ export interface AddExistingTenantResult {
 
 export const tenanciesApi = {
   getLandlordTenancies: () => apiClient.get<Tenancy[]>("/tenancies/landlord"),
+
+  /** Agent: tenancies they manage, with their rights on each. */
+  getManagedTenancies: () => apiClient.get<ManagedTenancy[]>("/tenancies/managed"),
 
   // Onboard a tenant already living in a unit — creates a managed tenancy now,
   // and an unclaimed phone-keyed account if they're not on the platform yet.

@@ -23,6 +23,9 @@ export const maintenanceApi = {
 
   getLandlordRequests: () => apiClient.get<MaintenanceRequest[]>("/maintenance/landlord"),
 
+  /** Agent: requests on the properties they manage. */
+  getManagedRequests: () => apiClient.get<MaintenanceRequest[]>("/maintenance/managed"),
+
   getRequest: (id: string) => apiClient.get<MaintenanceRequest>(`/maintenance/${id}`),
 
   createRequest: ({ photos, ...data }: CreateMaintenanceData) => {
