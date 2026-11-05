@@ -5,7 +5,8 @@ import { DashboardSidebar } from "@/components/layout/dashboard-sidebar"
 import { AuthGuard } from "@/components/layout/auth-guard"
 import { useAuthStore } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
-import { LayoutDashboard, DollarSign, BarChart3, MessageCircle, User, ShieldCheck, Building2, Wallet, Calendar, Users, UserPlus } from "lucide-react"
+import { useAgentFullManagementEnabled } from "@/lib/hooks/use-app-config"
+import { LayoutDashboard, DollarSign, BarChart3, MessageCircle, User, ShieldCheck, Building2, Wallet, Calendar, Users, UserPlus, KeyRound } from "lucide-react"
 
 const navItems = [
   { label: "Dashboard", href: "/agent", icon: LayoutDashboard },
@@ -23,6 +24,10 @@ const navItems = [
 
 function AgentNav({ children }: { children: React.ReactNode }) {
   const { setUser } = useAuthStore()
+  const mandatesEnabled = useAgentFullManagementEnabled()
+  const items = mandatesEnabled
+    ? [...navItems.slice(0, 3), { label: "Landlord authority", href: "/agent/mandates", icon: KeyRound }, ...navItems.slice(3)]
+    : navItems
 
   useEffect(() => {
     authApi.me().then((res) => setUser(res.data)).catch(() => {})
@@ -30,7 +35,7 @@ function AgentNav({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-[#f8fafc]">
-      <DashboardSidebar navItems={navItems} role="agent" />
+      <DashboardSidebar navItems={items} role="agent" />
       <main className="flex-1 min-w-0 lg:ml-0 pt-14 lg:pt-0">
         <div className="p-6">{children}</div>
       </main>

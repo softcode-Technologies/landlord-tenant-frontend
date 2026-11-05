@@ -2,6 +2,7 @@
 
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar"
 import { AuthGuard } from "@/components/layout/auth-guard"
+import { useAgentFullManagementEnabled } from "@/lib/hooks/use-app-config"
 import {
   LayoutDashboard,
   Users,
@@ -15,6 +16,7 @@ import {
   UserCircle,
   ShieldCheck,
   UserX,
+  KeyRound,
 } from "lucide-react"
 
 const navItems = [
@@ -32,11 +34,19 @@ const navItems = [
   { label: "Profile", href: "/admin/profile", icon: UserCircle },
 ]
 
+function AdminSidebar() {
+  const mandatesEnabled = useAgentFullManagementEnabled()
+  const items = mandatesEnabled
+    ? [...navItems.slice(0, 6), { label: "Mandate reviews", href: "/admin/mandates", icon: KeyRound }, ...navItems.slice(6)]
+    : navItems
+  return <DashboardSidebar navItems={items} role="admin" />
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGuard>
       <div className="flex min-h-screen bg-[#f8fafc]">
-        <DashboardSidebar navItems={navItems} role="admin" />
+        <AdminSidebar />
         <main className="flex-1 min-w-0 lg:ml-0 pt-14 lg:pt-0">
           <div className="p-6">{children}</div>
         </main>
