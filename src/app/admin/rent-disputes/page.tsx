@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { rentRecordsApi, METHOD_LABEL, type OfflineRentRecord } from "@/lib/api/rent-records"
-import { useAgentFullManagementEnabled, useAppConfig } from "@/lib/hooks/use-app-config"
+import { collectionsApi, type Remittance } from "@/lib/api/collections"
+import { useAgentFullManagementEnabled, useAgentRentCollectionEnabled, useAppConfig } from "@/lib/hooks/use-app-config"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -28,6 +29,7 @@ const REASON_LABEL: Record<string, string> = {
  */
 export default function AdminRentDisputesPage() {
   const enabled = useAgentFullManagementEnabled()
+  const collectionEnabled = useAgentRentCollectionEnabled()
   const { isLoading: configLoading } = useAppConfig()
   const { data, isLoading } = useQuery({
     queryKey: ["admin-rent-disputes"],
@@ -58,7 +60,95 @@ export default function AdminRentDisputesPage() {
           ))}
         </div>
       )}
+      {collectionEnabled && <RemittanceDisputes />}
     </div>
+  )
+}
+
+/** Payments an agent says they passed on, which the landlord says never arrived. */
+function RemittanceDisputes() {
+  const { data, isLoading } = useQuery({ queryKey: ["admin-remittance-disputes"], queryFn: () => collectionsApi.disputed() })
+  const rows = data?.data ?? []
+  return (
+    <section className="space-y-4 pt-4">
+      <div>
+        <h2 className="text-lg font-semibold text-slate-900">Payments to landlords</h2>
+        <p className="text-slate-500 text-sm mt-0.5">An agent recorded paying a landlord rent they collected; the landlord says it never arrived.</p>
+      </div>
+      {isLoading ? (
+        <Skeleton className="h-28 rounded-2xl" />
+      ) : rows.length === 0 ? (
+        <p className="text-sm text-slate-500">None.</p>
+      ) : (
+        rows.map((r) => <RemittanceDisputeCard key={r.id} r={r} />)
+      )}
+    </section>
+  )
+}
+
+function RemittanceDisputeCard({ r }: { r: Remittance & { agentName: string; landlordName: string } }) {
+  const queryClient = useQueryClient()
+  const [mode, setMode] = useState<"keep" | "cancel" | null>(null)
+  const [text, setText] = useState("")
+  const act = useMutation({
+    mutationFn: () => (mode === "keep" ? collectionsApi.uphold(r.id, text.trim() || undefined) : collectionsApi.voidRemittance(r.id, text.trim())),
+    onSuccess: () => {
+      toast.success(mode === "keep" ? "Record kept" : "Record cancelled. The amount is owed again.")
+      setMode(null)
+      setText("")
+      queryClient.invalidateQueries({ queryKey: ["admin-remittance-disputes"] })
+    },
+    onError: (err: unknown) => toast.error(extractApiError(err, "Could not update this")),
+  })
+  return (
+    <Card>
+      <CardContent className="p-5 space-y-3">
+        <div>
+          <p className="font-semibold text-slate-900">{formatNaira(r.amountKobo)} · {METHOD_LABEL[r.method]}</p>
+          <p className="text-sm text-slate-600 mt-0.5">
+            {r.agentName} → {r.landlordName} · paid {formatDate(r.paidOn)}
+            {r.reference ? ` · ref ${r.reference}` : ""}
+          </p>
+          <p className="text-xs text-slate-400 mt-1">Recorded {formatDateTime(r.createdAt)}</p>
+        </div>
+        <div className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+          Landlord says they didn&apos;t receive it{r.disputeNote ? `: “${r.disputeNote}”` : "."}
+        </div>
+        {r.note && <p className="text-sm text-slate-500">Agent&apos;s note: “{r.note}”</p>}
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => setMode("keep")}>Keep record</Button>
+          <Button size="sm" variant="destructive" onClick={() => setMode("cancel")}>Cancel record</Button>
+        </div>
+      </CardContent>
+      <Dialog open={mode !== null} onOpenChange={(o) => { if (!o) { setMode(null); setText("") } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{mode === "keep" ? "Keep this record?" : "Cancel this record?"}</DialogTitle>
+            <DialogDescription>
+              {mode === "keep"
+                ? "Use this when the agent shows proof they paid. It no longer counts against them."
+                : "The amount counts as owed to the landlord again."}
+            </DialogDescription>
+          </DialogHeader>
+          <div>
+            <Label htmlFor={`rt-${r.id}`}>{mode === "keep" ? "Note (optional)" : "Reason"}</Label>
+            <Textarea id={`rt-${r.id}`} value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={1000} className="mt-1.5" />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMode(null)}>Back</Button>
+            <Button
+              variant={mode === "keep" ? "default" : "destructive"}
+              disabled={act.isPending || (mode === "cancel" && text.trim().length < 3)}
+              onClick={() => act.mutate()}
+              className="gap-2"
+            >
+              {act.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {mode === "keep" ? "Keep record" : "Cancel record"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
   )
 }
 

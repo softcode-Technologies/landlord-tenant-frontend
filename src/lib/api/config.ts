@@ -6,6 +6,7 @@ export interface AppConfig {
     depositEscrowEnabled?: boolean
     /** Management mandates (agent full management). Off until the backend flag is on. */
     agentFullManagementEnabled?: boolean
+    agentRentCollectionEnabled?: boolean
     kycMode: "manual" | "automatic"
     whatsappOptInDefault: boolean
   }
