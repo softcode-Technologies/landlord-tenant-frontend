@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { useAuthStore } from "@/lib/store/auth"
 import { EscrowPanel } from "@/components/shared/escrow-panel"
+import { AutoPayoutCard } from "@/components/payouts/auto-payout-card"
 
 export default function LandlordWalletPage() {
   const queryClient = useQueryClient()
@@ -359,6 +360,8 @@ export default function LandlordWalletPage() {
               )}
             </CardContent>
           </Card>
+
+          <AutoPayoutCard />
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">

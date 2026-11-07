@@ -27,3 +27,10 @@ export function useAgentFullManagementEnabled(): boolean {
   const { data } = useAppConfig()
   return data?.data?.features?.agentFullManagementEnabled === true
 }
+
+// Whether rent paid through Krib can go to agents (needs full management on
+// too; the backend already combines both). False while loading or on error.
+export function useAgentRentCollectionEnabled(): boolean {
+  const { data } = useAppConfig()
+  return data?.data?.features?.agentRentCollectionEnabled === true
+}
