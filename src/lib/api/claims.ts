@@ -40,6 +40,8 @@ export interface ClaimPreview {
   agentName: string
   agencyName: string | null
   landlordFirstName: string | null
+  /** The invited phone, masked ("+234809***5678"). Missing on older backends. */
+  landlordPhoneHint?: string | null
   propertyName: string | null
   propertyArea: string | null
   expiresAt: string
