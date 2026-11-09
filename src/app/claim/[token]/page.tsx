@@ -12,6 +12,7 @@ import {
   BellRing,
   CheckCircle2,
   Building2,
+  UserX,
 } from "lucide-react"
 import { BrandLogo } from "@/components/layout/brand-logo"
 import { Button } from "@/components/ui/button"
@@ -20,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { claimsApi, type ClaimRejectReason } from "@/lib/api/claims"
+import { authApi } from "@/lib/api/auth"
 import { useAuthStore } from "@/lib/store/auth"
 import { BRAND_NAME } from "@/lib/config/brand"
 import { extractApiError } from "@/lib/utils"
@@ -61,9 +63,10 @@ const REJECT_REASONS: { value: ClaimRejectReason; label: string; hint: string }[
 export default function ClaimPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params)
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user, logout } = useAuthStore()
 
-  const [mode, setMode] = useState<"decide" | "rejecting" | "accepted" | "rejected">("decide")
+  const [mode, setMode] = useState<"decide" | "rejecting" | "accepted" | "rejected" | "wrong-account">("decide")
+  const [switching, setSwitching] = useState(false)
   const [reason, setReason] = useState<ClaimRejectReason | null>(null)
   const [note, setNote] = useState("")
 
@@ -77,8 +80,25 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
   const acceptMutation = useMutation({
     mutationFn: () => claimsApi.accept(token),
     onSuccess: () => setMode("accepted"),
-    onError: (err: unknown) => toast.error(extractApiError(err, "Could not confirm. Please try again.")),
+    onError: (err: unknown) => {
+      // 403 = signed in, but not as the landlord this was sent to (often the
+      // agent, testing on the same browser). Show how to switch, not a toast.
+      if ((err as { response?: { status?: number } })?.response?.status === 403) {
+        setMode("wrong-account")
+        return
+      }
+      toast.error(extractApiError(err, "Could not confirm. Please try again."))
+    },
   })
+
+  const loginHere = `/login?redirect=${encodeURIComponent(`/claim/${token}`)}`
+
+  async function switchAccount() {
+    setSwitching(true)
+    try { await authApi.logout() } catch { /* signing out locally is enough */ }
+    logout()
+    router.push(loginHere)
+  }
 
   const rejectMutation = useMutation({
     mutationFn: () => claimsApi.reject(token, reason!, note.trim() || undefined),
@@ -90,7 +110,7 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
     // Confirming needs a session proving they are the landlord — the link alone
     // arrived by SMS or email and could have been forwarded.
     if (!isAuthenticated) {
-      router.push(`/login?redirect=${encodeURIComponent(`/claim/${token}`)}`)
+      router.push(loginHere)
       return
     }
     acceptMutation.mutate()
@@ -140,6 +160,39 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
           <Button onClick={() => router.push("/landlord")} className="w-full sm:w-auto">
             Go to my dashboard
           </Button>
+        </div>
+      </Shell>
+    )
+  }
+
+  // ── Signed in as the wrong person ────────────────────────────────────────────
+  if (mode === "wrong-account") {
+    const signedInAs = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || user?.phone || "another account"
+    return (
+      <Shell>
+        <div className="text-center py-2">
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-amber-100 grid place-items-center">
+            <UserX className="h-6 w-6 text-amber-700" />
+          </div>
+          <h1 className="text-xl font-semibold text-slate-900 mb-2">Sign in with the invited number</h1>
+          <p className="text-slate-600 text-sm mb-1 max-w-sm mx-auto">
+            You&apos;re signed in as <span className="font-medium text-slate-900">{signedInAs}</span>
+            {user?.phone && signedInAs !== user.phone ? ` (${user.phone})` : ""}.
+          </p>
+          <p className="text-slate-600 text-sm mb-6 max-w-sm mx-auto">
+            This invitation was sent to{" "}
+            <span className="font-medium text-slate-900">{claim.landlordPhoneHint ?? "the landlord's phone"}</span>.
+            Sign out, then sign in with that number to confirm.
+          </p>
+          <div className="space-y-2.5">
+            <Button onClick={switchAccount} disabled={switching} className="w-full h-11">
+              {switching && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Sign out and sign in with that number
+            </Button>
+            <Button variant="ghost" onClick={() => setMode("decide")} className="w-full h-11">
+              Back
+            </Button>
+          </div>
         </div>
       </Shell>
     )
@@ -270,7 +323,17 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
 
       {!isAuthenticated && (
         <p className="text-slate-400 text-xs text-center mt-4">
-          Confirming asks you to sign in with this phone number, so we know it&apos;s really you.
+          Confirming asks you to sign in with{" "}
+          {claim.landlordPhoneHint ? <span className="text-slate-600">{claim.landlordPhoneHint}</span> : "this phone number"}
+          , so we know it&apos;s really you.
+        </p>
+      )}
+      {isAuthenticated && user && (
+        <p className="text-slate-400 text-xs text-center mt-4">
+          Signed in as {[user.firstName, user.lastName].filter(Boolean).join(" ") || user.phone}.{" "}
+          <button type="button" onClick={switchAccount} className="underline hover:text-slate-600">
+            Not you? Switch account
+          </button>
         </p>
       )}
     </Shell>
