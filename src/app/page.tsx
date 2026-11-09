@@ -213,7 +213,7 @@ export default function HomePage() {
               </h1>
 
               <p className="text-lg text-slate-300/90 mb-9 leading-relaxed">
-                {BRAND_NAME} is a complete platform for landlords, agents, and tenants —
+                {BRAND_NAME}{" "}is a complete platform for landlords, agents, and tenants —
                 covering listings, tenancies, payments, maintenance, and communication.
                 Whether you&apos;re renting out a new unit or managing tenants you already have,
                 this is the system that holds it all together.

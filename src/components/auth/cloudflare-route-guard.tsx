@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { safeRedirectPath } from "@/lib/safe-redirect"
 
 // Client-side mirror of src/proxy.ts, used ONLY on the Cloudflare (OpenNext)
 // deployment — Next.js 16's Node-runtime proxy can't run there. On Vercel the
@@ -14,7 +13,6 @@ import { safeRedirectPath } from "@/lib/safe-redirect"
 // real protection; this only handles the pre-emptive redirect UX.
 const COOKIE = "naijarental-token"
 const PROTECTED_PREFIXES = ["/tenant", "/landlord", "/agent", "/admin"]
-const AUTH_ROUTES = ["/login"]
 
 function readCookie(name: string): string | undefined {
   if (typeof document === "undefined") return undefined
@@ -48,16 +46,13 @@ export function CloudflareRouteGuard() {
 
     const hasValidToken = isTokenValid(readCookie(COOKIE))
     const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
-    const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r))
 
     if (isProtected && !hasValidToken) {
       router.replace(`/login?redirect=${encodeURIComponent(pathname)}`)
       return
     }
-    if (isAuthRoute && hasValidToken) {
-      const redirect = new URLSearchParams(window.location.search).get("redirect")
-      router.replace(safeRedirectPath(redirect, "/"))
-    }
+    // /login is not bounced on the cookie (see src/proxy.ts); the login page
+    // redirects signed-in users itself.
   }, [pathname, router])
 
   return null
