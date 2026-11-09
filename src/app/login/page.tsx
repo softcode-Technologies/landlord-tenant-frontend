@@ -19,6 +19,19 @@ function LoginContent() {
   const searchParams = useSearchParams()
   const redirect = safeRedirectPath(searchParams.get("redirect"), "")
   const { setAuth, setAccessToken } = useAuthStore()
+  const hydrated = useAuthStore((s) => s._hasHydrated)
+  const signedInUser = useAuthStore((s) => (s.isAuthenticated ? s.user : null))
+
+  // Set once a login completes here, so the check below never races the
+  // post-login navigation (e.g. a new user going to onboarding).
+  const signingIn = useRef(false)
+
+  // Already signed in (by the same state the header uses): skip the form.
+  // The server no longer does this from the cookie alone; see src/proxy.ts.
+  useEffect(() => {
+    if (!hydrated || !signedInUser || signingIn.current) return
+    router.replace(redirect || getRoleDashboardPath(signedInUser))
+  }, [hydrated, signedInUser, redirect, router])
 
   const [step, setStep] = useState<"phone" | "otp">("phone")
   const [phone, setPhone] = useState("")
@@ -133,6 +146,7 @@ function LoginContent() {
       // Store the token first so the request interceptor includes it in /auth/me.
       // The refresh token is set by the backend as an httpOnly cookie — not read
       // here, so it's never exposed to JS.
+      signingIn.current = true
       setAccessToken(accessToken)
 
       // Get full user profile (includes landlord/tenant/agent profiles)

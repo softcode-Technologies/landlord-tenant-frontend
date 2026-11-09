@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { safeRedirectPath } from "@/lib/safe-redirect"
 
 const COOKIE = "naijarental-token"
 const PROTECTED_PREFIXES = ["/tenant", "/landlord", "/agent", "/admin"]
-const AUTH_ROUTES = ["/login"]
 
 // Validate the token's expiry instead of trusting its mere presence. A stale or
 // expired cookie (common after a backend restart or DB reset) used to count as
@@ -34,7 +32,6 @@ export function proxy(request: NextRequest) {
   const hasValidToken = isTokenValid(token)
 
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
-  const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r))
 
   if (isProtected && !hasValidToken) {
     const loginUrl = new URL("/login", request.url)
@@ -44,12 +41,12 @@ export function proxy(request: NextRequest) {
     return res
   }
 
-  // Only bounce away from /login when the session is genuinely valid.
-  if (isAuthRoute && hasValidToken) {
-    // Only honor internal paths so ?redirect= can't bounce to an external host.
-    const redirectTo = safeRedirectPath(request.nextUrl.searchParams.get("redirect"), "/")
-    return NextResponse.redirect(new URL(redirectTo, request.url))
-  }
+  // /login is deliberately NOT bounced here. The header picks "Log in" vs
+  // "Dashboard" from the client auth store, which can be empty while this
+  // cookie is still valid (cleared site storage, private mode, in-app
+  // browsers). Bouncing on the cookie sent those users back to "/", so the
+  // Log in button seemed dead. The login page redirects signed-in users
+  // itself, from the same store the header uses.
 
   // Stale token on a public page — clear it so it can't cause trouble later.
   if (token && !hasValidToken) {
