@@ -13,7 +13,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { formatNaira, formatDate, getStatusVariant } from "@/lib/utils"
+import { formatNairaAmount, formatDate, getStatusVariant } from "@/lib/utils"
 import { Home, Search } from "lucide-react"
 
 export default function AdminTenanciesPage() {
@@ -120,7 +120,7 @@ export default function AdminTenanciesPage() {
                       {tenancy.property?.name ?? tenancy.unit?.unitNumber ?? "N/A"}
                     </TableCell>
                     <TableCell className="font-semibold text-[#00162E] text-sm">
-                      {formatNaira(tenancy.rentAmount)}
+                      {formatNairaAmount(tenancy.rentAmount)}
                     </TableCell>
                     <TableCell className="text-sm text-slate-500">
                       {formatDate(tenancy.startDate)}
