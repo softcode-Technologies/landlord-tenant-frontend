@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, Suspense } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Phone, ArrowLeft, Loader2, Shield, ShieldCheck, Receipt, Bell } from "lucide-react"
 import { BrandLogo } from "@/components/layout/brand-logo"
@@ -14,8 +14,22 @@ import { BrandWordmark } from "@/components/layout/brand-wordmark"
 import { BRAND_NAME } from "@/lib/config/brand"
 import { safeRedirectPath } from "@/lib/safe-redirect"
 
+/**
+ * Leave the login page with a full page load, not a client-side push.
+ *
+ * Before sign-in, Next's client router may have cached the server's answer for
+ * a protected page ("no cookie → go to /login"), e.g. from a prefetch. A
+ * router.push after sign-in can replay that cached redirect and land back here,
+ * even though the code was accepted, so the next press says "invalid OTP"
+ * (codes are single-use) until a reload clears the cache. A full load always
+ * asks the server again, now with the session cookie.
+ */
+function goTo(path: string, replace = false) {
+  if (replace) window.location.replace(path)
+  else window.location.assign(path)
+}
+
 function LoginContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = safeRedirectPath(searchParams.get("redirect"), "")
   const { setAuth, setAccessToken } = useAuthStore()
@@ -30,8 +44,8 @@ function LoginContent() {
   // The server no longer does this from the cookie alone; see src/proxy.ts.
   useEffect(() => {
     if (!hydrated || !signedInUser || signingIn.current) return
-    router.replace(redirect || getRoleDashboardPath(signedInUser))
-  }, [hydrated, signedInUser, redirect, router])
+    goTo(redirect || getRoleDashboardPath(signedInUser), true)
+  }, [hydrated, signedInUser, redirect])
 
   const [step, setStep] = useState<"phone" | "otp">("phone")
   const [phone, setPhone] = useState("")
@@ -138,10 +152,14 @@ function LoginContent() {
       return
     }
 
+    if (loading) return // a code is single-use: never send it twice
     setLoading(true)
+    let leaving = false
+    let codeAccepted = false
     try {
       const response = await authApi.verifyOtp(phone, otpString)
       const { accessToken, isNew } = response.data
+      codeAccepted = true
 
       // Store the token first so the request interceptor includes it in /auth/me.
       // The refresh token is set by the backend as an httpOnly cookie — not read
@@ -162,22 +180,30 @@ function LoginContent() {
       // the invite is what makes them a tenant and fills in their profile. Send them
       // straight back to the invite page (which auto-accepts), new or not.
       const isInviteFlow = redirect.startsWith("/invite/")
+      // Keep the button busy while the next page loads.
+      leaving = true
       if (redirect && (isInviteFlow || !isNew)) {
-        router.push(redirect)
+        goTo(redirect)
       } else if (isNew) {
         // Carry the redirect through onboarding so a first-timer who came here to
         // unlock a listing lands back on that listing once their profile is set up.
-        router.push(redirect ? `/onboarding?redirect=${encodeURIComponent(redirect)}` : "/onboarding")
+        goTo(redirect ? `/onboarding?redirect=${encodeURIComponent(redirect)}` : "/onboarding")
       } else {
-        router.push(getRoleDashboardPath(user))
+        goTo(getRoleDashboardPath(user))
       }
     } catch (err: unknown) {
+      if (codeAccepted) {
+        // The code worked (and is now used up); only loading the account failed.
+        // Don't call it an invalid code, which would send them round in circles.
+        toast.error("You're signed in, but we couldn't load your account. Please reload the page.")
+        return
+      }
       const error = err as { response?: { data?: { error?: { message?: string }; message?: string } } }
       toast.error(error.response?.data?.error?.message ?? error.response?.data?.message ?? "Invalid OTP. Please try again.")
       setOtp(["", "", "", "", "", ""])
       otpRefs.current[0]?.focus()
     } finally {
-      setLoading(false)
+      if (!leaving) setLoading(false)
     }
   }
 
@@ -208,6 +234,7 @@ function LoginContent() {
           <BrandLogo 
             variant="full"
             size="lg"
+            onDark
             className="w-9 h-9 rounded-xl bg-white/20" 
             iconClassName="h-5 w-5 text-white" 
           />
