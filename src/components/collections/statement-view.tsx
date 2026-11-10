@@ -14,16 +14,24 @@ import { extractApiError, formatDate, formatNaira } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
-/** The four numbers that matter, in plain words. */
-export function StatementTotals({ s, viewer }: { s: Statement | Omit<Statement, "collected" | "remittances">; viewer: "agent" | "landlord" }) {
+/** The numbers that matter, in plain words. */
+export function StatementTotals({ s, viewer }: { s: Statement | Omit<Statement, "collected" | "cashHeld" | "remittances">; viewer: "agent" | "landlord" }) {
+  const throughKrib = s.collectedKobo > 0 || s.managementFeeKobo > 0
   const items: [string, number, string?][] = [
-    [viewer === "agent" ? "Rent you collected" : "Rent your agent collected", s.collectedKobo],
-    [viewer === "agent" ? "Your fee" : "Agent's fee", s.managementFeeKobo],
+    ...(throughKrib || s.cashHeldKobo === 0
+      ? ([
+          [viewer === "agent" ? "Rent Krib paid you" : "Rent Krib paid your agent", s.collectedKobo],
+          [viewer === "agent" ? "Your fee" : "Agent's fee", s.managementFeeKobo],
+        ] as [string, number][])
+      : []),
+    ...(s.cashHeldKobo > 0
+      ? ([[viewer === "agent" ? "Cash you received" : "Cash your agent received", s.cashHeldKobo]] as [string, number][])
+      : []),
     [viewer === "agent" ? "Paid to landlord" : "Paid to you", s.remittedKobo],
     [viewer === "agent" ? "You still owe" : "Still owed to you", Math.max(0, s.outstandingKobo), s.outstandingKobo > 0 ? "text-amber-700" : "text-emerald-700"],
   ]
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className={`grid grid-cols-2 gap-3 ${items.length === 5 ? "sm:grid-cols-5" : items.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-4"}`}>
       {items.map(([label, kobo, tone]) => (
         <div key={label} className="rounded-xl border border-slate-200 bg-white p-3">
           <p className="text-xs text-slate-500">{label}</p>
@@ -31,7 +39,7 @@ export function StatementTotals({ s, viewer }: { s: Statement | Omit<Statement, 
         </div>
       ))}
       {s.disputedKobo > 0 && (
-        <p className="col-span-2 sm:col-span-4 text-sm text-red-700">
+        <p className="col-span-full text-sm text-red-700">
           {formatNaira(s.disputedKobo)} is under review: {viewer === "agent" ? "the landlord says they didn't receive it." : "you said you didn't receive it."}
         </p>
       )}
@@ -39,10 +47,41 @@ export function StatementTotals({ s, viewer }: { s: Statement | Omit<Statement, 
   )
 }
 
-/** Collected rent and payments to the landlord, newest first. */
+/** Rent received (through Krib and in cash) and payments to the landlord, newest first. */
 export function StatementDetail({ s, viewer, queryKey }: { s: Statement; viewer: "agent" | "landlord"; queryKey: unknown[] }) {
+  const cashHeld = s.cashHeld ?? []
   return (
     <div className="space-y-5">
+      {cashHeld.length > 0 && (
+        <Card>
+          <CardContent className="p-5">
+            <h3 className="font-semibold text-slate-900 mb-1">
+              {viewer === "agent" ? "Cash you received and are holding" : "Cash your agent received for you"}
+            </h3>
+            <p className="text-xs text-slate-500 mb-3">
+              Rent a tenant paid {viewer === "agent" ? "you" : "your agent"} by cash, transfer or POS. Krib didn&apos;t move it; it
+              stays owed {viewer === "agent" ? "to the landlord" : "to you"} until {viewer === "agent" ? "you record" : "your agent records"} paying it over.
+            </p>
+            <ul className="divide-y divide-slate-100">
+              {cashHeld.map((c) => (
+                <li key={c.recordId} className="py-2.5 flex flex-wrap justify-between gap-2 text-sm">
+                  <span className="text-slate-700">
+                    {c.propertyName ?? "Property"}
+                    {c.unitNumber ? ` · ${c.unitNumber}` : ""}
+                    {c.tenantName ? ` · ${c.tenantName}` : ""}
+                    <span className="text-slate-400"> · {METHOD_LABEL[c.method]} · {formatDate(c.paidOn)}</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    {c.status === "disputed" && <Badge variant="destructive">Under review</Badge>}
+                    <span className="font-medium text-slate-900">{formatNaira(c.amountKobo)}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+      {(s.collected.length > 0 || cashHeld.length === 0) && (
       <Card>
         <CardContent className="p-5">
           <h3 className="font-semibold text-slate-900 mb-3">Rent collected through Krib</h3>
@@ -67,6 +106,7 @@ export function StatementDetail({ s, viewer, queryKey }: { s: Statement; viewer:
           )}
         </CardContent>
       </Card>
+      )}
       <Card>
         <CardContent className="p-5">
           <h3 className="font-semibold text-slate-900 mb-3">{viewer === "agent" ? "Payments to the landlord" : "Payments to you"}</h3>

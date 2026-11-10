@@ -21,6 +21,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { formatNairaAmount, formatNaira, formatDate, getStatusVariant, extractApiError, rentAmountLabel } from "@/lib/utils"
 import { ArrowLeft, MapPin, Calendar, Wallet, Wrench, FileText, Loader2, ExternalLink, PenLine, Star, CheckCircle2, ShieldCheck, Clock } from "lucide-react"
 import { RentHistoryCard } from "@/components/shared/rent-history-card"
+import { TenantCashPayments } from "@/components/rent/tenant-cash-payments"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -269,6 +270,9 @@ export default function TenantTenancyDetailPage() {
 
           {/* Rent History */}
           <RentHistoryCard tenancyId={id} />
+
+          {/* Rent paid by cash/transfer and recorded by the landlord or agent */}
+          <TenantCashPayments tenancyId={id} />
 
           {/* Deposit Info */}
           <Card>

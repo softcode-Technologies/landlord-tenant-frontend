@@ -26,6 +26,29 @@ export interface OfflineRentRecord {
   createdAt: string
 }
 
+/** A record with where it was paid, for the full lists. */
+export interface CashLedgerRow extends OfflineRentRecord {
+  landlordProfileId: string
+  landlordName: string | null
+  tenantName: string | null
+  propertyName: string | null
+  unitNumber: string | null
+}
+
+export interface CashLedger {
+  totals: {
+    /** Every payment not cancelled. */
+    recordedKobo: number
+    count: number
+    /** Of that, what the agent said they're holding for the landlord. */
+    heldByAgentKobo: number
+    disputedKobo: number
+  }
+  records: CashLedgerRow[]
+}
+
+export type CashLedgerViewer = "landlord" | "agent" | "tenant"
+
 export interface RecordOfflineRentData {
   tenancyId: string
   /** Whole naira. */
@@ -53,9 +76,12 @@ export interface OfflineRentPreview {
 export const rentRecordsApi = {
   record: (data: RecordOfflineRentData) => apiClient.post<OfflineRentRecord>("/rent-records", data),
   forTenancy: (tenancyId: string) => apiClient.get<OfflineRentRecord[]>(`/rent-records/tenancy/${tenancyId}`),
+  mine: (as: CashLedgerViewer) => apiClient.get<CashLedger>(`/rent-records/mine?as=${as}`),
   void: (id: string, reason: string) => apiClient.post<OfflineRentRecord>(`/rent-records/${id}/void`, { reason }),
 
   // Admin
+  all: (status?: OfflineRentStatus) =>
+    apiClient.get<CashLedger>(status ? `/rent-records?status=${status}` : "/rent-records"),
   disputed: () => apiClient.get<(OfflineRentRecord & { landlordProfileId: string })[]>("/rent-records/disputed"),
   uphold: (id: string, note?: string) => apiClient.post<OfflineRentRecord>(`/rent-records/${id}/uphold`, { note }),
 

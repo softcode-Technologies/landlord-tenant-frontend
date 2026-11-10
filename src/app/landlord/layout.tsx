@@ -9,7 +9,7 @@ import { useAuthStore } from "@/lib/store/auth"
 import { authApi } from "@/lib/api/auth"
 import { commissionsApi } from "@/lib/api/commission"
 import { propertiesApi } from "@/lib/api/properties"
-import { useAgentFullManagementEnabled, useAgentRentCollectionEnabled } from "@/lib/hooks/use-app-config"
+import { useAgentFullManagementEnabled } from "@/lib/hooks/use-app-config"
 import {
   LayoutDashboard,
   KeyRound,
@@ -29,6 +29,7 @@ import {
   UserCog,
   Activity,
   HandCoins,
+  Banknote,
 } from "lucide-react"
 
 function LandlordNav({ children }: { children: React.ReactNode }) {
@@ -53,7 +54,6 @@ function LandlordNav({ children }: { children: React.ReactNode }) {
     queryFn: () => propertiesApi.getProperties(),
   })
   const mandatesEnabled = useAgentFullManagementEnabled()
-  const collectionEnabled = useAgentRentCollectionEnabled()
   const usesAgents =
     (commissionsData?.data?.length ?? 0) > 0 ||
     (propertiesData?.data ?? []).some((p) => p.assignedAgent)
@@ -75,8 +75,11 @@ function LandlordNav({ children }: { children: React.ReactNode }) {
     { label: "Activity", href: "/landlord/activity", icon: Activity, section: "Tenants" },
 
     { label: "Wallet", href: "/landlord/wallet", icon: Wallet, section: "Money" },
-    ...(collectionEnabled
-      ? [{ label: "Rent from agents", href: "/landlord/collections", icon: HandCoins, section: "Money" }]
+    ...(mandatesEnabled
+      ? [
+          { label: "Cash payments", href: "/landlord/cash-payments", icon: Banknote, section: "Money" },
+          { label: "Rent from agents", href: "/landlord/collections", icon: HandCoins, section: "Money" },
+        ]
       : []),
     ...(usesAgents
       ? [{ label: "Commissions", href: "/landlord/commissions", icon: DollarSign, section: "Money" }]
