@@ -10,16 +10,20 @@ import { BrandWordmark } from "./brand-wordmark"
 //
 // `variant` can be "full" (logo with text) or "icon" (just icon/mark)
 // `size` controls the height: "sm" (32px), "md" (48px), "lg" (64px), or custom class
+// `onDark` puts the logo image on a white chip. The logo's "rib" lettering is
+// dark navy on a transparent background, so on a dark panel it disappears.
 export function BrandLogo({
   className,
   iconClassName,
   variant = "icon",
   size = "md",
+  onDark = false,
 }: {
   className?: string
   iconClassName?: string
   variant?: "full" | "icon"
   size?: "sm" | "md" | "lg" | "xl"
+  onDark?: boolean
 }) {
   // Map size to Tailwind height classes
   const sizeClasses = {
@@ -32,7 +36,14 @@ export function BrandLogo({
   // Full logo variant - displays the complete logo image that includes text
   if (variant === "full") {
     return (
-      <div className="flex items-center">
+      <div
+        className={cn(
+          "flex items-center",
+          // In dark mode every background is dark, so the chip goes on there too.
+          BRAND_LOGO_URL && "dark:rounded-xl dark:bg-white dark:px-1",
+          onDark && BRAND_LOGO_URL && "rounded-xl bg-white px-1 shadow-sm",
+        )}
+      >
         {BRAND_LOGO_URL ? (
           // Full logo image with text included - displays at a good readable size
           // eslint-disable-next-line @next/next/no-img-element
@@ -47,7 +58,7 @@ export function BrandLogo({
             <div className={cn("flex items-center justify-center overflow-hidden", className)}>
               <Building2 className={iconClassName} />
             </div>
-            <BrandWordmark className="ml-2 text-xl font-bold text-[#00162E]" />
+            <BrandWordmark className={cn("ml-2 text-xl font-bold", onDark ? "text-white" : "text-[#00162E]")} />
           </>
         )}
       </div>
