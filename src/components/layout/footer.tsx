@@ -49,6 +49,7 @@ export function Footer() {
               <BrandLogo
                 variant="full"
                 size="lg"
+                onDark
                 className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00162E] to-[#000E1E] border border-white/10"
                 iconClassName="h-5 w-5 text-white"
               />

@@ -16,6 +16,18 @@ export interface CollectedRentLine {
   owedKobo: number
 }
 
+/** Rent a tenant paid the agent outside Krib that the agent said they're holding. */
+export interface CashHeldLine {
+  recordId: string
+  paidOn: string
+  method: RemittanceMethod
+  propertyName: string | null
+  unitNumber: string | null
+  tenantName: string | null
+  amountKobo: number
+  status: "recorded" | "disputed"
+}
+
 /** Money the agent says they passed on to the landlord. */
 export interface Remittance {
   id: string
@@ -42,6 +54,9 @@ export interface StatementTotals {
   landlordName: string
   collectedKobo: number
   managementFeeKobo: number
+  /** Cash (or transfer/POS) the agent recorded receiving and holding. */
+  cashHeldKobo: number
+  /** collected − fee + cash held. */
   owedKobo: number
   remittedKobo: number
   disputedKobo: number
@@ -50,6 +65,7 @@ export interface StatementTotals {
 
 export interface Statement extends StatementTotals {
   collected: CollectedRentLine[]
+  cashHeld: CashHeldLine[]
   remittances: Remittance[]
 }
 

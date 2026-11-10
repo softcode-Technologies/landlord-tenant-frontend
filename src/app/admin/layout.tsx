@@ -18,6 +18,7 @@ import {
   UserX,
   KeyRound,
   Scale,
+  Banknote,
 } from "lucide-react"
 
 const navItems = [
@@ -41,6 +42,7 @@ function AdminSidebar() {
     ? [
         ...navItems.slice(0, 6),
         { label: "Mandate reviews", href: "/admin/mandates", icon: KeyRound },
+        { label: "Cash payments", href: "/admin/cash-payments", icon: Banknote },
         { label: "Rent disputes", href: "/admin/rent-disputes", icon: Scale },
         ...navItems.slice(6),
       ]

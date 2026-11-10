@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { collectionsApi, type RemittanceMethod, type StatementTotals as Totals } from "@/lib/api/collections"
 import { METHOD_LABEL } from "@/lib/api/rent-records"
-import { useAgentRentCollectionEnabled, useAppConfig } from "@/lib/hooks/use-app-config"
+import { useAgentFullManagementEnabled, useAppConfig } from "@/lib/hooks/use-app-config"
 import { StatementTotals, StatementDetail } from "@/components/collections/statement-view"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -20,11 +20,12 @@ import { ArrowLeft, HandCoins, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 /**
- * Rent Krib paid to the agent for their landlords, and what they've passed on.
- * The agent records each payment to a landlord here; the landlord gets an SMS.
+ * Rent the agent holds for their landlords (paid to them by Krib, or cash a
+ * tenant gave them), and what they've passed on. The agent records each
+ * payment to a landlord here; the landlord gets an SMS.
  */
 export default function AgentCollectionsPage() {
-  const enabled = useAgentRentCollectionEnabled()
+  const enabled = useAgentFullManagementEnabled()
   const { isLoading: configLoading } = useAppConfig()
   const [openId, setOpenId] = useState<string | null>(null)
   const { data, isLoading } = useQuery({
@@ -36,23 +37,23 @@ export default function AgentCollectionsPage() {
 
   if (configLoading) return <Skeleton className="h-40 rounded-2xl" />
   if (!enabled) {
-    return <EmptyState icon={HandCoins} title="Not available yet" description="Collecting rent for landlords isn't switched on yet." />
+    return <EmptyState icon={HandCoins} title="Not available yet" description="Managing rent for landlords isn't switched on yet." />
   }
   if (openId) return <LandlordStatement landlordProfileId={openId} onBack={() => setOpenId(null)} />
 
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Collected rent</h1>
-        <p className="text-slate-500 mt-1">Rent paid to you for your landlords, and what you still owe each one.</p>
+        <h1 className="text-2xl font-bold text-slate-900">Rent you hold</h1>
+        <p className="text-slate-500 mt-1">Rent you received for your landlords (through Krib or in cash), and what you still owe each one.</p>
       </div>
       {isLoading ? (
         <Skeleton className="h-40 rounded-2xl" />
       ) : rows.length === 0 ? (
         <EmptyState
           icon={HandCoins}
-          title="No collected rent yet"
-          description="When a landlord gives you authority to collect rent, rent tenants pay through Krib comes to your wallet and shows here."
+          title="You hold no rent yet"
+          description="When you record cash you received from a tenant and are holding, or Krib pays you rent for a landlord, it shows here until you pass it on."
         />
       ) : (
         <div className="space-y-3">
@@ -71,7 +72,7 @@ function LandlordRow({ s, onOpen }: { s: Totals; onOpen: () => void }) {
       <CardContent className="p-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-semibold text-slate-900">{s.landlordName}</p>
-          <p className="text-sm text-slate-500">Collected {formatNaira(s.collectedKobo)}</p>
+          <p className="text-sm text-slate-500">Received {formatNaira(s.collectedKobo + s.cashHeldKobo)}</p>
         </div>
         <div className="text-right">
           <p className="text-xs text-slate-500">You owe</p>
@@ -150,7 +151,7 @@ function RecordRemittanceDialog({ landlordProfileId, outstandingKobo, onClose }:
         <DialogHeader>
           <DialogTitle>Record payment to landlord</DialogTitle>
           <DialogDescription>
-            Money you sent the landlord from rent you collected. They get an SMS and can tell us if it didn&apos;t arrive.
+            Money you handed or sent the landlord from rent you hold. They get an SMS and can tell us if it didn&apos;t arrive.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
