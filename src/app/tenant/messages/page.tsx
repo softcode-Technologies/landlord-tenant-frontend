@@ -10,14 +10,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { EmptyState } from "@/components/shared/empty-state"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import { getInitials, formatRelativeTime, extractApiError } from "@/lib/utils"
 import type { Message, Conversation } from "@/lib/types"
-import { MessageCircle, Send, Loader2, Plus } from "lucide-react"
+import { MessageCircle, Send, Loader2, Plus, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 
 export default function TenantMessagesPage() {
@@ -67,8 +66,26 @@ export default function TenantMessagesPage() {
   }, [selected])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    // Scroll only the message list, never the whole page.
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })
   }, [messages])
+
+  // On a phone an open chat fills the screen. Give it a history entry so the
+  // phone's Back button returns to the list instead of leaving Messages.
+  const openChat = (conv: Conversation) => {
+    const isPhone = typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches
+    if (isPhone && !selected) window.history.pushState({ kribChat: true }, "")
+    setSelected(conv)
+  }
+  const closeChat = () => {
+    if (typeof window !== "undefined" && window.history.state?.kribChat) window.history.back()
+    else setSelected(null)
+  }
+  useEffect(() => {
+    const onPop = () => setSelected(null)
+    window.addEventListener("popstate", onPop)
+    return () => window.removeEventListener("popstate", onPop)
+  }, [])
 
   const { data: convsData, isLoading } = useQuery({
     queryKey: ["conversations"],
@@ -106,7 +123,7 @@ export default function TenantMessagesPage() {
       const convList = (refreshed.data as unknown as Conversation[]) ?? []
       const found = convList.find((c) => c.id === newId) ?? (res.data as Conversation)
       queryClient.invalidateQueries({ queryKey: ["conversations"] })
-      setSelected(found)
+      openChat(found)
       toast.success("Conversation started!")
     },
     onError: (err: unknown) => toast.error(extractApiError(err, "Failed to start conversation.")),
@@ -152,15 +169,17 @@ export default function TenantMessagesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
-        <p className="text-slate-500 mt-1">Real-time conversations with landlords and agents</p>
+        <p className="hidden sm:block text-slate-500 mt-1">Conversations with your landlord, tenants and agents</p>
       </div>
 
-      <div className="flex gap-0 h-[calc(100vh-250px)] min-h-[500px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      {/* Phone: the list, or (when a chat is open) the chat full screen.
+          Wider screens: list and chat side by side. */}
+      <div className="flex h-[calc(100dvh-180px)] sm:h-[calc(100dvh-250px)] min-h-[420px] sm:min-h-[500px] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         {/* Conversations list */}
-        <div className="w-full sm:w-80 border-r border-slate-100 flex flex-col shrink-0">
+        <div className={`${selected ? "hidden sm:flex" : "flex"} w-full sm:w-80 min-w-0 border-r border-slate-100 flex-col shrink-0`}>
           <div className="p-4 border-b border-slate-100 flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-700">Conversations</p>
             <button
@@ -172,7 +191,7 @@ export default function TenantMessagesPage() {
             </button>
           </div>
 
-          <ScrollArea className="flex-1">
+          <div className="flex-1 overflow-y-auto overscroll-contain">
             {isLoading ? (
               <div className="p-4 space-y-3">
                 {[1, 2, 3].map((i) => (
@@ -205,8 +224,8 @@ export default function TenantMessagesPage() {
                   return (
                     <button
                       key={conv.id}
-                      onClick={() => setSelected(conv)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors text-left ${
+                      onClick={() => openChat(conv)}
+                      className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left ${
                         selected?.id === conv.id ? "bg-slate-50" : ""
                       }`}
                     >
@@ -215,7 +234,7 @@ export default function TenantMessagesPage() {
                         <AvatarFallback className="text-xs">{getInitials(name)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           <p className="text-sm font-semibold text-slate-900 truncate">{name}</p>
                           {conv.lastMessage && (
                             <span className="text-[10px] text-slate-400 shrink-0">
@@ -237,14 +256,28 @@ export default function TenantMessagesPage() {
                 })}
               </div>
             )}
-          </ScrollArea>
+          </div>
         </div>
 
-        {/* Chat area */}
-        <div className="flex-1 flex flex-col">
+        {/* Chat area: full screen on a phone */}
+        <div
+          className={`${
+            selected
+              ? "flex max-sm:fixed max-sm:inset-0 max-sm:z-50 max-sm:h-[100dvh] max-sm:bg-white max-sm:dark:bg-slate-900"
+              : "hidden sm:flex"
+          } flex-1 min-w-0 flex-col`}
+        >
           {selected ? (
             <>
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
+              <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 pb-2.5 sm:py-3 border-b border-slate-100 pt-[max(0.625rem,env(safe-area-inset-top))]">
+                <button
+                  type="button"
+                  onClick={closeChat}
+                  aria-label="Back to conversations"
+                  className="sm:hidden -ml-0.5 p-2 rounded-full text-slate-700 hover:bg-slate-100 active:bg-slate-200"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
                 {(() => {
                   const other = getOtherParticipant(selected)
                   const name = other
@@ -252,14 +285,14 @@ export default function TenantMessagesPage() {
                     : "Unknown"
                   return (
                     <>
-                      <Avatar className="h-9 w-9">
+                      <Avatar className="h-9 w-9 shrink-0">
                         <AvatarImage src={other?.avatarUrl} />
                         <AvatarFallback className="text-xs">{getInitials(name)}</AvatarFallback>
                       </Avatar>
-                      <div>
-                        <p className="font-semibold text-sm text-slate-900">{name}</p>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-slate-900 truncate">{name}</p>
                         {selected.property && (
-                          <p className="text-xs text-slate-500">{selected.property.name}</p>
+                          <p className="text-xs text-slate-500 truncate">{selected.property.name}</p>
                         )}
                       </div>
                     </>
@@ -267,20 +300,21 @@ export default function TenantMessagesPage() {
                 })()}
               </div>
 
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-3">
+              <div className="flex-1 overflow-y-auto overscroll-contain p-3 sm:p-4 bg-slate-50/60 sm:bg-transparent">
+                <div className="space-y-2.5 sm:space-y-3">
                   {messages.map((msg) => {
                     const isMe = msg.senderUserId === user?.id
                     return (
                       <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                         <div
-                          className={`max-w-xs lg:max-w-md px-4 py-2.5 rounded-2xl text-sm ${
+                          className={`max-w-[82%] sm:max-w-xs lg:max-w-md px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-[15px] sm:text-sm ${
                             isMe
                               ? "bg-[#00162E] text-white rounded-br-sm"
                               : "bg-slate-100 text-slate-900 rounded-bl-sm"
                           }`}
                         >
-                          <p className="leading-relaxed">{msg.body}</p>
+                          {/* Long links and words wrap instead of running off the screen. */}
+                          <p className="leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">{msg.body}</p>
                           <p className={`text-[10px] mt-1 ${isMe ? "text-blue-200" : "text-slate-400"}`}>
                             {formatRelativeTime(msg.createdAt)}
                           </p>
@@ -290,22 +324,23 @@ export default function TenantMessagesPage() {
                   })}
                   <div ref={messagesEndRef} />
                 </div>
-              </ScrollArea>
+              </div>
 
               <form
                 onSubmit={handleSend}
-                className="flex items-center gap-2 px-4 py-3 border-t border-slate-100"
+                className="flex items-center gap-2 px-3 sm:px-4 pt-2.5 sm:pt-3 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:pb-3 border-t border-slate-100 bg-white dark:bg-slate-900"
               >
                 <Input
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Type a message..."
-                  className="flex-1 bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
+                  enterKeyHint="send"
+                  className="flex-1 h-11 sm:h-10 rounded-full sm:rounded-xl bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doSend() }
                   }}
                 />
-                <Button type="submit" size="icon" disabled={!inputText.trim() || sendMutation.isPending}>
+                <Button type="submit" size="icon" aria-label="Send" className="h-11 w-11 sm:h-10 sm:w-10 rounded-full shrink-0" disabled={!inputText.trim() || sendMutation.isPending}>
                   {sendMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
@@ -319,7 +354,7 @@ export default function TenantMessagesPage() {
               <EmptyState
                 icon={MessageCircle}
                 title="Select a conversation"
-                description="Choose a conversation from the left to start chatting."
+                description="Choose a conversation to start chatting."
               />
             </div>
           )}
