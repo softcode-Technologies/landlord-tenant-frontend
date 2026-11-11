@@ -59,8 +59,9 @@ export function StatementDetail({ s, viewer, queryKey }: { s: Statement; viewer:
               {viewer === "agent" ? "Cash you received and are holding" : "Cash your agent received for you"}
             </h3>
             <p className="text-xs text-slate-500 mb-3">
-              Rent a tenant paid {viewer === "agent" ? "you" : "your agent"} by cash, transfer or POS. Krib didn&apos;t move it; it
-              stays owed {viewer === "agent" ? "to the landlord" : "to you"} until {viewer === "agent" ? "you record" : "your agent records"} paying it over.
+              {`Rent a tenant paid ${viewer === "agent" ? "you" : "your agent"} by cash, transfer or POS. Krib didn't move it; it stays owed ${
+                viewer === "agent" ? "to the landlord" : "to you"
+              } until ${viewer === "agent" ? "you record" : "your agent records"} paying it over.`}
             </p>
             <ul className="divide-y divide-slate-100">
               {cashHeld.map((c) => (
