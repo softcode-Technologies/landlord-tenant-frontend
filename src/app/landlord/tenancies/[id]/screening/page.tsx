@@ -75,7 +75,7 @@ export default function TenantScreeningPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3">
         <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-1">
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>

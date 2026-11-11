@@ -74,9 +74,9 @@ export default function TenantTenanciesPage() {
           {pendingInvites.map((invite) => (
             <Card key={invite.id} className="border-orange-200 bg-orange-50">
               <CardContent className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
                       <h3 className="font-semibold text-slate-900">
                         {invite.unit?.property?.name ?? "Property Invite"}
                       </h3>
@@ -85,7 +85,7 @@ export default function TenantTenanciesPage() {
 
                     {invite.unit?.property && (
                       <div className="flex items-center gap-1 text-sm text-slate-500 mb-2">
-                        <MapPin className="h-3.5 w-3.5" />
+                        <MapPin className="h-3.5 w-3.5 shrink-0" />
                         {invite.unit.property.city}, {invite.unit.property.state}
                       </div>
                     )}
@@ -122,7 +122,7 @@ export default function TenantTenanciesPage() {
 
                   <Button
                     size="sm"
-                    className="gap-1.5 shrink-0 bg-[#00162E] hover:bg-[#00162E]/90"
+                    className="gap-1.5 shrink-0 w-full sm:w-auto bg-[#00162E] hover:bg-[#00162E]/90"
                     onClick={() => acceptMutation.mutate(invite.inviteCode)}
                     disabled={acceptMutation.isPending}
                   >
@@ -166,9 +166,9 @@ export default function TenantTenanciesPage() {
           {tenancies.map((tenancy) => (
             <Card key={tenancy.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
                       <h3 className="font-semibold text-slate-900">
                         {tenancy.property?.name ?? tenancy.unit?.unitNumber ?? "Property"}
                       </h3>
@@ -179,7 +179,7 @@ export default function TenantTenanciesPage() {
 
                     {tenancy.property && (
                       <div className="flex items-center gap-1 text-sm text-slate-500 mb-3">
-                        <MapPin className="h-3.5 w-3.5" />
+                        <MapPin className="h-3.5 w-3.5 shrink-0" />
                         {tenancy.property.address}, {tenancy.property.city},{" "}
                         {tenancy.property.state}
                       </div>
@@ -212,7 +212,7 @@ export default function TenantTenanciesPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="gap-1"
+                        className="gap-1 flex-1 sm:flex-none"
                         onClick={() => messageMutation.mutate(tenancy.landlordUserId)}
                         disabled={messageMutation.isPending}
                       >
@@ -224,8 +224,8 @@ export default function TenantTenanciesPage() {
                         Message
                       </Button>
                     )}
-                    <Link href={`/tenant/tenancies/${tenancy.id}`}>
-                      <Button variant="outline" size="sm" className="gap-1">
+                    <Link href={`/tenant/tenancies/${tenancy.id}`} className="flex-1 sm:flex-none">
+                      <Button variant="outline" size="sm" className="gap-1 w-full">
                         Details
                         <ArrowRight className="h-3.5 w-3.5" />
                       </Button>

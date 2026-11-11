@@ -185,7 +185,7 @@ export default function TenantTenancyDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3">
         <Link href="/tenant/tenancies">
           <Button variant="ghost" size="sm" className="gap-1">
             <ArrowLeft className="h-4 w-4" />

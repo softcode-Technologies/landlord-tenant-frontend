@@ -142,8 +142,8 @@ export default function LandlordListingsPage() {
         <div className="space-y-4">
           {listings.map((listing) => (
             <Card key={listing.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-4">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex flex-wrap sm:flex-nowrap items-start gap-3 sm:gap-4">
                   {listing.images?.[0] && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -154,7 +154,7 @@ export default function LandlordListingsPage() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <div>
+                      <div className="min-w-0">
                         <h3 className="font-semibold text-slate-900 truncate">
                           {listing.title}
                         </h3>
@@ -176,7 +176,7 @@ export default function LandlordListingsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 mt-2">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
                       <div className="flex items-center gap-1 text-xs text-slate-500">
                         <Bed className="h-3.5 w-3.5" />
                         {listing.bedrooms}bd / {listing.bathrooms}ba
@@ -190,7 +190,7 @@ export default function LandlordListingsPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="basis-full sm:basis-auto flex flex-wrap items-center gap-1.5 shrink-0">
                     <Link href={`/listings/${listing.id}`}>
                       <Button variant="outline" size="sm" className="h-8 gap-1">
                         <Eye className="h-3.5 w-3.5" />

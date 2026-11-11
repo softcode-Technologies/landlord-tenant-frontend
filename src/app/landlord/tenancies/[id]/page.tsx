@@ -224,7 +224,7 @@ export default function LandlordTenancyDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3">
         <Link href="/landlord/tenancies">
           <Button variant="ghost" size="sm" className="gap-1">
             <ArrowLeft className="h-4 w-4" />
@@ -249,17 +249,17 @@ export default function LandlordTenancyDetailPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-12 w-12">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+                <Avatar className="h-12 w-12 shrink-0">
                   <AvatarImage src={tenancy.tenant?.avatarUrl} />
                   <AvatarFallback>{getInitials(tenantName)}</AvatarFallback>
                 </Avatar>
-                <div>
-                  <h3 className="font-semibold text-slate-900 text-lg">{tenantName}</h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-slate-900 text-lg break-words">{tenantName}</h3>
                   <p className="text-sm text-slate-500">{tenancy.tenant?.phone}</p>
                 </div>
-                <Link href={`/landlord/tenancies/${id}/screening`} className="ml-auto">
-                  <Button variant="outline" size="sm" className="gap-1">
+                <Link href={`/landlord/tenancies/${id}/screening`} className="w-full sm:w-auto sm:ml-auto">
+                  <Button variant="outline" size="sm" className="gap-1 w-full sm:w-auto">
                     <Shield className="h-3.5 w-3.5" />
                     Screen Tenant
                   </Button>

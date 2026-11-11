@@ -209,15 +209,15 @@ export default function PropertyDetailPage() {
       {/* Header — stacks vertically on phones (<sm), goes side-by-side on tablet+.
           Was previously one wide horizontal flex row that blew past 360px screens. */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <Link href="/landlord/properties" className="shrink-0">
+        <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3 min-w-0 flex-1 w-full">
+          <Link href="/landlord/properties" className="shrink-0 -ml-2 sm:ml-0">
             <Button variant="ghost" size="sm" className="gap-1">
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
           </Link>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 truncate">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 sm:truncate">
               {property.name}
             </h1>
             <div className="flex items-center gap-1 text-sm text-slate-500 mt-0.5 truncate">

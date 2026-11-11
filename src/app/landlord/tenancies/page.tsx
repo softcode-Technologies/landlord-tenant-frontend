@@ -109,12 +109,12 @@ export default function LandlordTenanciesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Tenancies</h1>
           <p className="text-slate-500 mt-1">Manage all your tenant relationships</p>
         </div>
-        <Button className="gap-2 shrink-0" onClick={() => { reset(); setOpen(true) }}>
+        <Button className="gap-2 shrink-0 w-full sm:w-auto" onClick={() => { reset(); setOpen(true) }}>
           <UserPlus className="h-4 w-4" />
           Add existing tenant
         </Button>
@@ -144,8 +144,10 @@ export default function LandlordTenanciesPage() {
 
             return (
               <Card key={tenancy.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-4">
+                <CardContent className="p-4 sm:p-5">
+                  {/* Phone: name row, then rent, then buttons, each full width.
+                      Wider screens: all on one line. */}
+                  <div className="flex flex-wrap sm:flex-nowrap items-center gap-x-4 gap-y-3">
                     <Avatar className="h-10 w-10 shrink-0">
                       <AvatarImage src={tenancy.tenant?.avatarUrl} />
                       <AvatarFallback className="text-xs">
@@ -154,8 +156,8 @@ export default function LandlordTenanciesPage() {
                     </Avatar>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="font-semibold text-slate-900">{tenantName}</h3>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-0.5">
+                        <h3 className="font-semibold text-slate-900 break-words min-w-0">{tenantName}</h3>
                         <Badge
                           variant={getStatusVariant(tenancy.status)}
                           className="capitalize text-xs"
@@ -169,7 +171,7 @@ export default function LandlordTenanciesPage() {
                       </p>
                     </div>
 
-                    <div className="text-right shrink-0">
+                    <div className="basis-full sm:basis-auto pl-14 sm:pl-0 sm:text-right shrink-0">
                       <p className="font-bold text-[#00162E]">
                         {formatNairaAmount(tenancy.rentAmount)}{rentCycleSuffix(tenancy.rentCycle)}
                       </p>
@@ -178,12 +180,12 @@ export default function LandlordTenanciesPage() {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="basis-full sm:basis-auto flex items-center gap-2 shrink-0 sm:pl-0 pl-14">
                       {tenancy.tenantUserId && (
                         <Button
                           variant="outline"
                           size="sm"
-                          className="gap-1"
+                          className="gap-1 flex-1 sm:flex-none"
                           onClick={() => messageMutation.mutate(tenancy.tenantUserId)}
                           disabled={messageMutation.isPending}
                         >
@@ -195,8 +197,8 @@ export default function LandlordTenanciesPage() {
                           Message
                         </Button>
                       )}
-                      <Link href={`/landlord/tenancies/${tenancy.id}`}>
-                        <Button variant="outline" size="sm" className="gap-1">
+                      <Link href={`/landlord/tenancies/${tenancy.id}`} className="flex-1 sm:flex-none">
+                        <Button variant="outline" size="sm" className="gap-1 w-full">
                           Details
                           <ArrowRight className="h-3.5 w-3.5" />
                         </Button>
