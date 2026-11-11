@@ -133,9 +133,9 @@ export default function TenantMaintenancePage() {
           {requests.map((req) => (
             <Card key={req.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-start justify-between gap-3 sm:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
                       <h3 className="font-semibold text-slate-900">{req.title}</h3>
                       <span
                         className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${
@@ -168,7 +168,7 @@ export default function TenantMaintenancePage() {
                         ))}
                       </div>
                     )}
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-400">
                       <span>{formatDate(req.createdAt)}</span>
                       {req.landlordNote && (
                         <span className="text-[#00162E]">Landlord note added</span>
